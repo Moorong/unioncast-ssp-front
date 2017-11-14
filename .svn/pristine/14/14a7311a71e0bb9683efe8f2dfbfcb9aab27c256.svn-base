@@ -1,0 +1,366 @@
+ <!DOCTYPE html>
+
+<html>
+<meta charset="UTF-8">
+<body>
+	
+   			<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">财务管理</a> <i> / </i> <span>订单充值</span></h2>
+			
+			<div class="page_main">
+				<div class="page_main_white">
+				<form id="orderRechargeForm" action="sspOrder/AdStatePage" >
+					<div class="search_block clearfix">
+						<div class="form-group  clearfix">
+							<div class="pull-left">
+								<div class="formgroup clearfix ">
+								    <label>广告主：</label>
+							      	<select class="dropdown" id="advertiserState" name ="advertiserState" >
+								    	<option value="" selected>全部</option>
+								    	<option value="1">开</option>
+								    	<option value="2">关</option>
+									</select>
+								</div>
+								<div class="formgroup clearfix ">
+								    <label>订单：</label>
+							      	<select class="dropdown" id="adPutState" name="adPutState">
+								    	<option value="" selected>全部</option>
+								    	<option value="1">开</option>
+								    	<option value="2">关</option>
+									</select>
+								</div>
+								<div class="formgroup clearfix ">
+								    <label>时间段：</label>
+							      	<div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+					                  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+					                  <span id="time" name="time"></span> 
+					                  <input type="hidden" name="pushStartTime" value="" />
+                                      <input type="hidden" name="pushEndTime" value="" />
+					                  <b class="caret"></b>
+					               </div>
+								</div>
+							</div>
+							<div class="pull-right">
+								<div class="has-feedback clearfix ">
+							  		<!-- <label class="control-label sr-only" for="inputSuccess2">閻樿埖锟斤拷</label> -->
+							 		<label>订单名称：</label><input type="text" class="form-control" id="orderName" name="orderName" placeholder="请输入名称">
+					            </div>
+					            <a href="javascript:void(0)" class="btn btn-sm" id="search" onclick="searchPage(1)">查询</a>
+				            </div>
+						</div>
+					</div>
+					</form>
+					<div style="height:10px;background:#f1f2f7;"></div>
+					<div class="block_content">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-12">
+									<table class="table" >
+										<thead>
+											<tr>
+												<th>广告主</th>
+												<th>订单</th>
+												<th>余额</th>
+												<th width='175'>修改</th>
+												<th width='175'>最后修改时间</th>
+											</tr>
+										</thead>
+										<tbody id="orderRachargeList">
+										</tbody>
+									</table>
+									<div class="bs-component clearfix pull-right" id="page">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>	
+			</div>
+	
+	<!-- Modal -->
+<div class="modal  modaltitle" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-dialog2" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">提示：</h4>
+      </div>
+      <div class="modal-body">
+       您成功为“某某”订单充值<strong>10000</strong>元
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal " id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-dialog2" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">提示：</h4>
+      </div>
+      <div class="modal-body">
+        	您未“某某”充值失败
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+<script type="text/javascript" src="js/base/moment.js"></script>
+<script type="text/javascript" src="js/base/daterangepicker.js"></script>
+<script>
+$(function () {
+    $(".dropdown").selectpicker({});
+	    var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+        var defEndDate = moment().format(defDateFormat);
+         $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+	$('#reportrange2').daterangepicker({
+	startDate: defStartDate
+	},
+	function (start, end) {
+                var choStart = start.format(defDateFormat);
+                var choEnd = end.format(defDateFormat);
+                $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+                $('input[name="pushStartTime"]').val(choStart);
+                $('input[name="pushEndTime"]').val(choEnd);
+                $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+            }
+	);
+        $('input[name="pushEndTime"]').val(getMapDate(0));
+        
+
+    function getDay(str){
+        var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+        return oDate;
+    };
+    
+    function addDate(dd,dadd){
+        var a = new Date(dd)
+        a = a.valueOf()
+        a = a + dadd * 24 * 60 * 60 * 1000
+        a = new Date(a)
+        return a;
+    }
+    function getMapDate(dayss){
+        var now = new Date();
+        var NextNow=addDate(now,-dayss);
+        var years = NextNow.getFullYear();
+        var months = NextNow.getMonth()+1;
+        var days = NextNow.getDate();
+        var beginTime=years+"-"+months+"-"+days;
+        return beginTime;
+    }
+    
+    loadData(1);
+    
+});
+function addEvent(){
+		/* $('body').on('click',function(event){
+			var target = $(event.target); 
+			var n = target.closest('.popover').length;
+			if (n == 0 && !target.hasClass('element') && !target.hasClass('element2')) {
+	       		$('.element').popover('hide');        // 当点击body的非弹出框相关的内容的时候，关闭所有popover
+	    		$('.element2').popover('hide');
+	    	}
+		}); */
+	  	$(".element").on('click',function (event) {
+	        $('.element,.element2').popover('hide');          // 当点击一个按钮的时候把其他的所有内容先关闭。
+	        $(this).popover('toggle');          // 然后只把自己打开。
+	    });
+	    $(".element2").click(function (event) {
+	        $('.element,.element2').popover('hide');          // 当点击一个按钮的时候把其他的所有内容先关闭。
+	        $(this).popover('toggle');          // 然后只把自己打开。
+	    });
+		
+		 /* $('body').on('click','.tbnok',function (e){
+			$('.element,.element2').popover('hide');
+			$('#myModal').modal();
+		}); */
+		
+  	}
+ function loadData(currentPageNo){
+        var pageSize = 10;
+        page.ajax({
+            url: "sspOrder/AdStatePage",
+            type:"post",
+            data: {currentPageNo: currentPageNo,
+                   pageSize:pageSize
+            },
+            datatype: 'json',
+            success:function (data) {
+                $("#orderRachargeList").html("");
+                if (data==null||data.dataArray == null ){
+                	 $("#orderRachargeList").empty();
+				     $("#page").empty();
+			         $("#orderRachargeList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+                     return false;
+                }else{
+                	loadPage(data,"loadPage");
+                	 addEvent();
+                }
+            }
+        });
+       
+    }
+    
+    function loadPage(data,type) {
+        var datas = data.dataArray;
+         $("#orderRachargeList").empty();
+        $.each(datas, function (index, order) {
+            var html = "<tr>";
+             html += "<td style='vertical-align: middle ;display:none;text-align:center;'>" + order.id + "</td>";
+             html += "<td style='vertical-align: middle;text-align:center;'>" + order.sspAdvertiser.name + "</td>";
+             html += "<td style='vertical-align: middle;text-align:center;'>" + order.name + "</td>";
+             html += "<td style='vertical-align: middle;text-align:center;'>" + order.balance + "</td>";
+			 html+="<td> <a href='#' class='btn btnlink element' data-toggle=\"popover\" onclick='addBalance("+order.id+",\""+order.sspAdvertiser.name+"\")'>充值</a>"
+			  +"<a href='#' class='btn btnlink element2' data-toggle=\"popover\" onclick='reduceBalance("+order.id+",\""+order.sspAdvertiser.name+"\")'>退款</a> </td>";
+             html += "<td style='vertical-align: middle;text-align:center;'>" +getDay(order.updateTime) + "</td>";
+             html += "</tr>";
+            $("#orderRachargeList").append(html);
+        });
+        var totalPage = data.totalPage; 
+        var totalCount = data.totalCount;
+        var startPage = data.currentPageNo;
+        $('#page').html("");
+        $('#page').html('<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+        page.ajaxPage({
+            pcont: 'pageUserListUl',
+            totalPages: totalPage, 
+            count : totalCount, //总记录数
+			startPage : startPage,
+            onPageClick: function (env, thisPage) {
+            if(type=="loadPage"){
+                loadData(thisPage);
+            }else if(type=="searchPage"){
+            searchPage(thisPage);
+            }
+            }
+        });
+        
+    }
+    function searchPage(currentPage){
+        var pageSize = 10;
+        var advertiserState = $("#advertiserState").val();
+        var adPutState = $("#adPutState").val();
+        var pushStartTime = $("input[name=pushStartTime]").val();
+        var  pushEndTime = $("input[name=pushEndTime]").val();
+        var orderName = $("#orderName").val();
+        page.ajax({
+            url: "sspOrder/AdStatePage",
+            type:"POST",
+            data: {
+                   pageSize:pageSize,
+                   currentPageNo: currentPage,
+                   advertiserState:advertiserState,
+                   adPutState:adPutState,
+                   pushStartTime:pushStartTime,
+                   pushEndTime:pushEndTime,
+                   orderName:orderName
+                   },
+            datatype: "json",
+            success:function (data) {
+                if (data==null||data.dataArray == null||data.dataArray.length<=0){
+                    $("#orderRachargeList").html("");
+                	 $("#orderRachargeList").empty();
+				     $("#page").empty();
+			         $("#orderRachargeList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+                     return false;
+                }else{
+                loadPage(data,"searchPage");
+                 addEvent();
+                }
+            }
+        });
+    }
+    
+    function addBalance(orderId,advertiserName){
+	 $('.element').popover({
+		trigger:"manual",    //如果设为focus 当按钮失去焦点提示层会消失，例如页面空白处单机提示层消失
+    	placement:"bottom",
+    	html:true,
+    	title:'充值',
+    	content:'<p>您准备为'+
+    				'<a href="#" class="">'+advertiserName+'</a>'+
+    				'的订单充值'+
+    			'</p>'+
+				'<div class="clearfix">'+
+				    '<label style="display:inline-block">金额：</label>'+
+					'<input type="number" class="form-control input-sm" placeholder=""  style="margin-left:5px;width:100px;display:inline-block; id="addBalanceMoney" name="addBalanceMoney">'+
+					'(元)'+
+				'</div>'+
+    			'<div class="text-center" style="margin-top:10px;">'+
+    				'<a href="#" class="btn btn2 green tbnok" style="padding:5px;" data-toggle="modal" data-target="#myModal" onclick="confirmCharge('+orderId+',\''+advertiserName+'\')">确定</a>'+
+    				'<a href="#" class="btn btn2 tbnremove" style="padding:5px;" onclick="cancelCharge()">取消</a>'+
+    			'</div>'
+	});
+	}
+	
+	function reduceBalance(orderId,advertiserName){
+		$('.element2').popover({
+			trigger:"manual",    //如果设为focus 当按钮失去焦点提示层会消失，例如页面空白处单机提示层消失
+	    	placement:"bottom",
+	    	html:true,
+	    	title:'退款',
+	    	content:'<p>您准备为'+
+	    				'<a href="#" class="">'+advertiserName+'</a>'+
+	    				'的订单退款'+
+	    			'</p>'+
+					'<div class="clearfix">'+
+					    '<label style="display:inline-block">金额：</label>'+
+						'<input type="number" class="form-control input-sm" placeholder="" name="reduceBalanceMoney" style="margin-left:5px;width:100px;display:inline-block; id="reduceBalanceMoney"">'+
+						'(元)'+
+					'</div>'+
+	    			'<div class="text-center" style="margin-top:10px;">'+
+	    				'<a href="#" class="btn btn2 green tbnok" style="padding:5px;" id="confirm" onclick="confirmReduce('+orderId+',\''+advertiserName+'\')">确定</a>'+
+	    				'<a href="#" class="btn btn2 tbnremove" style="padding:5px;" id="cancel" onclick="cancelCharge()">取消</a>'+
+	    			'</div>'
+		});
+		}
+		
+		function confirmCharge(orderId,advertiserName){
+		debugger;
+		var addBalanceMoney = $("input[name=addBalanceMoney]").val();
+		console.log("addBalanceMoney--"+addBalanceMoney);
+		var crType = "charge";
+		page.ajax({
+		url:"sspOrder/addOrReduceBalance",
+		type:"POST",
+		data:{
+			orderId:orderId,
+			money:addBalanceMoney,
+			crType:crType
+		},
+		success:function(data){
+			loadData(1);
+		}
+		
+		});
+		}
+		function confirmReduce(orderId,advertiserName){
+		debugger;
+		var reduceBalanceMoney = $("input[name=reduceBalanceMoney]").val();
+		console.log("reduceBalanceMoney---"+reduceBalanceMoney);
+		var crType = "reduce";
+		page.ajax({
+		url:"sspOrder/addOrReduceBalance",
+		type:"POST",
+		data:{
+		orderId:orderId,
+		money:reduceBalanceMoney,
+		crType:crType
+		},
+		success:function(data){
+		if(data<=0){
+		alert("该订单余额已不足，无法退款！");
+		}else{
+		loadData(1);
+		}
+		}
+		});
+		}
+		
+		function cancelCharge(){
+			$('.element,.element2').popover('hide');
+		};
+		
+</script>
+</html>

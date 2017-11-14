@@ -1,0 +1,810 @@
+ <!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+		<!-- 右侧开始 -->
+		<!-- <div class="content"> -->
+   			<!-- 当前位置开始 -->
+   			<h2 class="current_loc">
+   				<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');" >投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理(${(CURRENT_ADVERTISER_INFO.name)!''})</a> <i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspOrder/list">订单管理(${(CURRENT_ORDER_INFO.name)!''})</a><i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/plan/goPlanListByOrderId">策略组列表(${(CURRENT_PLAN_INFO.name)!''})</a><i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/plan/getCreativeListByPlanId">创意列表</a><i>/</i> <span>分配创意</span>
+   			</h2>
+			<!-- 当前位置结束 -->
+			<!-- 表单内容开始 -->
+			<div class="page_main">
+				<div class="page_main_white">
+				<form action="sspCreative/findCreativeByAdvertiser" method="post" id="seachFM">
+					<div class="search_block clearfix">
+						<div class="form-group  clearfix">
+							<div class="pull-left">
+<!-- 								<div class="formgroup clearfix "> -->
+<!-- 								    <label>订单：</label> -->
+<!-- 							      	<select class="dropdown auto"> -->
+<!-- 								    	<option value="1">全部</option> -->
+<!-- 								    	<option value="2">关</option> -->
+<!-- 									</select> -->
+<!-- 								</div> -->
+<!-- 								<div class="formgroup clearfix "> -->
+<!-- 								    <label>计划：</label> -->
+<!-- 							      	<select class="dropdown auto"> -->
+<!-- 								    	<option value="1">全部</option> -->
+<!-- 								    	<option value="2">关</option> -->
+<!-- 									</select> -->
+<!-- 								</div> -->
+								<div class="formgroup clearfix ">
+								    <label>创意类目：</label>
+							      	<select class="dropdown auto" name="creativeType">
+								    	<option value="">全部</option>
+										<option value="1">图片</option>
+										<option value="2">视频</option>
+										<option value="3">信息流</option>
+									</select>
+								</div>
+								<div class="formgroup clearfix ">
+								    <label>创意标签：</label>
+							      	<select class="dropdown auto" name="creativeLabel">
+								    	<option value="">全部</option>
+								    	<#list AllCLabels!'' as cla>
+								    		<option value="${(cla.id)!''}">${(cla.name)!''}</option>
+								    	</#list>
+									</select>
+								</div>
+							</div>
+							<div class="pull-right">
+								<div class="has-feedback clearfix ">
+							  		<label class="control-label sr-only" for="inputSuccess2">状态</label>
+							 		<input type="text" class="form-control" id="inputSuccess2" name="creativeName" placeholder="请输入创意名称">
+					            </div>
+					            <input type="hidden" value="${(advertiserId)!}" name="advertiserId" />
+					            <input class="btn btn-sm" type="submit" value="查询"/>
+				            </div>
+						</div>
+					</div>
+					</form>
+					<!-- 间隔 -->
+					<div class="jiange" ></div>
+					<!-- 间隔 -->
+					<div class="block_content">
+						<div class="container-fluid">
+							<div class="row">
+								<!-- 表单名称开始 -->
+								 <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										基本资料
+									</span>
+								</div> 
+								<!-- 表单名称结束 -->
+								<div class="col-md-12">
+									<form class="form-horizontal" role="form">
+										<div class="formwarp">
+											<div class="form-group">
+												<!-- <label for="inputEmail3" class="col-sm-1 control-label"><i>*</i>创意分组</label> -->
+												<label for="inputEmail3" class="col-sm-1 control-label">创意分组</label>
+												<div class="col-sm-8 ">
+													<input type="text" class="form-control input-sm " placeholder="" id="groupName" name="groupName" maxlength="10">
+													<!-- <em>文字控制在2-10个字符</em> -->
+												</div>
+											</div>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 间隔 -->
+					<div class="jiange" ></div>
+					<!-- 间隔 -->
+					
+					<!-- 隐藏存放广告主id -->
+					<input type="hidden" value="${(planId)!}" name="planId" id="planId"/>
+					<input type="hidden" value="${(advertiserId)!}" name="advertiserId" id="advertiserId"/>
+					
+					<div class="block_content">
+						<div class="container-fluid">
+							<div class="row">
+								<!-- 表单名称开始 -->
+								 <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										选择创意
+									</span>
+								</div> 
+								<!-- 表单名称结束 -->
+								<div class="col-md-12">
+									<form class="form-horizontal" role="form">
+									 <div class="margintb30 clearfix" id="allCreativeDiv">
+										
+											<!-- <div class="col-md-4">
+												<div class="xuanzechuangyi">
+													<img src="media/imgs/img2.jpg" >
+													<img src="images/img2.jpg">
+													<div class="clearfix">
+														<span class="pull-left">图片</span>
+														<span  class="pull-right">27K/jpg</span>
+													</div>
+													<p>名称</p>
+													<span class="xuanzechuangyiicon"><i class="iconfont icon-duihao1"></i></span>
+												</div>
+											</div> -->
+											<!-- <div class="col-md-4">
+												<div class="xuanzechuangyi">
+													<img src="media/imgs/img2.jpg" >
+													<img src="images/img2.jpg">
+													<div class="clearfix">
+														<span class="pull-left">图片</span>
+														<span  class="pull-right">27K/jpg</span>
+													</div>
+													<p>名称</p>
+													<span class="xuanzechuangyiicon"><i class="iconfont icon-duihao1"></i></span>
+												</div>
+											</div> -->
+											<!-- <div class="col-md-4">
+												<div class="xuanzechuangyi">
+													<img src="media/imgs/img2.jpg" >
+													<img src="images/img2.jpg">
+													<div class="clearfix">
+														<span class="pull-left">图片</span>
+														<span  class="pull-right">27K/jpg</span>
+													</div>
+													<p>名称</p>
+													<span class="xuanzechuangyiicon"><i class="iconfont icon-duihao1"></i></span>
+												</div>
+											</div> -->
+										</div>
+										<div class="col-md-4">
+												<div class="xuanzechuangyi xuanzechuangyi-add">
+													<!-- <a href="#" data-toggle="modal" data-target="#myModal" ><i class="iconfont icon-jiahao"></i></a> -->
+													<a href="#" data-toggle="modal" data-target="myModal" ><i class="iconfont icon-jiahao"></i></a>
+												</div>
+											</div>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="savewarp text-center">
+						<a href="#" class="btn formbtn green" onclick="save()">完成</a>
+						<a href="#" class="btn formbtn bk999" onclick="cancel()">取消</a>
+					</div> 
+				</div>	
+			</div>
+			<!-- 表单内容结束 -->
+		<!-- </div> -->
+		<!-- 右侧结束 -->
+	<!-- </div> -->
+	<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog modal-dialog3" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">添加：</h4>
+			</div>
+			<div class="modal-body">
+				<form class="form-horizontal" role="form">
+					<div class="formwarp">
+						<div class="form-group ">
+							<label for="inputEmail3" class="col-sm-2 control-label">创意类目</label>
+							<div class="col-sm-8 ">
+								<ul id="myTab" class="nav nav-tabs chuangyi">
+								    <li class="dropdown active" >
+								        <a href="#" id="myTabDrop1" class="dropdown-toggle"
+								           data-toggle="dropdown">创意类目
+								            <b class="caret"></b>
+								        </a>
+								        <ul class="dropdown-menu" role="menu" aria-labelledby="myTabDrop1">
+								        	<li class="active" ><a href="#tab1" tabindex="-1" data-toggle="tab">图片</a></li>
+								            <li><a href="#tab2" tabindex="-1" data-toggle="tab">信息流</a></li>
+								            <li><a href="#tab3" tabindex="-1" data-toggle="tab">视频</a></li>
+								        </ul>
+								    </li>
+								</ul>
+							</div>
+						</div>
+						<div id="myTabContent" class="tab-content">
+						    <div class="tab-pane fade in active" id="tab1">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意分组</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm " >
+										<em>文字被控制在2-10个字符</em>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意标签</label>
+									<div class="col-sm-8 "> 
+										<select class="dropdown small marginr33">
+									    	<option value="1">不限</option>
+									    	<option value="2">关</option>
+										</select>
+										<label>
+										    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+										    其他
+										</label>
+										<input type="text" class="form-control input-sm small180 " >
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">批量上传</label>
+									<div class="col-sm-8 ">
+										<!-- <input type="checkbox" name="switch"  /> -->
+										<a hrf="#" class="btn filebtn btnfilebtn">
+											<i class="iconfont icon-tupian "></i>上传素材
+											<input type="file" >
+										</a>
+										<em>视频需小于2M，swf、flv格式，播放时间15秒</em>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意预览</label>
+									<div class="col-sm-8">
+										<span class="col-sm-4 margint10">尺寸：120*100</span>
+										<span class="col-sm-4 margint10">尺寸：600*100</span>
+										<span class="col-sm-4 margint10">尺寸：320*100</span>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label sr-only">创意预览</label>
+									<div class="col-sm-8">
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+<!-- 																<!-- <img src="media/imgs/img2.jpg"> --> -->
+																<img src="images/img2.jpg">
+																<div class="screen"></div>
+																<div class="screenbtn clearfix">
+																	<a href="#" class="btn red"><i class="iconfont icon-tupiantihuantupian"></i>替换</a>
+																	<a href="#" class="btn green"><i class="iconfont icon-iconfontshanchu"></i>替换</a>
+																</div>
+															</span>
+														</div>
+														<span class="uploadimage-name">基本资质</span>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<a hrf="#" class="filebtn">
+																	<i class="iconfont icon-tupian"></i>选择图片
+																	<input type="file" >
+																</a>
+															</span>
+														</div>
+														<span class="uploadimage-name">基本资质</span>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<a hrf="#" class="filebtn">
+																	<i class="iconfont icon-tupian"></i>选择图片
+																	<input type="file" >
+																</a>
+															</span>
+														</div>
+														<div class="clearfix">
+															<span class="uploadimage-name pull-left">基本资质</span>
+															<span class="uploadimage-name pull-right">大小：2.7k</span>
+														</div>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">点击地址</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<a href="#"  data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">检测地址</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<a href="#"  data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a>
+									</div>
+								</div>
+						    </div>
+						    <div class="tab-pane fade" id="tab2">
+						        <div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">预算</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<em>文字被控制在2-10个字符</em>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意标签</label>
+									<div class="col-sm-8 "> 
+										<select class="dropdown small marginr33">
+									    	<option value="1">不限</option>
+									    	<option value="2">关</option>
+										</select>
+										<label>
+										    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+										    其他
+										</label>
+										<input type="text" class="form-control input-sm small180 " >
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">批量上传</label>
+									<div class="col-sm-8 ">
+										<!-- <input type="checkbox" name="switch"  /> -->
+										<a hrf="#" class="btn filebtn btnfilebtn">
+											<i class="iconfont icon-tupian "></i>上传素材
+											<input type="file" >
+										</a>
+										<em>视频需小于2M，swf、flv格式，播放时间15秒</em>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意预览</label>
+									<div class="col-sm-8">
+										<span class="col-sm-4 margint10">尺寸：120*100</span>
+										<span class="col-sm-4 margint10">尺寸：600*100</span>
+										<span class="col-sm-4 margint10">尺寸：320*100</span>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label sr-only">创意预览</label>
+									<div class="col-sm-8">
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<!-- <img src="media/imgs/img2.jpg"> -->
+																<img src="images/img2.jpg">
+																<div class="screen"></div>
+																<div class="screenbtn clearfix">
+																	<a href="#" class="btn red"><i class="iconfont icon-tupiantihuantupian"></i>替换</a>
+																	<a href="#" class="btn green"><i class="iconfont icon-iconfontshanchu"></i>替换</a>
+																</div>
+															</span>
+														</div>
+														<span class="uploadimage-name">基本资质</span>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<a hrf="#" class="filebtn">
+																	<i class="iconfont icon-tupian"></i>选择图片
+																	<input type="file" >
+																</a>
+															</span>
+														</div>
+														<span class="uploadimage-name">基本资质</span>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<a hrf="#" class="filebtn">
+																	<i class="iconfont icon-tupian"></i>选择图片
+																	<input type="file" >
+																</a>
+															</span>
+														</div>
+														<div class="clearfix">
+															<span class="uploadimage-name pull-left">基本资质</span>
+															<span class="uploadimage-name pull-right">大小：2.7k</span>
+														</div>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">广告标题</label>
+									<div class="col-sm-8 ">
+										<textarea class="form-control small338" rows="3"></textarea>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">点击地址</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<a href="#"  data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">检测地址</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<a href="#"  data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a>
+									</div>
+								</div>
+						    </div>
+						    <div class="tab-pane fade" id="tab3">
+						        <div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">预算</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<em>文字被控制在2-10个字符</em>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意标签</label>
+									<div class="col-sm-8 "> 
+										<select class="dropdown small marginr33">
+									    	<option value="1">不限</option>
+									    	<option value="2">关</option>
+										</select>
+										<label>
+										    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+										    其他
+										</label>
+										<input type="text" class="form-control input-sm small180 " >
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">批量上传</label>
+									<div class="col-sm-8 ">
+										<!-- <input type="checkbox" name="switch"  /> -->
+										<a hrf="#" class="btn filebtn btnfilebtn">
+											<i class="iconfont icon-tupian "></i>上传素材
+											<input type="file" >
+										</a>
+										<em>图片需小于150K格式需为，jpg、jpeg、gif、png,</em>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">创意预览</label>
+									<div class="col-sm-8">
+										<span class="col-sm-4 margint10">尺寸：120*100</span>
+										<span class="col-sm-4 margint10">尺寸：600*100</span>
+										<span class="col-sm-4 margint10">尺寸：320*100</span>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label sr-only">创意预览</label>
+									<div class="col-sm-8">
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<!-- <img src="media/imgs/img2.jpg"> -->
+																<img src="images/img2.jpg">
+																<div class="screen"></div>
+																<div class="screenbtn clearfix">
+																	<a href="#" class="btn red"><i class="iconfont icon-tupiantihuantupian"></i>替换</a>
+																	<a href="#" class="btn green"><i class="iconfont icon-iconfontshanchu"></i>替换</a>
+																</div>
+															</span>
+														</div>
+														<span class="uploadimage-name">基本资质</span>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<a hrf="#" class="filebtn">
+																	<i class="iconfont icon-tupian"></i>选择图片
+																	<input type="file" >
+																</a>
+															</span>
+														</div>
+														<span class="uploadimage-name">基本资质</span>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+										<div class="col-sm-4">
+											<div class="form-groupselect ">
+												<div class="control-div">
+													<div class="uploadimage">
+														<div class="uploadimage-bor">
+															<span class="uploadimage-title">
+																格式jpg/png/jpeg<br />文件<=500k
+															</span>
+															<span class="uploadimage-img">
+																<a hrf="#" class="filebtn">
+																	<i class="iconfont icon-tupian"></i>选择图片
+																	<input type="file" >
+																</a>
+															</span>
+														</div>
+														<div class="clearfix">
+															<span class="uploadimage-name pull-left">基本资质</span>
+															<span class="uploadimage-name pull-right">大小：2.7k</span>
+														</div>
+													</div>
+													<!-- <a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a> -->
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">点击地址</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<a href="#"  data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a>
+									</div>
+								</div>
+								<div class="form-group ">
+									<label for="inputEmail3" class="col-sm-2 control-label">检测地址</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "   placeholder="">
+										<a href="#"  data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a>
+									</div>
+								</div>
+						    </div>
+						</div>
+					</div>
+					<div class="savewarp text-center">
+						<a href="#" class="btn btn2 formbtn green" >完成</a>
+						<a href="#" class="btn btn2 formbtn bk999">取消</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+
+<script>
+$(function () {
+	
+	//下拉菜单
+    
+    //参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+    
+	$("table input[name='checkboxall']").on('click',function(event){
+		$(this).parent().parent().parent().next('tbody').find("input").prop('checked',$(this).prop('checked'));
+		event.stopPropagation();
+	});
+	$('table input[name="checkboxed"]').on('click',function(event){
+		$(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+		event.stopPropagation();
+	});
+	$('#tabbtn').click(function(){
+		$(this).parent().parent().next('.form-group').toggleClass('hidden');
+	});
+	$('#seachFM').submit(function(){
+		page.ajaxSubmit(this,function(result){
+			$("#allCreativeDiv").html("");
+			if(isEmpty(result)||isEmpty(result.result)||result.result.length==0){
+				alert("暂无可关联的创意，请上传创意或开启创意状态！")
+				return;
+			}else{
+				loadPage(result);
+			}
+		},function(err){
+			console.log(err);
+			alert("请求出错!");
+		});
+		return false;
+	}).submit();
+	
+});
+
+//加载说有数据
+$(function(){
+	//loadData();
+})
+// 加载数据
+	function loadData() {
+	
+	
+	//;
+		 var advertiserId = $("#advertiserId").val();
+		 console.log("根据广告主id查询创意页面的广告主id"+advertiserId);
+		page.ajax({
+			url : 'sspCreative/findCreativeByAdvertiser',
+			data : {
+				advertiserId : advertiserId
+			},
+			success : function(data) {
+			//;
+			console.log(data);
+				if (data!=null&&data.result!=null&&data.result.length > 0) {
+					$("#allCreativeDiv").html("");
+					loadPage(data);
+				} else {
+					//$("#allCreativeDiv").html("");
+					//$("#allCreativeDiv").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂无可关联的创意，请上传创意或开启创意状态</td></tr>");
+					alert("暂无可关联的创意，请上传创意或开启创意状态！")
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+var pData;
+	function loadPage(data1) {
+	//根据广告主id查询到的所有创意
+		var aData = data1.result;
+		//;
+		 //根据计划id查询所有创意、
+		var planId = $("#planId").val();
+// 		var advertiserId = $("#advertiserId").val();
+		page.ajax({
+			url : 'sspCreative/findCreativeRelationByPlanId',
+			data : {
+				planId : planId
+			},
+			async : false,
+			success : function(data2) {
+				//;
+			if (data2!=null&&data2.result!=null&&data2.result.length > 0) {
+				pData = data2.result;
+			}
+			},
+		});
+		 
+		if(aData!=null&&aData.length>0){
+		//该广告主有创意时
+		console.log("查询到的创意为---"+aData);
+		$("#allCreativeDiv").empty();
+		$.each(aData, function(index, creative) {
+			var html = "<div class='col-md-4'>";
+			html += "<div class='xuanzechuangyi' >";        
+			var imgUrl = creative.creativeUrl;
+			if(!isEmpty(imgUrl))
+				imgUrl = globalVar.imgPrefix+imgUrl;
+			html += "<img src="+imgUrl+">";//图片地址
+			html += "<div class='clearfix'>";
+			if(creative.creativeType==1){
+			html += "<span class='pull-left'>图片</span>";//创意类目
+			}else if(creative.creativeType==2){
+			html += "<span class='pull-left'>视频</span>";//创意类目
+			}else if(creative.creativeType==3){
+			html += "<span class='pull-left'>信息流</span>";//创意类目
+			}else{
+			html += "<span class='pull-left'>未定义</span>";//创意类目
+			}
+			html += "<span  class='pull-right'>"+creative.creativeSize+"/"+creative.creativeFormat+"</span>";//类型就是 格式-大小 呵呵
+			html += "</div>";
+			
+			var flag = false;
+			console.log("aaa:" + pData);
+			if(pData == 'undefined' || pData == null) {
+				html += "<span class='xuanzechuangyiicon' id="+creative.id+"><i class='iconfont icon-duihao1'></i></span>";//操作
+			} else {
+				$.each(pData, function(index, planCreative) {
+					console.log(planCreative);
+					if(creative.id == planCreative.sspCreative.id) {
+						html += "<span class='xuanzechuangyiicon xuanzechuangyi-ok' name='ok' id="+creative.id+"><i class='iconfont icon-duihao1'></i></span>";//操作
+						flag = true;							 
+						return false;
+					}
+				});
+				
+				if(!flag) {
+					html += "<span class='xuanzechuangyiicon' id="+creative.id+"><i class='iconfont icon-duihao1'></i></span>";//操作
+				}
+			}
+				html += "<div> <span class='pull-left'>"+creative.creativeName+"</span></div>";
+			html += "</div>";
+		
+			html += "</div>";
+			$("#allCreativeDiv").append(html);
+		});
+		xuanze();
+		}else {
+		//没有查到创意时
+		alert("没有创意！");
+		}
+
+	}
+	 function save(){
+		var creativeIds = [];
+		$.each($('.xuanzechuangyi-ok'),function(i,n){
+			var b = $(n).attr('id');
+			creativeIds.push(b);
+		});
+		var planId = $("#planId").val();
+		var groupName = $("#groupName").val();
+		var advertiserId = $("#advertiserId").val();
+		if(creativeIds.length<=0){
+		alert("请先添加创意!");
+		return false;
+		}else{
+		page.ajax({
+			url : 'ssp/plan/addPlanCreativeRelations1',
+			data : {
+				creativeIds : creativeIds.join(),
+				planId : planId,
+				groupName : groupName
+			},
+			success : function(data2) {
+			alert("创意分配成功");
+				var url = "ssp/plan/getCreativeListByPlanId?planId=" + planId
+				+ "&advertiserId=" + advertiserId;
+				page.loadPage(url);
+			},
+		});
+		}
+	}
+	function xuanze(){
+		$('.xuanzechuangyi').on('click',function(){
+			//alert("a");
+			if(!$(this).hasClass('xuanzechuangyi-add')){
+				$(this).find('.xuanzechuangyiicon').toggleClass('xuanzechuangyi-ok');	
+			}
+		});
+	}
+	//点击取消后的提示
+	function cancel() {
+        confirm('确定退出吗？退出后，分配的内容将不保存!', "确认退出", "确定", "取消").ok(function () {
+           	var planId = $("#planId").val();
+		    var advertiserId = $("#advertiserId").val();
+           var url = "ssp/plan/getCreativeListByPlanId?planId=" + planId
+				+ "&advertiserId=" + advertiserId;
+            page.loadPage(url);
+            return true;
+        })
+
+
+    }
+	
+</script>
+</html>

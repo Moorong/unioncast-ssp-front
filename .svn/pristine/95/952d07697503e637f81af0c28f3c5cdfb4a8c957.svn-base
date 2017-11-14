@@ -1,0 +1,105 @@
+package com.unioncast.ssp.front.common.util;
+
+import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import com.alibaba.fastjson.JSONObject;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.util.CommonUtil;
+import com.unioncast.common.util.DateUtil;
+
+/**
+ * 服务请求工具类
+ * 
+ * @author changguobin@unioncast.cn
+ */
+public class RestUtil {
+	
+	private static final Logger LOG = LogManager.getLogger(RestUtil.class);
+	
+	/**
+	 * 获取RestTemplate
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 11:44:24
+	 *
+	 * @return org.springframework.web.client.RestTemplate
+	 */
+	public static org.springframework.web.client.RestTemplate getRestTemplate() {
+		return SpringUtils.getBean(RestTemplateBuilder.class).build();
+	}
+
+	/**
+	 * 向用户系统服务发起post请求
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 14:02:41
+	 *
+	 * @param methodUrl
+	 * @param request
+	 * @param restResponseClass
+	 * @return T
+	 */
+	public static <T> T postForObjectForUser(String methodUrl, Object request, Class<T> restResponseClass) {
+		String url = String.format("%s%s", SpringUtils.getConfig().getRestUserServiceUrl(), methodUrl);
+		return postForObject(url,request,restResponseClass);
+	}
+
+	/**
+	 * 向数据访问层服务发起post请求
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 14:01:44
+	 *
+	 * @param methodUrl
+	 * @param request
+	 * @param restResponseClass
+	 * @return T
+	 */
+	public static <T> T postForObjectForDB(String methodUrl, Object request, Class<T> restResponseClass) {
+		String url = String.format("%s%s", SpringUtils.getConfig().getRestDBServiceUrl(), methodUrl);
+		return postForObject(url,request,restResponseClass);
+	}	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public static <T> T postForObject(String absUrl, Object request, Class<T> restResponseClass) {
+		HttpHeaders httpHeaders = new HttpHeaders();
+		httpHeaders.set("hi", "hello_" + DateUtil.getCurrentStrDate());
+		// httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<?> paramEntity = null;
+		if(request instanceof HttpEntity){
+			HttpEntity<?> httpEntity =  (HttpEntity)request;
+			paramEntity = new HttpEntity(httpEntity.getBody(),httpHeaders);
+		}else if(request instanceof Map){
+			System.err.println("当前为Map表单传值，如参数获取不正确，请去掉@RequestBody");
+//	        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
+//	        httpHeaders.setContentType(type);
+//	        httpHeaders.add("Accept", MediaType.APPLICATION_JSON.toString());
+//	        paramEntity = new HttpEntity<String>(JSONObject.toJSONString(request), httpHeaders);
+			Map<String,Object> map = (Map)request;
+			MultiValueMap<String, Object> params = new LinkedMultiValueMap<String, Object>();
+			for (String k : map.keySet())
+				params.add(k,map.get(k));
+	        return getRestTemplate().postForObject(absUrl, params, restResponseClass);
+		}else{
+			paramEntity = new HttpEntity(request,httpHeaders);
+		}
+//		return getRestTemplate().postForObject(absUrl, paramEntity, restResponseClass);
+		//统一记录请求失败日志
+		T result = getRestTemplate().postForObject(absUrl, paramEntity, restResponseClass);
+		if(RestResponse.class.getName().equals(restResponseClass.getName())){
+			try {
+				if(CommonUtil.isNotNull(result)){
+					RestResponse restResponse = (RestResponse) result;
+					if(!restResponse.isSuccess()){
+						restResponse.getRestErrors();
+						LOG.error("请求地址响应异常:{}",JSONObject.toJSONString(restResponse.getRestErrors()));
+					}
+				}
+			} catch (Exception e) {}
+		}
+		return result;
+	}
+}

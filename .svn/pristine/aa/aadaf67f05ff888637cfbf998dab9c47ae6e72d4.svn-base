@@ -1,0 +1,28 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.rest.response.ssp.SspAgeTypeArrResponse;
+import com.unioncast.common.rest.response.ssp.SspSexTypeArrResponse;
+import com.unioncast.common.ssp.model.SspDictAgeTarget;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspAgeTypeService;
+
+@Component
+public class SspAgeTypeServiceImpl implements SspAgeTypeService {
+
+	
+
+	@Resource
+	private RestTemplate restTemplate;
+	@Override
+	public SspDictAgeTarget[] findByCode(String[] ageTarget) {
+		 HttpEntity<String[]> httpEntity = new HttpEntity<String[]>(ageTarget);
+		 SspAgeTypeArrResponse response = restTemplate.postForObjectForDB("rest/ssp/dictAgeTarget/batchFindbyCodes", httpEntity, SspAgeTypeArrResponse.class);
+			return response.getResult();
+	}
+	
+}

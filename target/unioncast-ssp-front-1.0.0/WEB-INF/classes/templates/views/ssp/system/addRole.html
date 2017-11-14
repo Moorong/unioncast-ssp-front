@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--zTree-->
+    <link rel="stylesheet" type="text/css" href="plugs/ztree/metroStyle/metroStyle.css">
+    <style>
+        ul.ztree {
+            border: 1px solid #617775;
+            width: 220px;
+            height: 360px;
+            overflow-y: scroll;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+<!-- 右侧开始 -->
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/role/roleList">角色管理</a> <i> / </i> <span>新增角色</span></h2>
+<!-- 当前位置结束 -->
+<!-- 表单内容开始 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <div class="block_content ">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										角色信息
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <form class="form-horizontal" role="form" action="ssp/role/addRole" method="post">
+                            <div class="formwarp">
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">角色名称：</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="hidden" id="oldName" name="oldName" value="${(role.name)!}">
+                                        <input type="text" id="name" name="name" class="form-control input-sm  "
+                                               placeholder="角色名">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <div id="hiddenBox" style="display: block;"></div>
+                                </div>
+                            </div>
+                            <div class="clearfix" style="width:725px;margin:0 auto;">
+
+                                <div class="bg left">
+                                    <div style="float: left;">
+                                        <ul>选择：</ul>
+                                        <ul id="treeDemo" class="ztree"></ul>
+                                    </div>
+                                    <div style="float:left;margin-left: 10%">
+                                        <ul>已选择：</ul>
+                                        <ul id="treeDemo1" class="ztree" style="float: left;"></ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="savewarp text-center">
+                                <a href="javascript:void(0)" class="btn formbtn green" id="submit">完成</a>
+                                <a href="javascript:void(0)" class="btn formbtn bk999"
+                                   id="cancel">取消</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 表单内容结束 -->
+<!-- 右侧结束 -->
+</body>
+<!--zTree-->
+<script type="text/javascript" src="plugs/ztree/jquery.ztree.core.js"></script>
+<script type="text/javascript" src="plugs/ztree/jquery.ztree.excheck.js"></script>
+<script type="text/javascript" src="plugs/ztree/jquery.ztree.exedit.js"></script>
+<script>
+    var setting = {
+        check: {
+            enable: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        }, callback: {
+            onCheck: zTreeOnCheck
+        }
+
+    };
+    var setting1 = {
+        check: {
+            enable: true
+        },
+        data: {
+            simpleData: {
+                enable: true
+            }
+        }, callback: {
+            onCheck: remove,
+        }
+    };
+
+
+    $(document).ready(function () {
+        var str = GetActionList();
+        var obj = eval('[' + str + ']');
+        var zNodes1 = obj;
+        $.fn.zTree.init($("#treeDemo"), setting, zNodes1);
+        $.fn.zTree.init($("#treeDemo1"), setting1, null);
+    });
+    function zTreeOnCheck(event, treeId, treeNode) {
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        var nodes = treeObj.getCheckedNodes(true);
+        var zNode1 = "";
+        for (var i = 0; i < nodes.length; i++) {
+            var roleIds = roleIds + nodes[i].id + ",";
+            zNode1 = zNode1 + '{"name":"' + nodes[i].name + '","id":"'
+                + nodes[i].id + '","pId":"' + nodes[i].pId
+                + '","open" : "true","checked":"true"},';
+        }
+        //var hiddenString = '<input type="hidden" name="modules[' + i + '].id" value="' + nodes[i].id + '">';
+        //$("#hiddenBox").append(hiddenString);
+        zNode1 = zNode1.substr(0, zNode1.length - 1);
+        zNode1 = eval('[' + zNode1 + ']');
+        $.fn.zTree.init($("#treeDemo1"), setting1, zNode1);
+    }
+    ;
+
+    function remove(event, treeId, treeNode) {
+        var treeObj1 = $.fn.zTree.getZTreeObj("treeDemo1");
+        var nodes1 = treeObj1.getChangeCheckedNodes();
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        var zNode = "";
+        for (var j = 0; j < nodes1.length; j++) {
+            var nodes = treeObj.getNodes();
+            nodes = treeObj.transformToArray(nodes);
+            zNode = "";
+            for (var i = 0; i < nodes.length; i++) {
+                //var child = nodes1[j].children;
+                if ((nodes[i].id == nodes1[j].id)) {
+                    zNode = zNode + '{"name":"' + nodes[i].name + '","id":"'
+                        + nodes[i].id + '","pId":"' + nodes[i].pId
+                        + '","open" : "true"},';
+                } else {
+                    zNode = zNode + '{"name":"' + nodes[i].name + '","id":"'
+                        + nodes[i].id + '","pId":"' + nodes[i].pId
+                        + '","open" : "' + nodes[i].open + '","checked":"' + nodes[i].checked + '"},';
+                }
+            }
+            zNode = zNode.substr(0, zNode.length - 1);
+            zNode = eval('[' + zNode + ']');
+            $.fn.zTree.init($("#treeDemo"), setting, zNode);
+
+        }
+        var count = nodes1.length;
+        for (var j = 0; j < count; j++) {
+            treeObj1.removeNode(nodes1[0]);
+        }
+    }
+    ;
+    function GetActionList() {
+        var zNode = "";
+        $.ajax({
+            url: "rest/ssp/module/findModuleBySystemId",
+            cache: false,
+            type: "post",
+            async: false,
+            success: function (restResponse) {
+                if (restResponse.restErrors == null) {
+                    for (var i = 0; i < restResponse.result.length; i++) {
+                        var row = restResponse.result[i];
+                        zNode = zNode + '{"name":"' + row.name + '","id":"'
+                            + row.id + '","pId":"' + row.parentId
+                            + '","open" : "true"},';
+                    }
+                    zNode = zNode.substr(0, zNode.length - 1);
+                }
+            }, error: function () {
+                alert('加载模块列表出错！');
+            }
+        });
+        return zNode;
+    }
+    ;
+    $("#cancel").click(function () {
+        var url = "ssp/role/roleList";
+        page.loadPage(url);
+    });
+    $('form').eq(0).bootstrapValidator({
+        fields: {
+            name: {
+                validators: {
+                    stringLength: {
+                        enabled: true,
+                        max: 10
+                    },
+                    notEmpty: {
+                        message: '角色名不能为空'
+                    },
+                    callback: {
+                        message: '角色名称已存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            if ($("#name").val() != "") {
+                                $.ajax({
+                                    url: 'rest/ssp/role/findByRoleName/' + $("#name").val(),
+                                    type: 'post',
+                                    dataType: 'json',
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null) {
+                                            res = false;
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    },
+                    /*remoteWhenDifferent: {
+                     field: "oldName",//原有值，不同时发送验证请求
+                     type: 'POST',
+                     url: 'rest/ssp/role/findByRoleName',
+                     message: '角色名称已存在'
+                     }*/
+                }
+            }
+        }
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        //alert("00")
+        page.ajaxSubmit(e.target, function (result) {
+            //alert("创建完毕")
+            console.log(result);
+            alert("新增数据成功").ok(function() {
+                var url = "ssp/role/roleList";
+                page.loadPage(url);
+            })
+        });
+    });
+    $("#submit").click(function () {
+        var treeObj = $.fn.zTree.getZTreeObj("treeDemo");
+        var nodes = treeObj.getCheckedNodes(true);
+        for (var i = 0; i < nodes.length; i++) {
+            var hiddenString = '<input type="hidden" name="modules[' + i + '].id" value="' + nodes[i].id + '">';
+            $("#hiddenBox").append(hiddenString);
+        }
+        $('form').eq(0).submit();
+    });
+</script>
+</html>

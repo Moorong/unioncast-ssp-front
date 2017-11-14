@@ -1,0 +1,236 @@
+$(function() {
+
+	/* 组件初始化 */
+	loadswitch();
+
+	// 初始化加载
+	loadData(1);
+
+	pullDownAdvertisers();
+
+	// 加载创意分组
+	//pullDownCreativeGroup();
+
+
+ 	// 新增
+	$("#addCreative").click(function() {
+		var planId = $("#planId").val();
+		var url = "sspCreative/getAdd?planId="+planId;
+		page.loadPage(url);
+	});
+
+	$("#search").click(function() {
+		loadData(1);
+	});
+
+	function loadswitch() {
+		$("[data-toggle='tooltip']").tooltip();
+		$("input[name='switch']").bootstrapSwitch({
+			onText : "开",
+			offText : "关",
+			size : "mini",
+			onSwitchChange : function(event, state) {
+				if (state == true) {
+					updateState($(this), 1);
+					$(this).val("1");
+				} else {
+					updateState($(this), 2);
+					$(this).val("2");
+				}
+			}
+		});
+	}
+	
+	//更改开关状态
+    function updateState(_this,val) {
+        var id =  _this.attr("id");
+        var url = "sspCreative/updateState";
+        page.ajax({
+            url:url,
+            data:{id:id,creativeState:val},
+            type:'post',
+            success:function (data) {
+//                 if (data.status == 200){
+//                    var url = "sspCreative/main";
+//					page.loadPage(url);
+//                 }
+            },
+            error : function (){
+            	alert("请求失败");
+            }
+        });
+        
+    }
+
+	// 加载数据
+	function loadData(currentPageNo) {
+		var planId = $("#planId").val();
+		page.ajax({
+			url : 'sspCreative/page',
+			data : {
+				currentPageNo : currentPageNo,
+				planId : planId,
+				name : $("[name=creativeName]").val(),
+				advertiserId : $("[name=advertiser]").val(),
+				state : $("[name=state]").val(),
+				creativeType : $("[name=creativeType]").val(),
+				creativeGroup : $("[name=creativeGroup]").val()
+			},
+			success : function(data) {
+				if (data.result.dataArray.length != null) {
+					$("#creativeList").html("");
+					$("#page").empty();
+					loadPage(data);
+				} else {
+					$("#creativeList").html("");
+					$("#page").empty();
+					alert("没有查询到数据！")
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+
+	function loadPage(data) {
+		console.info(data);
+		var datas = data.result.dataArray;
+		$("#creativeList").empty();
+		if(datas.length != 0) {
+			$.each(datas, function(index, creative) {
+				var html = "<tr>";
+				if(creative.creativeState==1){
+	           		html += "<td><input type='checkbox' name='switch' value='1' id='"+creative.id+"' checked /></td>";
+	            } else if(creative.creativeState==2){
+	           		html += "<td><input type='checkbox' name='switch' value='2' id='"+creative.id+"' /></td>";
+	            }
+				var imgUrl = globalVar.imgPrefix+creative.creativeUrl;
+				html += '<td><a href="#" data-toggle="tooltip" data-placement="right" data-original-title=\'<img src="'+imgUrl+'" height="100">\' data-html="true"><img class="echo-lazy" src="plugs/echojs/blank.gif" data-echo="'+ imgUrl +'" width="57" height="32"></a></td>';
+				html += "<td style='vertical-align: middle;text-align:center;'>"
+						+ creative.creativeName + "</td>";
+				/*html += "<td style='vertical-align: middle;text-align:center;'>"
+						+ creative.sspCreativeGroup.name + "</td>";*/
+				
+				if(creative.creativeType == 1){
+					html += "<td style='vertical-align: middle;text-align:center;'>图片</td>";
+				} else if(creative.creativeType == 2){
+					html += "<td style='vertical-align: middle;text-align:center;'>视频</td>";
+				} else if(creative.creativeType == 3){
+					html += "<td style='vertical-align: middle;text-align:center;'>信息流</td>";
+				}
+				html += "<td style='vertical-align: middle;text-align:center;'>"
+						+ creative.creativeFormat
+						+ "-"
+						+ creative.picSize + "K</td>";
+				html += "<td style='vertical-align: middle;text-align:center;'><a href='javascript:void(0);'>"
+						+ getDay(creative.updateTime) + "</a></td>";
+	
+				html += "<td><a href='#' data-toggle='tooltip' data-placement='top' onclick='updateCreative("
+						+ creative.id
+						+ ");' title='修改'><i class='iconfont icon-xiugai'></i></a>"
+						+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='deleteCreative("
+						+ creative.id
+						+ ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";
+				html += "</tr>";
+				$("#creativeList").append(html);
+				loadswitch();
+			});
+		} else {
+			$("#creativeList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+		}
+
+		var totalPage = data.result.totalPage;
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page').html('');
+		$('#page').html('<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',// 分页容器，ID
+			totalPages : totalPage, // 总页数
+			count : totalCount, // 总记录数
+			startPage : startPage,
+			onPageClick : function(env, thisPage) {
+				// CurrentPageNo = thisPage;
+				loadData(thisPage);
+			}
+		});
+		Echo.init({
+            offset: 0,
+            throttle: 0
+        });
+		$('img').unbind('error').bind('error', function() {
+        	var $this = $(this);
+            var retry= $this.attr("re");
+            retry = isNaN(retry)?1:retry;
+            if(retry > 5){
+            	$(this).unbind('error');
+            	$this.css('background','none');
+            }else {
+            	setTimeout(function(){
+            		$this.attr('src',$this.attr('src'));
+            	},1000);
+            }
+            $this.attr("re",++retry);
+        });
+	}
+	
+	
+
+	function pullDownAdvertisers() {
+		page.ajax({
+			url : 'sspAdvertiser/find',
+			cache : false,
+			success : function(res) {
+				var data = res.result;
+				if (data != null && data.length != 0) {
+					$.each(data, function(index, advertiser) {
+						$("[name=advertiser]").append(
+								'<option value=' + advertiser.id + '>'
+										+ advertiser.name + '</option>');
+					});
+					$("[name=advertiser]").selectpicker('refresh');
+				} else {
+					$("[name=advertiser]").append(
+							'<option value="">暂无广告主</option>');
+					$("[name=advertiser]").selectpicker('refresh');
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+	
+
+	/** 日期转换工具 */
+	function getMoth(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd");
+		return oDate;
+	}
+	;
+
+	// 处理默认时间工具
+	function addDate(dd, dadd) {
+		var a = new Date(dd)
+		a = a.valueOf()
+		a = a + dadd * 24 * 60 * 60 * 1000
+		a = new Date(a)
+		return a;
+	}
+	function getMapDate(dayss) {
+		var now = new Date();
+		var NextNow = addDate(now, -dayss);
+		var years = NextNow.getFullYear();
+		var months = NextNow.getMonth() + 1;
+		var days = NextNow.getDate();
+		var beginTime = years + "-" + months + "-" + days;
+		return beginTime;
+	};
+	
+	
+	function getDay(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+		return oDate;
+	};
+})

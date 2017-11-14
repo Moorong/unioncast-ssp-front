@@ -1,0 +1,126 @@
+$(function() {
+	$('#searchFM').submit(
+			function() {
+				var formData = UC.getFormJson(this);
+				var currentPageNo = formData.currentPageNo;
+				var pageSize = formData.pageSize;
+				var startMonth = formData.startMonth;
+				var endMonth = formData.endMonth;
+				var state = formData.state;
+				
+				var pageCriteria = {
+						currentPageNo:currentPageNo,
+						pageSize:pageSize,
+						searchExpressionList:[],
+						orderExpressionList:[],
+						predicate:'AND'
+				};
+				if(!isEmpty(startMonth))
+					pageCriteria.searchExpressionList.push({
+						operation:'GE',
+						propertyName:'month(update_time)',
+						value:startMonth,
+						valueType:''
+					});
+				if(!isEmpty(endMonth))
+					pageCriteria.searchExpressionList.push({
+						operation:'LE',
+						propertyName:'month(update_time)',
+						value:endMonth,
+						valueType:''
+					});
+				if(!isEmpty(state))
+					pageCriteria.searchExpressionList.push({
+						operation:'EQ',
+						propertyName:'state',
+						value:state,
+						valueType:''
+					});
+				page.ajaxJson({url:this.action,data:pageCriteria,success:function(result){
+					if (result && result.success&&result.result) {
+						var $dataBody = $('#dataBody').html('');
+						$.each(result.result.dataArray, function(i, o) {
+							var $tr = $(HT.tr);
+							var updatetime = new Date(o.updateTime)
+									.format('yyyy-MM-dd hh:mm:ss');
+							var preTax = o.preTax;
+							var tax = o.tax;
+							var afterTax = o.afterTax;
+							var stateText = o.state == 1 ? '待结算'
+									: (o.state == 2 ? '已结算'
+											: (o.state == 3 ? '结算失败' : ''));
+
+							$tr.append($(HT.td).html(updatetime)).append(
+									$(HT.td).html(preTax)).append(
+									$(HT.td).html(tax)).append(
+									$(HT.td).html(afterTax)).append(
+									$(HT.td).html(stateText));
+
+							$dataBody.append($tr);
+						});
+						if(result.result.currentPageNo&&result.result.currentPageNo==1){
+							var currentPageNo = result.result.currentPageNo;
+							var totalPage = result.result.totalPage;
+							var totalCount = result.result.totalCount;
+							
+							UC.ajaxPage("page", {
+								totalPages : totalPage, // 总页数
+								startPage : 1, // 当前页
+								count : totalCount, // 总记录数
+								onPageClick : function(event, thisPage) {// thisPage选择的页码
+									$('#currPageNoInput').val(thisPage);
+									$('#searchFM').submit();
+								}
+							});
+						}
+					}
+				}});
+//				page.ajaxSubmit(this, true, function(result) {
+//					
+//				});
+				return false;
+			}).submit();
+});
+function applyWithdrawal(){
+	if(100>$('#balance').val())return;
+	var htmlTemplate = '<form class="form-inline">';
+	htmlTemplate += '<div class="tixianbox ">';
+	htmlTemplate += '<h5 clearfix="">余额提现<i class="iconfont icon-tanhao1 pull-right"></i></h5>';
+	htmlTemplate += '<div class="tixian-inner ">';
+	htmlTemplate += '<div class="tixian-inner-s inhangka clearfix">';
+	htmlTemplate += '<span class="pull-left">农业银行</span>';
+	htmlTemplate += '<span class="pull-right">中国农业银行<br>尾号<b>7788</b> 储蓄卡</span></div>';
+	htmlTemplate += '<div class="tixian-inner-s tixianjine">';
+	htmlTemplate += '<span>提现金额</span>';
+	htmlTemplate += '<div class="form-group">';
+	htmlTemplate += '<label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>';
+	htmlTemplate += '<div class="input-group">';
+	htmlTemplate += '<div class="input-group-addon">￥</div>';
+	htmlTemplate += '<input type="text" class="form-control" id="exampleInputAmount" placeholder="请输入金额"></div>';
+	htmlTemplate += '</div>';
+	htmlTemplate += '<div class="jineqbtixian"><em class="pull-left">可用金额1000元</em><button class="btn btnlink pull-right">全部提现</button></div></div>';
+	htmlTemplate += '<button class="btn green btn2 btnBlock">确定</button></div></div></form>';
+	$.dialog({
+        title:'<div class="tixianbox "><h5 clearfix="">余额提现<i class="iconfont icon-tanhao1 pull-right"></i></h5></div>',
+        content:'<div style="width:300px;height:300px;border:1px solid red;"></div>',
+        animation: 'scale'
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

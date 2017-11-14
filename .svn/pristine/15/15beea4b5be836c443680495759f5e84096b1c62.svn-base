@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.history.go(this)"
+                                                              urlk="rest/sspAppInfo/list">应用管理</a> <i> / </i> <span>编辑app</span>
+</h2>
+<!-- 当前位置结束 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <form class="form-horizontal" role="form" action="sspAppInfo/updateInfo" method="post">
+            <div class="block_content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- 表单名称开始 -->
+                        <div class="block_title white clearfix">
+										<span class="block_title_name pull-left">
+											app信息
+										</span>
+                        </div>
+                        <!-- 表单名称结束 -->
+                        <div class="col-md-12">
+                            <div class="formwarp">
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i>应用名称</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder="" name="name"
+                                               id="name" value="${(app.name)!}">
+                                        <input type="hidden" id="oldName" value="${(app.name)!}">
+                                        <input type="hidden" name="id" value="${(app.id)!}">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i></i>所属行业</label>
+                                    <div class="col-sm-8 ">
+                                        <select class="dropdown marginr33 bs-select-hidden" id="industry1"
+                                                onchange="getIndustry2()">
+
+                                        </select>
+                                        <select class="dropdown marginr33 bs-select-hidden" id="industry2"
+                                                name="sspDictIndustry.code">
+                                            <option value="">--请选择--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i>系统平台</label>
+                                    <div class="col-sm-8 ">
+                                        <label class="radio-inline">
+                                            <input type="radio" id="iosPlstform" name="sspDictPlatforms" value="1001"
+                                            > ios
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" id="androidPlstform" name="sspDictPlatforms"
+                                                   value="1002"
+                                            > android
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i>适用终端</label>
+                                    <div class="col-sm-8 ">
+                                        <select class="dropdown marginr33 bs-select-hidden" id="platform"
+                                                name="sspDictPlatform.code">
+                                            <option>--请选择--</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i>
+                                        接入方式</label>
+                                    <div class="col-sm-8 ">
+                                        <label class="radio-inline">
+                                            <input type="radio" id="inlineCheckbox3" name="sspDictAccessWay.code"
+                                                   value="0"
+                                            <#if (app.sspDictAccessWay.code ==0)> checked</#if>
+                                            > SDK
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" id="inlineCheckbox4" name="sspDictAccessWay.code"
+                                                   value="1"
+                                            <#if (app.sspDictAccessWay.code ==1)> checked</#if>
+                                            > API
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i> 下载地址</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder=""
+                                               name="downloadUrl" value="${(app.downloadUrl)!}">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix" id="ios">
+                                    <label class="col-sm-4 control-label "><i>*</i>Tunes ID</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder=""
+                                               name="itunesId" id="itunesId" value="${(app.itunesId)!}">
+                                        <input type="hidden" id="itunesIdOld" value="${(app.itunesId)!}">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix" id="android">
+                                    <label class="col-sm-4 control-label "><i>*</i>包名</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder=""
+                                               name="packageName" id="packageName" value="${(app.packageName)!}">
+                                        <input type="hidden" id="packageNameOld" value="${(app.packageName)!}">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i></i>应用关键词</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder=""
+                                               name="appKeywords" value="${(app.appKeywords)!}">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i></i> 应用简介</label>
+                                    <div class="col-sm-8 ">
+                                        <textarea class="form-control small338" rows="3" name="appDesc"
+                                        >${(app.appDesc)!}</textarea>
+                                    </div>
+                                </div>
+                                <!--<div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i></i>app标识</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder=""
+                                               value="${(app.appId)!}" disabled>
+                                    </div>
+                                </div>-->
+                            </div>
+                        </div>
+                        <div class="block_title white clearfix">
+										<span class="block_title_name pull-left">
+											设置底价
+										</span>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="formwarp">
+
+
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i>
+                                        付费模式</label>
+                                    <div class="col-sm-8 ">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="kpi"
+                                                   value="2"
+                                            <#if (app.kpi ==2)> checked</#if>
+                                            > cpc
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="kpi"
+                                                   value="3"
+                                            <#if (app.kpi ==3)> checked</#if>
+                                            > cpm
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label "><i>*</i> 统一底价</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder=""
+                                               name="unifiedPrice" value="${(app.unifiedPrice)!}">元/（cpc/cpm）
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix">
+                                    <label class="col-sm-4 control-label"><i>*</i>定价周期</label>
+                                    <div class="col-sm-8 ">
+
+                                        <div id="reportrange2"
+                                             style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span></span>
+                                            <input type="hidden" name="priceStartTimeStr" value="${(sta)!}"/>
+                                            <input type="hidden" name="priceEndTimeStr" value="${(end)!}"/>
+                                            <b class="caret"></b>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="savewarp text-center">
+                    <a href="javascript:void(0)" class="btn formbtn green" id="submit">保存</a>
+                    <a href="javascript:void(0)" class="btn formbtn bk999"
+                       id="cancel">取消</a>
+                </div>
+        </form>
+    </div>
+</div>
+<input type="hidden" value="${(app.sspDictPlatform.code)!}" id="platformCode">
+<input type="hidden" value="${(app.sspDictPlatform.level)!}" id="platformLevel">
+<input type="hidden" value="${(app.sspDictIndustry.code)!}" id="industryCode">
+<input type="hidden" value="${(app.sspDictIndustry.level)!}" id="industryLevel">
+<!-- 右侧结束 -->
+</body>
+<script>
+    var pageInit = {
+        init: function () {
+            var val = $("#industryLevel").val();
+            this.initRadio();
+            this.loadIndustry1();
+            this.loadIndustry2(val);
+            this.loadPlatform();
+        },
+        initRadio: function () {
+            var platformLevel = $("#platformLevel").val();
+            if (platformLevel == '1002') {
+                $("#androidPlstform").attr("checked", "checked");
+            } else {
+                $("#iosPlstform").attr("checked", "checked");
+            }
+        },
+        loadIndustry1: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspDicIndustry/find",
+                type: "POST",
+                dataType: "json",
+                data: {level: 1000},
+                success: function (restResponse) {
+                    if (restResponse.result != null) {
+                        $('#industry1').empty();
+                        options.push("<option value='0'>--请选择--</option>");
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            var industryLevel = $("#industryLevel").val();
+                            if (industryLevel == row.code) {
+                                options.push("<option value=\"" + row.code + "\" selected>" + row.name + "</option>");
+                            } else {
+                                options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                            }
+                        }
+                        //var selectElement = "<select id=\"parentId\" name=\"parentId\" class=\"form-control\"> " + options.join('') + " </select>"
+                        $("#industry1").append(options.join(''));
+                        $('#industry1').selectpicker('refresh');
+
+                    }
+                }, error: function () {
+                    alert('加载行业信息失败！');
+                }
+            });
+
+        }, loadIndustry2: function (level) {
+            if (isNotEmpty(level)) {
+                var options = [];
+                $.ajax({
+                    url: "rest/sspDicIndustry/find",
+                    type: "POST",
+                    dataType: "json",
+                    data: {level: level},
+                    success: function (restResponse) {
+                        if (restResponse.result != null) {
+                            $('#industry2').empty();
+                            //options.push("<option value='0'>--请选择--</option>");
+                            for (var i = 0; i < restResponse.result.length; i++) {
+                                var row = restResponse.result[i];
+                                var industryCode = $("#industryCode").val();
+                                if (industryCode == row.code) {
+                                    options.push("<option value=\"" + row.code + "\" selected>" + row.name + "</option>");
+                                } else {
+                                    options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                                }
+                            }
+                            //var selectElement = "<select id=\"parentId\" name=\"parentId\" class=\"form-control\"> " + options.join('') + " </select>"
+                            $("#industry2").append(options.join(''));
+                            $('#industry2').selectpicker('refresh');
+                        }
+                    }, error: function () {
+                        alert('加载行业信息失败！');
+                    }
+                });
+            }
+
+        }, loadPlatform: function () {
+
+            var item = $("input[name='sspDictPlatforms']:checked").val();
+            if (item == '1002') {
+                $("#android").show();
+                $("#ios").hide();
+                $('#itunesId').attr("disabled", true);
+                $('#packageName').attr("disabled", false);
+
+            } else {
+                $("#ios").show();
+                $("#android").hide();
+                $('#packageName').attr("disabled", true);
+                $('#itunesId').attr("disabled", false);
+            }
+            var options = [];
+            $.ajax({
+                url: "rest/sspDicPlatform/find",
+                type: "POST",
+                dataType: "json",
+                data: {level: item},
+                success: function (restResponse) {
+                    if (restResponse.result != null) {
+                        $('#platform').empty();
+                        var platformCode = $("#platformCode").val();
+                        //options.push("<option value='0'>--请选择--</option>");
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            if (platformCode == row.code) {
+                                options.push("<option value=\"" + row.code + "\" selected>" + row.name + "</option>");
+                            } else {
+                                options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                            }
+                        }
+                        //var selectElement = "<select id=\"parentId\" name=\"parentId\" class=\"form-control\"> " + options.join('') + " </select>"
+                        $("#platform").append(options.join(''));
+                        $('#platform').selectpicker('refresh');
+
+                    }
+                }, error: function () {
+                    alert('加载适用终端信息失败！');
+                }
+            });
+        }
+    }
+    $(function () {
+        var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().format(defDateFormat);
+        var defEndDate = moment().add('days', 7).format(defDateFormat);
+        /* 投放周期初始化 */
+        var priceStartTimeStr = $('input[name="priceStartTimeStr"]').val();
+        var priceEndTimeStr = $('input[name="priceEndTimeStr"]').val();
+        if (isNotEmpty(priceStartTimeStr) && isNotEmpty(priceEndTimeStr)) {
+            defStartDate = priceStartTimeStr;
+            defEndDate = priceEndTimeStr;
+        }
+        $('input[name="priceStartTimeStr"]').val(defStartDate);
+        $('input[name="priceEndTimeStr"]').val(defEndDate);
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+        $('#reportrange2').daterangepicker({
+        	locale: page.attr.drDefaultLocal,
+        	startDate: defStartDate,
+            endDate: defEndDate,
+        }, function (start, end, label) {
+            var choStart = start.format(defDateFormat);
+            var choEnd = end.format(defDateFormat);
+            $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+            $('input[name="priceStartTimeStr"]').val(choStart);
+            $('input[name="priceEndTimeStr"]').val(choEnd);
+        }).on('apply.daterangepicker', function (ev, picker) {
+            var pstartDate = picker.startDate.format('YYYY-MM-DD');
+            var pendDate = picker.endDate.format('YYYY-MM-DD');
+            $('input[name="priceStartTimeStr"]').val(pstartDate);
+            $('input[name="priceEndTimeStr"]').val(pendDate);
+            $('#reportrange2 span').html(String.format("%s-%s", pstartDate, pendDate));
+        }).on('cancel.daterangepicker', function (ev, picker) {
+            $('input[name="priceStartTimeStr"]').val('');
+            $('input[name="priceEndTimeStr"]').val('');
+            $('#reportrange2 span').html('&nbsp;');
+        });
+        pageInit.init();
+    });
+    $("#cancel").click(function () {
+        var url = "sspAppInfo/list";
+        page.loadPage(url);
+    });
+    function getIndustry2() {
+        var val = $("#industry1").val();
+        pageInit.loadIndustry2(val);
+    }
+    $("input[name=sspDictPlatforms]").click(function () {
+        pageInit.loadPlatform();
+    });
+
+    $('form').eq(0).bootstrapValidator({
+        fields: {
+            name: {
+                validators: {
+                    stringLength: {
+                        enabled: true,
+                        max: 20
+                    },
+                    notEmpty: {
+                        message: '应用名不能为空'
+                    },
+                    callback: {
+                        message: '应用名称已存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            var val = $("#name").val();
+                            if (val != "" && val != $("#oldName").val()) {
+                                $.ajax({
+                                    url: 'rest/sspAppInfo/find',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {name: val},
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null && data.result.length > 0) {
+                                            res = false;
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    },
+                }
+            }, downloadUrl: {
+                validators: {
+                    callback: {
+                        callback: function (val, $fm, $input) {
+                            if (isEmpty(val))return {faild: false, message: '下载地址不能为空!'};
+                            if (!UC.isUrl(val))return {faild: false, message: '请填写有效的网址'};
+                            return true;
+                        }
+                    }
+                }
+            }, packageName: {
+                validators: {
+                    notEmpty: {
+                        message: '包名不能为空'
+                    },
+                    callback: {
+                        message: '包名已存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            var packageName = $("#packageName").val();
+                            if (packageName != "" && packageName != $("#packageNameOld").val()) {
+                                $.ajax({
+                                    url: 'rest/sspAppInfo/find',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {packageName: packageName},
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null && data.result.length > 0) {
+                                            res = false;
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    }
+                }
+            }, itunesId: {
+                validators: {
+                    notEmpty: {
+                        message: 'Tunes ID不能为空'
+                    },
+                    callback: {
+                        message: 'Tunes ID已存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            var itunesId = $("#itunesId").val();
+                            if (itunesId != "" && itunesId != $("#itunesIdOld").val()) {
+                                $.ajax({
+                                    url: 'rest/sspAppInfo/find',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {itunesId: itunesId},
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null && data.result.length > 0) {
+                                            res = false;
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    }
+                }
+            }, appDesc: {
+                validators: {
+                    stringLength: {
+                        max: 40
+                    }
+                }
+            }, unifiedPrice: {
+                validators: {
+                    notEmpty: {
+                        message: '底价不能为空'
+                    },
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            }
+        }
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        //alert("00")
+        page.ajaxSubmit(e.target, function (result) {
+            //alert("创建完毕")
+            console.log(result);
+            alert("更新数据成功").ok(function () {
+                var url = "sspAppInfo/list";
+                page.loadPage(url);
+            });
+        });
+    });
+    $("#submit").click(function () {
+        $('form').eq(0).submit();
+    });
+</script>
+</html>

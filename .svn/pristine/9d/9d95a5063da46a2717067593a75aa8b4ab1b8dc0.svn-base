@@ -1,0 +1,9 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspDictAgeTarget;
+
+public interface SspAgeTypeService {
+
+	SspDictAgeTarget[] findByCode(String[] ageTarget);
+
+}

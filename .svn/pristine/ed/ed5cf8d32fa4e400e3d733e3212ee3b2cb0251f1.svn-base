@@ -1,0 +1,9 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspDictBuyTarget;
+
+public interface SspBuyTypeService {
+
+	SspDictBuyTarget[] findByCode(String[] buyTarget);
+
+}

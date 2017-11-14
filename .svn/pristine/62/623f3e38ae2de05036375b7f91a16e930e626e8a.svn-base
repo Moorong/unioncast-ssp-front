@@ -1,0 +1,9 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspDictCrowdSexType;
+
+public interface SspCrowdSexService {
+
+	SspDictCrowdSexType[] findByCode(String[] sexType);
+
+}

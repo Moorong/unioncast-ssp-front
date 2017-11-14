@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="css/base/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/base/bootstrap-theme.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" type="text/css" href="css/fonts/fontsize/iconfont.css">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" type="text/css" href="css/base/style.css">
+    <link rel="stylesheet" type="text/css" href="css/base/custom.css">
+</head>
+<style>
+    .mycode {
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+        vertical-align: middle;
+        background: white;
+    }
+</style>
+<body>
+<div class="containered">
+    <div class="header clearfix">
+        <ul class="logogroup">
+            <li><a href="#">广告投放媒体管理系统</a></li>
+        </ul>
+        <!-- <ul class="user_info clearfix">
+            <li><span>zhuc</span><a href="javascript:;" class="goout">退出</a></li>
+        </ul> -->
+    </div>
+    <div class="denglubox">
+        <div class="dengluformbox">
+            <h4>易通SSP媒体服务平台</h4>
+            <div class="dengluform">
+                <div class="dengluform-bk"></div>
+                <div class="dengluform-input">
+
+                    <form role="form" action="login" method="post" id="userLogin">
+
+                        <div class="form-group form-groupnew clearfix">
+                            <label class=" control-label">用户名</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="iconfont icon-user"></i></div>
+                                <input class="form-control" type="text" name="username" id="username">
+                            </div>
+                        </div>
+                        <div class="form-group form-groupnew clearfix">
+                            <label class=" control-label">密码</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="iconfont icon-unie614"></i></div>
+                                <input class="form-control" type="password" name="password" id="password">
+                            </div>
+                        </div>
+                        <div class="form-group form-groupnew clearfix" style="margin-bottom: 0px;">
+                            <label class=" control-label">验证码</label>
+                            <div class="input-group yzm">
+                                <input class="form-control" id="inputCode" type="text"/>
+
+                                <span id="code" class="mycode"></span>
+                                <!--<input class="form-control" type="text" placeholder="Enter email" >
+                                <img src="media/imgs/yzm.jpg" class="yzm">-->
+                            </div>
+                        </div>
+                        <div class="form-group form-groupnew clearfix" style="margin-bottom: 0px;">
+                            <!--<div class="input-group yzm">
+                                <span id="login_error" style="color: red;"></span>
+                            </div>-->
+                            <label class=" control-label"></label>
+                            <div class="input-group yzm" style="margin-top: 10px;">
+                                <span id="login_error" style="color: red;"></span>
+                                <!--<input class="form-control" type="text" placeholder="Enter email" >
+                                <img src="media/imgs/yzm.jpg" class="yzm">-->
+                            </div>
+                        </div>
+
+                        <div class="userpsd clearfix" style="margin-top: 0px;">
+
+                            <label class="checkbox-inline pull-left">
+                                <input id="_spring_security_remember_me" name="remember-me" type="checkbox" checked/>
+                                自动登录
+                            </label>
+                            <a href="#" onclick="findPassword()" class="btn btnlink pull-right">忘记密码</a>
+                        </div>
+                        <div class="text-center denglubtnbox">
+                            <a href="javascript:void(0)" class="btn btn2  green denglubtn" id="submit"
+                               >登&nbsp;&nbsp;&nbsp;录</a>
+                            <a href="javascript:void(0)" class="btn btn2 zhucebtn" onclick="toRegister()">注&nbsp;&nbsp;&nbsp;册</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/base/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="js/base/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/base/jquery-form.js"></script>
+<!--验证码-->
+<script type="text/javascript" src="js/base/js.KinerCode.js"></script>
+<script>
+    //$(function(){tologin();});//自动跳过登录，稍后去掉
+    $(function () {
+        $("#username").focus();
+    });
+    function isEmpty(str) {
+        return str == undefined || str == null || $.trim(str) == '';
+    }
+    function toRegister() {
+        window.location.href ="register/register";
+    }
+    function findPassword() {
+        window.location.href ="register/findPassword";
+    }
+    //点击Enter键实现登录
+    $(document).keydown(function (event) {
+        /*;*/
+        if (event.keyCode == 13)
+            document.getElementById('submit').click();
+    });
+    var inp = document.getElementById('inputCode');
+    var code = document.getElementById('code');
+    var submit = document.getElementById('submit');
+    var c = new KinerCode({
+        len: 4,//需要产生的验证码长度
+        //        chars: ["1+2","3+15","6*8","8/4","22-15"],//问题模式:指定产生验证码的词典，若不给或数组长度为0则试用默认字典
+        chars: [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        ],//经典模式:指定产生验证码的词典，若不给或数组长度为0则试用默认字典
+        question: false,//若给定词典为算数题，则此项必须选择true,程序将自动计算出结果进行校验【若选择此项，则可不配置len属性】,若选择经典模式，必须选择false
+        copy: false,//是否允许复制产生的验证码
+        bgColor: "",//背景颜色[与背景图任选其一设置]
+        bgImg: "bg.jpg",//若选择背景图片，则背景颜色失效
+        randomBg: false,//若选true则采用随机背景颜色，此时设置的bgImg和bgColor将失效
+        inputArea: inp,//输入验证码的input对象绑定【 HTMLInputElement 】
+        codeArea: code,//验证码放置的区域【HTMLDivElement 】
+        click2refresh: true,//是否点击验证码刷新验证码
+        false2refresh: true,//在填错验证码后是否刷新验证码
+        validateObj: submit,//触发验证的对象，若不指定则默认为已绑定的输入框inputArea
+        validateEven: "click",//触发验证的方法名，如click，blur等
+        validateFn: function (result, code) {//验证回调函数
+           /* ;*/
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var code = $("#inputCode").val();
+            if (isEmpty(username) || isEmpty(password)) {
+                $("#login_error").text("用户名或密码不能为空");
+                return;
+            }
+            if (isEmpty(code)) {
+                $("#login_error").text("请输入正确的验证码");
+                return;
+            }
+            if (result) {
+                $("#userLogin").ajaxSubmit({
+                    success: function (data) {
+                        window.location.href = "index";
+                    },
+                    error: function (e) {
+                        /*;*/
+                        var result = eval('(' + e.responseText + ')');
+                        $("#login_error").text(result.restErrors[0].message);
+                    }
+                })
+            } else {
+                if (this.opt.question) {
+                    //alert('验证失败:' + code.answer);
+                    $("#login_error").text("请输入正确的验证码");
+                } else {
+                    //alert('验证失败:' + code.strCode);
+                    //alert('验证失败:' + code.arrCode);
+                    $("#login_error").text("请输入正确的验证码");
+                }
+            }
+        }
+    });
+</script>
+</html>

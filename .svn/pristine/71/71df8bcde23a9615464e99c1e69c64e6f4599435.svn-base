@@ -1,0 +1,289 @@
+package com.unioncast.ssp.front.controller.ssp.dict;
+
+import java.util.List;
+import javax.annotation.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.unioncast.common.ssp.model.SspCityInfo;
+import com.unioncast.common.ssp.model.SspDictAccessWay;
+import com.unioncast.common.ssp.model.SspDictAdPositionType;
+import com.unioncast.common.ssp.model.SspDictAdType;
+import com.unioncast.common.ssp.model.SspDictAgeTarget;
+import com.unioncast.common.ssp.model.SspDictAudit;
+import com.unioncast.common.ssp.model.SspDictBuyTarget;
+import com.unioncast.common.ssp.model.SspDictCreativeSize;
+import com.unioncast.common.ssp.model.SspDictEducationTarget;
+import com.unioncast.common.ssp.model.SspDictIndustry;
+import com.unioncast.common.ssp.model.SspDictInterestsTarget;
+import com.unioncast.common.ssp.model.SspDictLabel;
+import com.unioncast.common.ssp.model.SspDictMediaType;
+import com.unioncast.common.ssp.model.SspDictMobileBrandType;
+import com.unioncast.common.ssp.model.SspDictPlatform;
+import com.unioncast.common.ssp.model.SspDictSysOperationType;
+import com.unioncast.ssp.front.controller.common.BaseController;
+import com.unioncast.ssp.front.controller.user.UserSystemController;
+import com.unioncast.ssp.front.service.ssp.dict.DictService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
+/**
+ * 字典数据控制器
+ * 
+ * @author changguobin@unioncast.cn
+ * @date 2017-01-25 10:37:47
+ */
+@Api("字典请求")
+@RestController
+@RequestMapping("rest/ssp/dict")
+public class DictController extends BaseController {
+
+	private static final Logger logger = LoggerFactory.getLogger(UserSystemController.class);
+
+	@Resource
+	private DictService dictService;
+
+	/**
+	 * 接入方式
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 16:59:25
+	 *
+	 * @param sspDictAccessWay
+	 * @return List<SspDictAccessWay>
+	 */
+	@ApiOperation(value = "接入方式", httpMethod = "POST")
+	@RequestMapping(value = "/accessWay", method = RequestMethod.POST)
+	public List<SspDictAccessWay> queryAccessWay(SspDictAccessWay sspDictAccessWay) {
+		return dictService.queryAccessWay(sspDictAccessWay);
+	}
+
+	/**
+	 * 广告位类型
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:16:08
+	 *
+	 * @param sspDictAdPositionType
+	 * @return List<SspDictAdPositionType>
+	 */
+	@ApiOperation(value = "广告位类型", httpMethod = "POST")
+	@RequestMapping(value = "/adPositionType", method = RequestMethod.POST)
+	public List<SspDictAdPositionType> queryAdPositionType(SspDictAdPositionType sspDictAdPositionType) {
+		return dictService.queryAdPositionType(sspDictAdPositionType);
+	}
+
+	/**
+	 * 广告类型
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:15:21
+	 *
+	 * @param sspDictAdType
+	 * @return List<SspDictAdType>
+	 */
+	@ApiOperation(value = "广告类型", httpMethod = "POST")
+	@RequestMapping(value = "/adType", method = RequestMethod.POST)
+	public List<SspDictAdType> queryAdTypeDict(SspDictAdType sspDictAdType) {
+		return dictService.queryAdType(sspDictAdType);
+	}
+
+	/**
+	 * 地域定向
+	 * 
+	 * @author zylei
+	 * @data 2017年2月9日 上午9:55:42
+	 * @param sspCityInfo
+	 * @return
+	 */
+	@ApiOperation(value = "地域定向", httpMethod = "POST")
+	@RequestMapping(value = "/areaTarget", method = RequestMethod.POST)
+	public List<SspCityInfo> queryCityInfo(@RequestBody(required = false) SspCityInfo sspCityInfo) {
+		return dictService.queryCityInfo(sspCityInfo);
+	}
+	
+	/**
+	 * 年龄定向
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:18:21
+	 *
+	 * @param sspDictAgeTarget
+	 * @return List<SspDictAgeTarget>
+	 */
+	@ApiOperation(value = "年龄定向", httpMethod = "POST")
+	@RequestMapping(value = "/ageTarget", method = RequestMethod.POST)
+	public List<SspDictAgeTarget> queryAgeTarget(SspDictAgeTarget sspDictAgeTarget) {
+		return dictService.queryAgeTarget(sspDictAgeTarget);
+	}
+
+	/**
+	 * 审核状态
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:19:10
+	 *
+	 * @param sspDictAudit
+	 * @return List<SspDictAudit>
+	 */
+	@ApiOperation(value = "审核状态", httpMethod = "POST")
+	@RequestMapping(value = "/audit", method = RequestMethod.POST)
+	public List<SspDictAudit> queryAudit(SspDictAudit sspDictAudit) {
+		return dictService.queryAudit(sspDictAudit);
+	}
+
+	/**
+	 * 购买倾向
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:23:14
+	 *
+	 * @param sspDictBuyTarget
+	 * @return List<SspDictBuyTarget>
+	 */
+	@ApiOperation(value = "购买倾向", httpMethod = "POST")
+	@RequestMapping(value = "/buyTarget", method = RequestMethod.POST)
+	public List<SspDictBuyTarget> queryBuyTarget(SspDictBuyTarget sspDictBuyTarget) {
+		return dictService.queryBuyTarget(sspDictBuyTarget);
+	}
+
+	/**
+	 * 创意尺寸
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:22:57
+	 *
+	 * @param sspDictCreativeSize
+	 * @return List<SspDictCreativeSize>
+	 */
+	@ApiOperation(value = "创意尺寸", httpMethod = "POST")
+	@RequestMapping(value = "/creativeSize", method = RequestMethod.POST)
+	public List<SspDictCreativeSize> queryCreativeSize(SspDictCreativeSize sspDictCreativeSize) {
+		return dictService.queryCreativeSize(sspDictCreativeSize);
+	}
+
+	/**
+	 * 学历定向
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:22:40
+	 *
+	 * @param sspDictEducationTarget
+	 * @return List<SspDictEducationTarget>
+	 */
+	@ApiOperation(value = "学历定向", httpMethod = "POST")
+	@RequestMapping(value = "/educationTarget", method = RequestMethod.POST)
+	public List<SspDictEducationTarget> queryEducationTarget(SspDictEducationTarget sspDictEducationTarget) {
+		return dictService.queryEducationTarget(sspDictEducationTarget);
+	}
+
+	/**
+	 * 行业类型
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:22:17
+	 *
+	 * @param sspDictIndustry
+	 * @return List<SspDictIndustry>
+	 */
+	@ApiOperation(value = "行业类型", httpMethod = "POST")
+	@RequestMapping(value = "/industry", method = RequestMethod.POST)
+	public List<SspDictIndustry> queryIndustry(SspDictIndustry sspDictIndustry) {
+		return dictService.queryIndustry(sspDictIndustry);
+	}
+
+	/**
+	 * 兴趣定向
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:21:59
+	 *
+	 * @param sspDictInterestsTarget
+	 * @return List<SspDictInterestsTarget>
+	 */
+	@ApiOperation(value = "兴趣定向", httpMethod = "POST")
+	@RequestMapping(value = "/interestsTarget", method = RequestMethod.POST)
+	public List<SspDictInterestsTarget> queryInterestsTarget(SspDictInterestsTarget sspDictInterestsTarget) {
+		return dictService.queryInterestsTarget(sspDictInterestsTarget);
+	}
+
+	/**
+	 * 创意标签
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:21:42
+	 *
+	 * @param sspDictLabel
+	 * @return List<SspDictLabel>
+	 */
+	@ApiOperation(value = "创意标签", httpMethod = "POST")
+	@RequestMapping(value = "/label", method = RequestMethod.POST)
+	public List<SspDictLabel> queryLabel(SspDictLabel sspDictLabel) {
+		return dictService.queryLabel(sspDictLabel);
+	}
+
+	/**
+	 * 媒体类型
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:21:21
+	 *
+	 * @param sspDictMediaType
+	 * @return List<SspDictMediaType>
+	 */
+	@ApiOperation(value = "媒体类型", httpMethod = "POST")
+	@RequestMapping(value = "/mediaType", method = RequestMethod.POST)
+	public List<SspDictMediaType> queryMediaType(SspDictMediaType sspDictMediaType) {
+		return dictService.queryMediaType(sspDictMediaType);
+	}
+
+	/**
+	 * 设备品牌
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:21:02
+	 *
+	 * @param sspDictMobileBrandType
+	 * @return List<SspDictMobileBrandType>
+	 */
+	@ApiOperation(value = "设备品牌", httpMethod = "POST")
+	@RequestMapping(value = "/mobileBrandType", method = RequestMethod.POST)
+	public List<SspDictMobileBrandType> queryMobileBrandType(SspDictMobileBrandType sspDictMobileBrandType) {
+		return dictService.queryMobileBrandType(sspDictMobileBrandType);
+	}
+
+	/**
+	 * 所属平台
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:20:39
+	 *
+	 * @param sspDictPlatform
+	 * @return List<SspDictPlatform>
+	 */
+	@ApiOperation(value = "所属平台", httpMethod = "POST")
+	@RequestMapping(value = "/platform", method = RequestMethod.POST)
+	public List<SspDictPlatform> queryPlatform(SspDictPlatform sspDictPlatform) {
+		return dictService.queryPlatform(sspDictPlatform);
+	}
+
+	/**
+	 * 操作系统类型
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-02-06 17:20:14
+	 *
+	 * @param sspDictSysOperationType
+	 * @return List<SspDictSysOperationType>
+	 */
+	@ApiOperation(value = "操作系统类型", httpMethod = "POST")
+	@RequestMapping(value = "/sysOperationType", method = RequestMethod.POST)
+	public List<SspDictSysOperationType> querySysOperationType(SspDictSysOperationType sspDictSysOperationType) {
+		return dictService.querySysOperationType(sspDictSysOperationType);
+	}
+
+}

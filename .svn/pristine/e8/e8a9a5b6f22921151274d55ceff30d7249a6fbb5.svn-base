@@ -1,0 +1,14 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspPricingGranularity;
+
+/**
+ * @auther wangyao
+ * @date 2017-04-24 19:57
+ */
+
+public interface SspPricingGranularityService {
+
+    void save(SspPricingGranularity sspPricingGranularity) throws Exception;
+
+}

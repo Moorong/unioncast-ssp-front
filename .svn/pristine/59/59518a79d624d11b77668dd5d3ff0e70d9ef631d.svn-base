@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="returnPage()">媒体管理</a>
+    <i> / </i> <span>广告位管理</span></h2>
+<!-- 当前位置结束 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <!-- 表单内容开始 -->
+        <div class="block_content">
+            <div class="container-fluid">
+                <div class="search_block clearfix">
+                    <div class="form-group  clearfix">
+                        <div class="pull-left">
+                            <a href="javascript:void(0)" class="btn green btn2" data-toggle="modal"
+                               data-target="#myModal" id="add"><i class="glyphicon glyphicon-plus"></i>新增广告位</a>
+                            <a href="javascript:void(0)" class="btn btn_trash" onclick="deleteMany()"><i
+                                    class="glyphicon glyphicon-trash"></i>批量删除</a>
+                        </div>
+                        <div class="pull-right">
+                            <select class="dropdown" id="appInfo">
+
+                            </select>
+                            <select class="dropdown" id="platform">
+
+                            </select>
+                            <select class="dropdown" id="state">
+                                <option value="">--状态--</option>
+                                <option value="1">开</option>
+                                <option value="2">关</option>
+                            </select>
+                            <select class="dropdown" id="adPosition">
+
+                            </select>
+                            <div class=" inline_block has-feedback clearfix">
+                                <label class="control-label sr-only">Input with success</label>
+                                <input type="text" class="form-control" id="adPositionName">
+                                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                            </div>
+                            <a href="javascript:void(0)" class="btn btn-sm" id="search">查询</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" name="checkboxed1" onclick="operateCheckBox.checkAll()"></th>
+                                <th>广告位标识</th>
+                                <th>广告位名称</th>
+                                <th>所属应用</th>
+                                <th>所属平台</th>
+                                <th>广告形式</th>
+                                <th>更新日期</th>
+                                <th>广告位状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody class="sldataBody">
+                            <tr class="sldataBodyHeader">
+                                <td><input type="checkbox" name="checkboxed2"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                            <tbody class="sldataBodyTemplate">
+                            <tr class="sldataBodyRow">
+                                <td><input type="checkbox" value="{id}" name="checkboxed" class="adPositionId"
+                                           onclick="operateCheckBox.check()"></td>
+                                <td>{adPositionId}</td>
+                                <td>{name}</td>
+                                <td>{app}</td>
+                                <td>{platform}</td>
+                                <td>{type}</td>
+                                <td>{updateTime}</td>
+                                <td>{state}</td>
+                                <td>{operate}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- 分页开始 -->
+                        <div class="bs-component pull-right" id="pageAdPositionList"></div>
+                        <!-- 分页结束 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 表单内容结束 -->
+    </div>
+</div>
+<!-- 右侧结束 -->
+</body>
+
+<script>
+    var currentPage = 1;
+    var pageInit = {
+        init: function () {
+            this.loadPlatform();
+            this.LoadAppInfo();
+            this.loadAdPosition();
+            this.loadPage();
+        }, loadPlatform: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspDicPlatform/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    $('#platform').empty();
+                    options.push("<option value=''>--所属平台--</option>");
+                    if (restResponse.result != null) {
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            var level = row.level;
+                            if (level != "1000") {
+                                options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                            }
+                        }
+                    }
+                    $("#platform").append(options.join(''));
+                    $('#platform').selectpicker('refresh');
+                }, error: function () {
+                    alert('加载平台信息失败！');
+                }
+            });
+        }, LoadAppInfo: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspAppInfo/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    if (restResponse.result != null) {
+                        $('#appInfo').empty();
+                        options.push("<option value=''>--所属应用--</option>");
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            options.push("<option value=\"" + row.id + "\">" + row.name + "</option>");
+                        }
+                        $("#appInfo").append(options.join(''));
+                        $('#appInfo').selectpicker('refresh');
+
+                    }
+                }, error: function () {
+                    alert('加载应用信息失败！');
+                }
+            });
+        }, loadAdPosition: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspDictAdPositionType/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    $('#adPosition').empty();
+                    options.push("<option value=''>--广告位类型--</option>");
+                    if (restResponse.result != null) {
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                        }
+                    }
+                    $("#adPosition").append(options.join(''));
+                    $('#adPosition').selectpicker('refresh');
+                }, error: function () {
+                    alert('加载广告位类型失败！');
+                }
+            });
+        }, loadPage: function () {
+            if (currentPage == null || currentPage <= 0) {
+                currentPage = 1;
+            }
+            var name = $("#adPositionName").val();
+            var platform = $("#platform").val();
+            var appInfo = $("#appInfo").val();
+            var state = $("#state").val();
+            var adPosition = $("#adPosition").val();
+            //TODO  暂时不做
+            //var audit = $("#audit").val();
+            /* 
+            var data = {};
+            if (name != null && name != "") {
+                data = {
+                    'currentPageNo': currentPage,
+                    'pageSize': 10,
+                    'searchExpressionList[0].value': platform,
+                    'searchExpressionList[0].propertyName': 'dict_platform_id',
+                    'searchExpressionList[0].operation': 'EQ',
+                    'searchExpressionList[1].value': appInfo,
+                    'searchExpressionList[1].propertyName': 'app_info_id',
+                    'searchExpressionList[1].operation': 'EQ',
+                    'searchExpressionList[2].value': name,
+                    'searchExpressionList[2].propertyName': 'name',
+                    'searchExpressionList[2].operation': 'LIKE',
+                    'searchExpressionList[3].value': state,
+                    'searchExpressionList[3].propertyName': 'state',
+                    'searchExpressionList[3].operation': 'EQ',
+                    'searchExpressionList[4].value': adPosition,
+                    'searchExpressionList[4].propertyName': 'dict_ad_position_type_list',
+                    'searchExpressionList[4].operation': 'EQ',
+                    'orderExpressionList[0].op': 'desc',
+                    'orderExpressionList[0].propertyName': 'id',
+                    'orderExpressionList[0].operation': 'AND',
+                    'predicate': 'AND'
+                };
+            } else {
+                data = {
+                    'currentPageNo': currentPage,
+                    'pageSize': 10,
+                    'searchExpressionList[0].value': platform,
+                    'searchExpressionList[0].propertyName': 'dict_platform_id',
+                    'searchExpressionList[0].operation': 'EQ',
+                    'searchExpressionList[1].value': appInfo,
+                    'searchExpressionList[1].propertyName': 'app_info_id',
+                    'searchExpressionList[1].operation': 'EQ',
+                    'searchExpressionList[2].value': state,
+                    'searchExpressionList[2].propertyName': 'state',
+                    'searchExpressionList[2].operation': 'EQ',
+                    'searchExpressionList[3].value': adPosition,
+                    'searchExpressionList[3].propertyName': 'dict_ad_position_type_list',
+                    'searchExpressionList[3].operation': 'EQ',
+                    'orderExpressionList[0].op': 'desc',
+                    'orderExpressionList[0].propertyName': 'id',
+                    'orderExpressionList[0].operation': 'AND',
+                    'predicate': 'AND'
+                };
+            }
+             */
+			var jsonData = {
+            		 "currentPageNo" : currentPage,
+         			"pageSize" : 10,
+         			"predicate" : "AND",
+         			"searchExpressionList" : [],
+         			"orderExpressionList" : [{
+         				"propertyName" : "id",
+         				"op" : "DESC"
+         			}] 
+			};
+			if(!isEmpty(platform)) {
+         		jsonData.searchExpressionList.push({
+         			'value' : platform,
+                 	'propertyName' : 'dict_platform_id',
+                 	'operation' : 'EQ'
+         		});
+         	}
+			if(!isEmpty(appInfo)) {
+         		jsonData.searchExpressionList.push({
+         			'value' : appInfo,
+                 	'propertyName' : 'app_info_id',
+                 	'operation' : 'EQ'
+         		});
+         	}
+			if(!isEmpty(state)) {
+         		jsonData.searchExpressionList.push({
+         			'value' : state,
+                 	'propertyName' : 'state',
+                 	'operation' : 'EQ'
+         		});
+         	}
+			if(!isEmpty(adPosition)) {
+         		jsonData.searchExpressionList.push({
+         			'value' : adPosition,
+                 	'propertyName' : 'dict_ad_position_type_list',
+                 	'operation' : 'EQ'
+         		});
+         	}
+			$.ajax({
+					type: "post",
+					asyne: true,
+                    cache: false,
+                    contentType : 'application/json',
+            		data : JSON.stringify(jsonData),
+                    url: "rest/sspAdPositionInfo/page",
+                    success: function (restResponse) {
+                        $(".sldataBody .sldataBodyRow").remove();
+                        var totalPages = 1;
+                        var startPage = 1;
+                        var count = 0;
+                        if ((restResponse.restErrors == null) && (restResponse.result.dataArray.length != 0)) {
+                            totalPages = restResponse.result.totalPage; //总页数
+                            startPage = restResponse.result.currentPageNo; //当前页
+                            count = restResponse.result.totalCount; //总记录数
+                            for (var i = 0; i < restResponse.result.dataArray.length; i++) {
+                                var row = restResponse.result.dataArray[i];
+                                var rowHtml = $(".sldataBodyTemplate").html();
+                                rowHtml = rowHtml.replace(/{name}/g,
+                                    (row.name == null) ? '' : row.name);
+                                rowHtml = rowHtml.replace(/{id}/g,
+                                    (row.id == null) ? '' : row.id);
+                                rowHtml = rowHtml.replace(/{adPositionId}/g,
+                                    (row.adPositionId == null) ? '' : row.adPositionId);
+                                rowHtml = rowHtml.replace(/{state}/g,
+                                    (row.state == 1) ? '<input type="checkbox" value="1" id="switch' + row.id + '" name="switch"checked />' : '<input type="checkbox" value="2" id="switch' + row.id + '" name="switch"/>');
+                                rowHtml = rowHtml.replace(/{platform}/g, (row.sspAppInfo.sspDictPlatform.name == null) ? '' : row.sspAppInfo.sspDictPlatform.name);
+                                rowHtml = rowHtml.replace(/{app}/g, (row.sspAppInfo.name == null) ? '' : row.sspAppInfo.name);
+                                rowHtml = rowHtml.replace(/{type}/g, (row.sspDictAdPositionTypeList.name == null) ? '' : row.sspDictAdPositionTypeList.name);
+                                rowHtml = rowHtml.replace(/{updateTime}/g,
+                                    getMyDate(row.updateTime));
+                                rowHtml = rowHtml
+                                    .replace(
+                                        /{operate}/g,
+                                        "<a data-toggle='tooltip' data-placement='top' title='修改' href=\"javascript:void(0)\" onclick=\"updateInfo('"
+                                        + row.id
+                                        + "')\"><i class='iconfont icon-xiugai'></i></a>&nbsp;<a data-toggle='tooltip' data-placement='top' title='删除' href=\"javascript:void(0)\" onclick=\"deleteInfo('"
+                                        + row.id
+                                        + "','"
+                                        + startPage
+                                        + "','"
+                                        + row.state
+                                        + "')\"><i class='iconfont icon-shanchu'></i></a>");
+
+                                $(".sldataBody").append($(rowHtml));
+                                $("#currentPag").val(startPage);
+                                loadSwitch();
+                            }
+                        } else {
+                            $(".sldataBody .sldataBodyRow").remove();
+                            $(".sldataBody").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"9\">暂时没有数据</td></tr>");
+                        }
+                        $('#pageAdPositionList').html('');
+                        $('#pageAdPositionList').html('<ul id="pageAdPositionListUl" class="bs-component pull-right"></ul>');
+                        UC
+                            .ajaxPage(
+                                "pageAdPositionListUl",
+                                {
+                                    totalPages: totalPages, //总页数
+                                    startPage: startPage, //当前页
+                                    count: count, //总记录数
+                                    visiblePages: 5,
+                                    onPageClick: function (event, thisPage) {
+                                        currentPage = thisPage;
+                                        pageInit.loadPage();
+                                    }
+                                });
+                    },
+                    error: function () {
+                        $(".sldataBody .sldataBodyRow").remove();
+                        $(".sldataBody").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"9\">暂时没有数据</td></tr>");
+                    }
+
+                });
+        }
+    };
+    var operateCheckBox = {
+        checkAll: function () {
+            var obj = document.getElementsByName('checkboxed1');
+            var cks = document.getElementsByName('checkboxed');
+            var ckslen = cks.length;
+            for (var i = 0; i < ckslen - 1; i++) {
+                cks[i].checked = obj[0].checked;
+            }
+        }, check: function () {
+            var obj = document.getElementsByName('checkboxed1');
+            var cks = document.getElementsByName('checkboxed');
+            var ckslen = cks.length;
+            var state = true;
+            for (var i = 0; i < ckslen - 1; i++) {
+                if (!cks[i].checked) {
+                    state = false;
+                }
+            }
+            obj[0].checked = state;
+        }
+    };
+    $(function () {
+        /*组件初始化*/
+        $("[data-toggle='tooltip']").tooltip();
+        //下拉菜单
+        $(".dropdown").selectpicker({});
+        pageInit.init();
+    });
+    function changeState(val, _this) {
+        var id = _this.closest('tr').find('.adPositionId').val();
+        $.ajax({
+            url: "rest/sspAdPositionInfo/updateInfo",
+            type: "POST",
+            dataType: "json",
+            data: {state: val, id: id},
+            success: function (restResponse) {
+                pageInit.loadPage();
+            }, error: function () {
+                alert('操作失败！');
+            }
+        });
+    }
+    function loadSwitch() {
+        $("input[name='switch']").bootstrapSwitch({
+            onText: "开",
+            offText: "关",
+            size: "mini",
+            onSwitchChange: function (event, state) {
+                if (state == true) {
+                    $(this).val("1");
+                    changeState(1, $(this));
+                } else {
+                    $(this).val("2");
+                    changeState(2, $(this));
+                }
+            }
+        });
+    }
+    $("#add").click(function () {
+        var url = "sspAdPositionInfo/add";
+        page.loadPage(url);
+    });
+    $("#search").click(function () {
+        pageInit.loadPage();
+    });
+
+    function updateInfo(id) {
+        var state = $("#switch" + id).val();
+        if (state == 1) {
+            alert("请将状态关闭后，再进行修改操作！");
+            return false;
+        }
+        var url = "sspAdPositionInfo/update/" + id;
+        page.loadPage(url);
+    }
+    function deleteMany() {
+        var checked = $("input[name='checkboxed']").is(':checked');
+        if (!checked) {
+            alert("请选择一项应用");
+            return false;
+        }
+        var ids = ""
+        var states=2;
+        $("input[name='checkboxed']:checkbox:checked").each(function () {
+            var id = $(this).val();
+            var state = $("#switch" + id).val();
+            if (state == 1) {
+                states=1;
+            }
+            ids += id + ",";
+        })
+        deleteInfo(ids, $("#currentPag").val(),states);
+    }
+    function deleteInfo(id, currentPageNo,state) {
+
+        if (state == 1) {
+            alert("请将状态关闭后，再进行删除操作！");
+            return false;
+        }
+        confirm('确认删除该广告位？', "提示", "确定", "取消").ok(function () {
+            $.ajax({
+                type: "post",
+                asyne: true,
+                cache: false,
+                datatype: "json",
+                data: {
+                    ids: id
+                },
+                url: "rest/sspAdPositionInfo/batchDelete",
+                success: function (restResponse) {
+                    if (restResponse.restErrors == null) {
+                        alert('删除成功！');
+                        currentPage = currentPageNo;
+                        pageInit.loadPage();
+                    } else {
+                        alert('删除失败！');
+                    }
+                },
+                error: function () {
+                    alert('删除失败！');
+                }
+            });
+        })
+    }
+    function returnPage() {
+        var url = "ssp/sspDeveloper/list";
+        page.choiceMenu('51')
+        page.loadPage(url);
+    }
+</script>
+</html>

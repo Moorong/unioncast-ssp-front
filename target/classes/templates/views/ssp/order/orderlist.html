@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2 class="current_loc">
+    <i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理(${(CURRENT_ADVERTISER_INFO.name)!''})</a> <i> / </i> <span>订单管理</span>
+</h2>
+<!-- 当前位置结束 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <!-- 表单名称开始 -->
+        <!-- <div class="block_title white clearfix">
+            <span class="block_title_name pull-left">
+                提现记录
+            </span>
+        </div> -->
+        <!-- 表单名称结束 -->
+        <!-- 表单内容开始 -->
+        <form id="orderForm" action="sspOrder/page">
+            <div class="search_block clearfix">
+                <div class="form-group  clearfix">
+                    <div class="pull-left">
+                        <a href="javascript:void(0)" id="addOrder" class="btn  btn2 green" data-toggle="modal"
+                           data-target="#myModal" onClick="addOrder()"><i class="glyphicon glyphicon-plus"></i>新增订单</a>
+                        <a href="javascript:void(0)" class="btn  btn_trash" onclick="deleteAll()"><i
+                                class="glyphicon glyphicon-trash"></i>批量删除</a>
+                        <!-- <a href="javascript:void(0)" class="btn btn_trash"><i class="glyphicon glyphicon-trash"></i>批量删除</a> -->
+                        <!-- <a href="javascript:void(0)" class="btn btn_trash" id="tabbtn">筛选</a> -->
+                    </div>
+
+                    <div class="pull-right">
+                        <div class="formgroup clearfix ">
+                            <label>投放状态：</label>
+                            <select class="dropdown" name="adPutState" id="adPutState">
+                                <option value="">全部</option>
+                                <option value="1">开</option>
+                                <option value="2">关</option>
+                            </select>
+                        </div>
+                        <div class="formgroup clearfix ">
+                            <label>修改时间：</label>
+                            <div id="reportrange2"
+                                 style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                <span name=""></span>
+                                <input type="hidden" name="pushStartTime" value="" id="pushStartTime"/>
+                                <input type="hidden" name="pushEndTime" value="" id="pushEndTime"/>
+                                <b class="caret"></b>
+                            </div>
+                        </div>
+                        <div class="has-feedback clearfix ">
+                            <!-- <label class="control-label sr-only" for="inputSuccess2">状态</label>-->
+                            <label>订单名称：</label>
+                            <input type="text" class="form-control" name="orderName" id="orderName"
+                                   placeholder="请输入订单名称">
+                        </div>
+                        <!--隐藏广告主ID接收表单-->
+                        <input type="hidden" name="advertiserId" id="advertiserId" value="${(advertiserId)!}">
+                        <a href="javascript:void(0)" id="serach" onclick="searchPage(1)" class="btn btn-sm">查询</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!-- 间隔 -->
+        <div style="height:10px;background:#f1f2f7;"></div>
+        <!-- 间隔 -->
+        <div class="block_content ">
+            <div class="block_content">
+                <div class="container-fluid">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th><input id="btnCheckAll" type="checkbox"></th>
+                                    <th>投放状态</th>
+                                    <th>订单名称</th>
+                                    <th>订单ID</th>
+                                    <th>投放时间</th>
+                                    <th>进度条</th>
+                                    <th>订单预算</th>
+                                    <th>余额</th>
+                                    <th>策略</th>
+                                    <th>修改时间</th>
+                                    <th>操作</th>
+                                </tr>
+                                </thead>
+                                <tbody id="orderList">
+                                </tbody>
+                            </table>
+                            <!-- 分页开始 -->
+                            <div class="bs-component clearfix pull-right" id="page">
+                            </div>
+                            <!-- 分页结束 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 表单内容结束 -->
+        </div>
+    </div>
+</div>
+<!-- 右侧结束 -->
+</body>
+<script>
+    $(function () {
+//         /!*组件初始化*!/
+//          
+        loadSwith();
+        //下拉菜单
+//         
+
+        var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+        var defEndDate = moment().format(defDateFormat);
+      //搜索时间默认赋值
+        $('input[name="pushStartTime"]').val(defStartDate);
+        $('input[name="pushEndTime"]').val(defEndDate);
+        /*双日历组件*/
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+        $('#reportrange2').daterangepicker({
+        	locale: page.attr.drDefaultLocal,    
+        	startDate: defStartDate
+            },
+            function (start, end) {
+                var choStart = start.format(defDateFormat);
+                var choEnd = end.format(defDateFormat);
+                $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+                $('input[name="pushStartTime"]').val(choStart);
+                $('input[name="pushEndTime"]').val(choEnd);
+                $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+            });
+        //初始化加载
+        loadData(1);
+    });
+
+    /**增加订单*/
+    function addOrder() {
+        var advertiserId = $("#advertiserId").val();
+        var url = "sspOrder/addOrder";
+        page.loadPage(url, {advertiserId: advertiserId});
+    }
+
+    //渲染开关组件
+    function loadSwith() {
+        $("input[name='switch']").bootstrapSwitch({
+            onText: "开",
+            offText: "关",
+            size: "mini",
+            onSwitchChange: function (event, state) {
+                if (state == true) {
+                    updateState($(this), 1);
+                    $(this).val("1");
+                } else {
+                    updateState($(this), 2);
+                    $(this).val("2");
+                }
+            }
+        });
+    }
+
+    //加载页面开始
+    function loadData(currentPageNo) {
+        var advertiserId = $("#advertiserId").val();
+        var pageSize = 10;
+        page.ajax({
+            url: "sspOrder/page",
+            data: {currentPageNo: currentPageNo, advertiserId: advertiserId},
+            datatype: 'json',
+            success: function (data) {
+                $("#orderList").html("");
+                $("#notice").html("");
+                if (data.totalPage == 0) {
+                    $("#orderList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+                    return false;
+                }
+                loadPage(data, "loadPage");
+            }
+        });
+    }
+    /*公共加载页面*/
+    function loadPage(data, type) {
+        var datas = data.dataArray;
+        $.each(datas, function (index, order) {
+            var html = "<tr>";
+            html += "<td><input type='checkbox' name='checkboxed' value='" + order.id + "'></td>";
+            html += "<td style='display: none' class='orderId'>" + order.id + "</td>";
+            if (order.adPutState == 2) {
+                html += "<td><input type='checkbox' id='switch-" + order.id + "' name='switch' value= '2' /></td>";
+            } else {
+                html += "<td><input type='checkbox' name='switch'  value='1' id='switch-" + order.id + "' checked/></td>";
+            }
+            html += "<td style='vertical-align: middle;text-align:center;'>" + "<a href='#' onclick='goToPlanList(" + order.id + ")'> " + order.name + "</a>" + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>" + order.orderIdentifying + "</td>";
+            if (order.putTimeState == '2') {
+                html += "<td style='vertical-align: middle;text-align:center;'>不限</td>";
+            } else {
+                html += "<td style='vertical-align: middle;text-align:center;'>" + getMoth(order.putStartTime) + "-" + getMoth(order.putEndTime) + "</td>";
+            }
+            /*计算进度条(总预算-消耗/总预算)% */
+            var money = ((order.budget - order.consumptionAmount) / order.budget) * 100;
+            html += "<td style='vertical-align: middle;text-align:center;'>" +
+                "<div class='progress'>" +
+                "<div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: " + toDecimal2(money) + "%' >" + toDecimal2(money)+'%'
+            "</div>" +
+            "</div>" +
+            "</td>";
+            /*订单预算*/
+            html += "<td style='vertical-align: middle;text-align:center;'>" + order.budget + "</td>";
+            /*订单余额*/
+            html += "<td style='vertical-align: middle;text-align:center;'>" + order.balance + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>" + order.openStatePlanAmount + "/" + order.countPlanAmount + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>"+"<a href='#' onclick='goToLogList(" + order.id + ","+order.updateTime+")'> "+ getMyDate(order.updateTime) +"</a>"+ "</td>";
+            html += "<td>  <a href='#' data-toggle='tooltip' data-placement='top' onclick='updateOrder(" + order.id + ")' title='修改'><i class='iconfont icon-xiugai'></i></a>" +
+                "<a href='#' data-toggle='tooltip' data-placement='top' title='删除' onclick='deleteOrder(" + order.id + "," + order.adPutState + ")'><i class='iconfont icon-shanchu'></i></a></td>";
+            html += "</tr>";
+            $("#orderList").append(html);
+            //渲染开关
+            loadSwith();
+        });
+        //渲染分页插件
+        var totalPage = data.totalPage;
+        var totalCount = data.totalCount;
+        var startPage = data.currentPageNo;
+        $('#page').html("");
+        $('#page').html('<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+        page.ajaxPage({
+            pcont: 'pageUserListUl',//分页容器，ID
+            totalPages: totalPage, //总页数
+            startPage: startPage, //当前页
+            count: totalCount, //总记录数
+            onPageClick: function (env, thisPage) {
+                if (type == "loadPage")
+                    loadData(thisPage);
+                if (type == "search")
+                    searchPage(thisPage);
+            }
+        });
+    }
+
+    /*搜索按钮提交*/
+    function searchPage(currentPageNo) {
+        var advertiserId = $("#advertiserId").val();
+        var adPutState = $("#adPutState").val();
+        var orderName = $("#orderName").val();
+        var pushStartTime = $("#pushStartTime").val();
+        var pushEndTime = $("#pushEndTime").val();
+        var pageSize = 10;
+        page.ajax({
+            url: "sspOrder/page",
+            data: {
+                currentPageNo: currentPageNo,
+                advertiserId: advertiserId,
+                adPutState: adPutState,
+                orderName: orderName,
+                pushStartTime: pushStartTime,
+                pushEndTime: pushEndTime
+            },
+            datatype: 'json',
+            success: function (data) {
+                $("#orderList").html("");
+                if (data.totalPage == 0) {
+                    $("#orderList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+                    return false;
+                }
+                loadPage(data, "search");
+            }
+        });
+    }
+
+    /**修改方法*/
+    function updateOrder(orderId) {
+        var putAllowedState = $("#switch-" + orderId).val();
+        if (putAllowedState == 1) {
+            alert("请将状态关闭后，再进行修改操作！");
+            return;
+        }
+        var advertiserId = $("#advertiserId").val();
+        var url = "sspOrder/editOrder?id=" + orderId + "&advertiserId=" + advertiserId;
+        page.loadPage(url);
+    }
+
+    /**
+     * 删除订单
+     */
+    function deleteOrder(id, state) {
+        var state = $("#switch-" + id).val();
+        if (state == '1') {
+            alert("请将状态关闭后，再进行删除操作！");
+            return false;
+        }
+        var url = "sspOrder/delete";
+        confirm("是否删除该订单?", "提示", "确认", "取消").ok(function () {
+            page.ajax({
+                url: url,
+                data: {id: id},
+                type: 'post',
+                async: true,
+                success: function (data) {
+                    ;
+                    if (data.status == 200) {
+                        alert("删除成功").ok(function(){
+                            var advertiserId = $("#advertiserId").val();
+                            var url = "sspOrder/list?advertiserId=" + advertiserId;
+                            page.loadPage(url);
+                        });
+                    }
+                }
+            });
+        })
+    }
+
+    /**日期转换工具*/
+    function getMoth(str) {
+        var oDate = new Date(str).format("yyyy-MM-dd");
+        return oDate;
+    }
+    ;
+
+
+    //更改开关状态
+    function updateState(_this, val) {
+        var id = _this.closest('tr').find('.orderId').text();
+        var advertiserId = $("#advertiserId").val();
+        var url = "sspOrder/update";
+        page.ajax({
+            url: url,
+            data: {id: id, adPutState: val, advertiserId: advertiserId},
+            type: 'post',
+            success: function (data) {
+                /* if (data.status == 200){
+                 page.loadPage("sspOrder/list");
+                 } */
+            },
+            error: function () {
+                alert("修改状态失败！");
+            }
+        });
+    }
+
+
+    $(function () {
+        $("#btnCheckAll").bind("click", function () {
+            if ($(this).is(":checked")) {
+                //全选
+                $("[name = checkboxed]:checkbox").prop("checked", true);
+            } else {
+                //取消全选
+                $("[name = checkboxed]:checkbox").prop("checked", false);
+            }
+        });
+    });
+    //批量删除
+    function deleteAll() {
+        var ids = '';
+        var flag = true;
+        $("input[name=checkboxed]").each(function () {
+            if ($(this).is(":checked")) {
+                ids += "," + $(this).val();
+            }
+        });
+        if (ids == '') {
+            alert("没有选择一条数据");
+            return false;
+        }
+        var valIds = ids.split(",");
+        for (var i = 0;i < valIds.length; i++){
+            if (valIds[i] != ""){
+                var state = $("#switch-" + valIds[i]).val();
+                if(state == '1'){
+                    alert("请将状态关闭后，再进行删除操作！");
+                    return false;
+                }
+            }
+        }
+        confirm("是否删除该订单?", "提示", "确认", "取消").ok(function () {
+            page.ajax({
+                url: "sspOrder/batchDelete",
+                data: {ids: ids},
+                type: 'POST',
+                datatype: 'json',
+                success: function (data) {
+                    if (data.status == 200) {
+                        alert("删除成功").ok(function(){
+                            var advertiserId = $("#advertiserId").val();
+                            var url = "sspOrder/list?advertiserId=" + advertiserId;
+                            page.loadPage(url);
+                        });
+                    }
+                }
+            });
+        })
+    }
+
+    //跳转到策略列表
+    function goToPlanList(id) {
+        var advertiserId = $("#advertiserId").val();
+        var url = "ssp/plan/goPlanListByOrderId";
+        page.loadPage(url, {
+            orderId: id,
+            advertiserId: advertiserId
+        })
+    }
+    
+    //跳转到日志列表
+    function  goToLogList(orderId,updateTime) {
+        var url = "orerLog/log/goModelLoglist";
+        page.loadPage(url, {
+            'sspOrder.id': orderId,
+            'dateTime': getMyDate(updateTime)
+        });
+    }
+
+        //处理默认时间工具
+    function addDate(dd, dadd) {
+        var a = new Date(dd)
+        a = a.valueOf()
+        a = a + dadd * 24 * 60 * 60 * 1000
+        a = new Date(a)
+        return a;
+    }
+
+    function getMapDate(dayss) {
+        var now = new Date();
+        var NextNow = addDate(now, -dayss);
+        var years = NextNow.getFullYear();
+        var months = NextNow.getMonth() + 1;
+        var days = NextNow.getDate();
+        var beginTime = years + "-" + months + "-" + days;
+        return beginTime;
+    }
+
+    //计算金额保留两位小数
+    function toDecimal2(x) {
+        var f = parseFloat(x);
+        if (isNaN(f)) {
+            return false;
+        }
+        var f = Math.round(x * 100) / 100;
+        var s = f.toString();
+        var rs = s.indexOf('.');
+        if (rs < 0) {
+            rs = s.length;
+            s += '.';
+        }
+        while (s.length <= rs + 2) {
+            s += '0';
+        }
+        return s;
+    }
+    
+
+</script>
+</html>

@@ -1,0 +1,409 @@
+ <!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<body>
+<!-- 右侧开始 -->
+<!-- 表单内容开始 -->
+			
+<h2 class="current_loc">
+	<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i> <span>广告主管理</span>
+</h2>
+<div class="page_main">
+	<div class="page_main_white">
+		<form id="advertiserForm" action="sspAdvertiser/page">
+			<div class="search_block clearfix">
+				<div class="form-group  clearfix">
+					<div class="pull-left">
+						<a href="javascript:void(0)" class="btn  btn2 green"  data-toggle="modal" data-target="#myModal" id="addBtn"><i class="glyphicon glyphicon-plus"></i>新增广告主</a>
+					</div>
+					
+		            <div class="pull-right">
+		            	<div class="formgroup clearfix ">
+						    <label>投放状态：</label>
+					      	<select class="dropdown" name="state" id="state">
+					      		<option value="0">全部</option>
+					      		 <option value="1">开</option>
+		                         <option value="2">关</option> 
+							</select>
+						</div>
+						<div class="formgroup clearfix ">
+						    <label>修改时间：</label>
+					      	<div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+			                  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+			                  <span id="timePeriod"></span> <b class="caret"></b>
+								<input type="hidden" name="startTimeTem" value=""/>
+								<input type="hidden" name="endTimeTem" value=""/>
+			                  <input type="hidden" name="startTime" value=""/>
+                              <input type="hidden" name="endTime" value=""/>
+			               </div>
+						</div>
+						<div class="has-feedback clearfix ">
+					 		<input type="text" class="form-control" name="name" id="name" value=""  placeholder="请输入广告主名称">
+			            </div>
+						<a href="javascript:void(0)" class="btn btn-sm" id="search" >查询</a>
+					</div>
+				</div>
+			</div>
+		</form>
+		<!-- 间隔 -->
+		<div style="height:10px;background:#f1f2f7;"></div>
+		<!-- 间隔 -->
+		<div class="block_content">
+			<div class="container-fluid">
+				
+				
+				<div class="row">
+					<div class="col-md-12">
+						<table class="table" >
+							<thead>
+								<tr>
+									<th>投放状态</th>
+									<th>广告主名称</th>
+									<th>广告主ID</th>
+									<th>订单数</th>
+									<th>修改时间</th>
+									<th width="5%">审核状态</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody id="advertiserList">
+								
+								
+							</tbody>
+						</table>
+						<!-- 分页开始 -->
+                         <div class="bs-component clearfix pull-right" id="page">
+
+                         </div>
+                         <!-- 分页结束 -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</div>
+<!-- 表单内容结束 -->
+<!-- 右侧结束 -->
+</body>
+<script>
+function newFormGroup(title,content){
+	if(isEmpty(title)||isEmpty(content))return '';
+	return '<tr  style="border-bottom: 1px dotted #ccc;"><td style="text-align: right;padding-right: 5px;font-weight: bold;">'+title+'：</td><td>'+content+'</td></tr>';
+}
+	$(function () {
+		/*组件初始化*/
+		loadswitch();
+		//下拉菜单
+// 	     
+        var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+        var defEndDate = moment().format(defDateFormat);
+        /*双日历组件*/
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+
+        //默认为时间空间赋值
+        $('input[name="startTimeTem"]').val(defStartDate);
+        $('input[name="endTimeTem"]').val(defEndDate);
+
+        $('#reportrange2').daterangepicker({
+        		locale: page.attr.drDefaultLocal,    
+        		startDate: defStartDate
+            },
+            function (start, end) {
+                var choStart = start.format(defDateFormat);
+                var choEnd = end.format(defDateFormat);
+                $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+                $('input[name="startTimeTem"]').val(choStart);
+                $('input[name="endTimeTem"]').val(choEnd);
+                $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+            });
+
+        //初始化加载
+        loadData(1);
+	});
+	
+	function loadswitch(){
+		 
+		$("input[name='switch']").bootstrapSwitch({  
+	        onText:"开",  
+	        offText:"关",  
+	        size:"mini",  
+	        onSwitchChange:function(event,state){  
+	            if(state==true){  
+	            	updateState($(this),1);
+	                $(this).val("1");  
+	            }else{  
+	            	updateState($(this),2);
+	                $(this).val("2");  
+	            }
+	        }  
+	    }); 
+	}
+	//起始页
+	 var CurrentPageNo = 1;
+	 
+	 /*搜索按钮提交*/
+	 $("#search").click(function () {
+	 	//var state = $("#state").val();
+         $('input[name="startTime"]').val($('input[name="startTimeTem"]').val());
+         $('input[name="endTime"]').val($('input[name="endTimeTem"]').val());
+
+        page.ajaxSubmit($("#advertiserForm").eq(0)[0],function (resultJson,resultMsg,xmlHttpResponse) {
+            
+            if(resultJson.result.dataArray.length!=0){
+            	$("#advertiserList").html("");
+				$("#page").empty();
+            	loadPage(resultJson);
+            	
+            }else{
+            	$("#advertiserList").html("<tr><td colspan='6' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+            	$("#page").empty();
+            }
+        },function (xmlHttpRequest,errorMsg,errorObj) {
+
+        });
+    });
+	 
+	//加载数据
+	function loadData(currentPageNo){
+		var state = $("#state").val();
+		var startTime = $('input[name="startTime"]').val();
+        var endTime = $('input[name="endTime"]').val();
+        var name = $('#name').val();
+		page.ajax({
+			url : 'sspAdvertiser/page',
+			data : {
+				startTime : startTime,
+				endTime : endTime,
+				currentPageNo : currentPageNo,
+				state : state,
+				name : name
+			},
+			success : function(data) {
+
+				if (data.result.dataArray.length != null) {
+					$("#advertiserList").html("");
+					$("#page").empty();
+					loadPage(data);
+				} else {
+					$("#advertiserList").html("<tr><td colspan='6' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+					$("#page").empty();
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+
+	}
+
+	function loadPage(data) {
+		$('.popover').popover('hide');// 隐藏其他
+		var auditStatus = [];
+		auditStatus['pendding'] = '待审核';
+		auditStatus['submitted'] = '已提交，审核中';
+		auditStatus['approved'] = '通过';
+		auditStatus['disapporoved'] = '不通过';
+		var datas = data.result.dataArray;
+		$.each(datas,function(index, advertiser) {
+							var cssAlign = {
+								verticalAlign:'middle',
+								textAlign:'center'
+							};
+							var $tr = $(HT.tr);
+							var $td0 = $(HT.td);
+							var switchFlag = 1==advertiser.putAllowedState;
+							var $input0 = $(HT.input).attr({
+								type:'checkbox',
+								name:'switch',
+								value:switchFlag?1:2,
+								id:'switch' +advertiser.id
+							}).prop('checked',switchFlag);
+							$td0.append($input0);
+							var $td1 = $(HT.td).css(cssAlign);
+							var $a0 = $(HT.a).click(function(){enterOrder(advertiser.id)}).html(advertiser.name);
+							$td1.append($a0);
+							var $td2 = $(HT.td).css(cssAlign).addClass('advertiserId').html(advertiser.advertiserIdentifying);
+							var $td3 = $(HT.td).css(cssAlign).html(advertiser.orderNumber);
+							var $td4 = $(HT.td).css(cssAlign).html(getDay(advertiser.updateTime));
+							
+							var $td5 = $(HT.td);
+							if(isNotEmpty(advertiser.platformAudit)){
+								var pa = advertiser.platformAudit;
+								if(pa.status){
+									$td5.append('内审:').append(auditStatus[pa.status]);
+								}
+								if(pa.pltStatuses&&!$.isEmptyObject(pa.pltStatuses)){
+									var $tab = $(HT.tab);
+									for(var k in pa.pltStatuses){
+										var v = pa.pltStatuses[k];
+										$tab.append(newFormGroup(k,auditStatus[v]))
+									}
+									$td5.css({color:'#3daded',cursor:'pointer'}).popover({
+										placement:'left',// 显示在右侧
+										html:true,// 解析内容为html
+										trigger:'hover focus',// 点击触发
+										title:'外审信息',
+										content:$tab[0].outerHTML,// 弹出默认内容
+										container:'#uc_page_content'// 追加元素至body
+									});
+								}
+							}
+							var $td6 = $(HT.td);
+							var $a2 = $(HT.a).attr({
+								dataToggle:'tooltip',
+								dataPlacement:'top',
+								title:'修改'
+							}).click(function(){updateAd(advertiser.id)}).append($(HT.i).addClass('iconfont icon-xiugai'));
+							var $a3 = $(HT.a).attr({
+								dataToggle:'tooltip',
+								dataPlacement:'top',
+								title:'删除'
+							}).click(function(){deleteAd(advertiser.id)}).append($(HT.i).addClass('iconfont icon-shanchu'));
+							var $input1 = $(HT.input).attr({
+								type:'hidden',
+								name:'hiddenId',
+								value:advertiser.id
+							});
+							$td6.append($a2).append($a3).append($input1);
+							$tr.append($td0).append($td1).append($td2).append($td3).append($td4).append($td5).append($td6);
+							$("#advertiserList").append($tr);
+							loadswitch();
+						});
+
+		var totalPage = data.result.totalPage;
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page').html('');
+		$('#page').html('<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',//分页容器，ID
+			totalPages : totalPage, //总页数
+			count : totalCount, //总记录数
+			startPage : startPage,
+			onPageClick : function(env, thisPage) {
+				// CurrentPageNo = thisPage;
+				loadData(thisPage);
+			}
+		});
+	}
+
+	function enterOrder(id) {
+		var url = "sspOrder/list?advertiserId=" + id;
+		page.loadPage(url);
+	}
+
+	//新增
+	$("#addBtn").click(function() {
+		var url = "sspAdvertiser/getAdd";
+		page.loadPage(url);
+	});
+
+	//修改
+	function updateAd(id) {
+		var putAllowedState = $("#switch" + id).val();
+		if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行修改操作！");
+			return;
+		} else {
+			var url = "sspAdvertiser/getUpdate?id=" + id;
+			page.loadPage(url);
+		}
+	}
+
+	//更改开关状态
+	function updateState(_this, val) {
+		var id = _this.closest('tr').find('input[type="hidden"]').val();
+		var url = "sspAdvertiser/addOrUpdate";
+		page.ajax({
+			url : url,
+			data : {
+				id : id,
+				putState : val
+			},
+			type : 'post',
+			success : function(data) {
+				/* if (data.status == 200){
+				   var url = "sspAdvertiser/getPages";
+				page.loadPage(url);
+				} */
+			},
+			error : function() {
+				alert("修改状态失败！");
+			}
+		});
+
+	}
+
+	//删除
+	function deleteAd(id) {
+		var putAllowedState = $("#switch" + id).val();
+		if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行删除操作！");
+			return;
+		} else {
+			var url = "sspAdvertiser/delete?id=" + id;
+			$.confirm({
+				title : '删除广告主',
+				content : '是否删除该广告主？',
+				buttons : {
+					okay : {
+						text : '确定',
+						btnClass : 'btn green',
+						action : function() {
+							page.ajax({
+								url : url,
+								data : {
+									id : id
+								},
+								type : 'post',
+								success : function(data) {
+
+									if (data.status == 0) {
+										alert("删除成功").ok(function() {
+											var url = "sspAdvertiser/getPages";
+											page.loadPage(url);
+										});
+									}
+								}
+							});
+						}
+					},
+					no : {
+						text : '取消',
+						btnClass : 'btn '
+					}
+				}
+			});
+		}
+	}
+
+	/**日期转换工具*/
+	function getMoth(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd");
+		return oDate;
+	};
+	function getDay(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+		return oDate;
+	};
+
+	//处理默认时间工具
+	function addDate(dd, dadd) {
+		var a = new Date(dd)
+		a = a.valueOf()
+		a = a + dadd * 24 * 60 * 60 * 1000
+		a = new Date(a)
+		return a;
+	}
+	function getMapDate(dayss) {
+		var now = new Date();
+		var NextNow = addDate(now, -dayss);
+		var years = NextNow.getFullYear();
+		var months = NextNow.getMonth() + 1;
+		var days = NextNow.getDate();
+		var beginTime = years + "-" + months + "-" + days;
+		return beginTime;
+	}
+</script>
+</html>

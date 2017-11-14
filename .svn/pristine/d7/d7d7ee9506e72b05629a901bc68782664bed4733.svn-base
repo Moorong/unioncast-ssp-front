@@ -1,0 +1,230 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style type="text/css">
+	.tooltip-inner{
+		max-width:none;
+	}
+</style>
+<script type="text/javascript">
+var popover_template_html = '<div class="popover" style="position: absolute;max-width:auto;"><div class="arrow "></div><button type="button" style="padding:4px;" class="close" aria-hidden="true" onclick="popoverClose(this)">&times;</button><h3 class="popover-title"></h3><div class="popover-content"></div></div>';
+function popoverClose(o){
+	$(o).parent().popover('toggle');
+}
+</script>
+<script type="text/javascript" src="plugs/jqueryZoom/jquery.zoom.js"></script>
+<script type="text/javascript" src="js/ssp/creative/list.js"></script>
+</head>
+
+<body>
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46-50');">投放管理</a> <i> / </i> <span>广告创意</span>
+	</h2>
+	<div class="page_main">
+		<div class="page_main_white">
+			<!-- 右侧开始 -->
+			<form action="sspCreative/page">
+				<div class="search_block clearfix">
+					<div class="form-group  clearfix">
+						<div class="pull-left">
+							<a href="javascript:void(0)" class="btn  btn2 green"
+								data-toggle="modal" data-target="#myModal" id="addCreative"><i
+								class="glyphicon glyphicon-plus"></i>新增创意</a>
+							<!-- <a href="javascript:void(0)" class="btn btn_trash"><i class="glyphicon glyphicon-trash"></i>批量删除</a> -->
+							<!-- <a href="javascript:void(0)" class="btn btn_trash" id="tabbtn">筛选</a> -->
+						</div>
+						
+						<input type="hidden" value="${(planId)!}" name="planId" id="planId"/>
+						
+						<div class="pull-right">
+							<div class="formgroup clearfix ">
+								<label>广告主：</label>
+								<select class="dropdown auto " name="advertiser">
+									<option value="">全部</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>创意状态：</label> <select class="dropdown auto " name="state">
+									<option value="">全部</option>
+									<option value="1">开</option>
+									<option value="2">关</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>创意类目：</label> <select class="dropdown auto " name="creativeType">
+									<option value="">全部</option>
+									<option value="1">图片</option>
+									<option value="2">视频</option>
+									<option value="3">信息流</option>
+								</select>
+							</div>
+							<input type="text" class="form-control" name="creativeName" value=""
+								placeholder="请输入名称">
+							<a href="javascript:void(0)" class="btn btn-sm" id="search">查询</a>
+						</div>
+					</div>
+					<!-- 
+					<div class="form-group margint10 clearfix">
+						<div class="pull-left">
+							<div class="formgroup clearfix ">
+								<label>广告主：</label> <select class="dropdown auto " name="advertiser">
+									<option value="">全部</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>创意状态：</label> <select class="dropdown auto " name="state">
+									<option value="">全部</option>
+									<option value="1">开</option>
+									<option value="2">关</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>创意类目：</label> <select class="dropdown auto " name="creativeType">
+									<option value="">全部</option>
+									<option value="1">图片</option>
+									<option value="2">视频</option>
+									<option value="3">信息流</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					 -->
+				</div>
+			</form>
+			<!-- 间隔 -->
+			<div style="height: 10px; background: #f1f2f7;"></div>
+			<!-- 间隔 -->
+
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>投放状态</th>
+										<th>创意预览</th>
+										<th>创意名称</th>
+										<th>创意类目</th>
+										<th>类型-大小</th>
+										<th>修改时间</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody id="creativeList">
+									<tr><td align="center" colspan="8">暂时没有数据</td></tr>
+
+								</tbody>
+							</table>
+							<!-- 分页开始 -->
+							<div class="bs-component clearfix pull-right" id="page"></div>
+							<!-- 分页结束 -->
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</body>
+
+<script>
+	$(function() {
+		//下拉菜单
+		
+		//参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+
+		/*双日历组件*/
+		$('#reportrange2 span').html(
+				moment().subtract('days', 7).format('YYYY.MMMM.D') + ' - '
+						+ moment().format('YYYY.MMMM.D'));
+		$('#reportrange2').daterangepicker({locale: page.attr.drDefaultLocal});
+
+		$("table input[name='checkboxall']").on(
+				'click',
+				function(event) {
+					$(this).parent().parent().parent().next('tbody').find(
+							"input").prop('checked', $(this).prop('checked'));
+					event.stopPropagation();
+				});
+		$('table input[name="checkboxed"]').on(
+				'click',
+				function(event) {
+					$(this).parent().parent().parent().prev('thead').find(
+							"input[name='checkboxall']").prop(
+							'checked',
+							$(this).parent().parent().parent().find('tr').find(
+									'input:checked').length == $(this).parent()
+									.parent().parent().find('tr').length ? true
+									: false);
+					event.stopPropagation();
+				});
+		/* $('#tabbtn').click(
+				function() {
+					$(this).parent().parent().parent().next('.form-group')
+							.toggleClass('hidden');
+				});
+		 */
+	});
+	
+	function updateCreative(id){
+		var state = $("#"+id).val();
+		if(state == 1){
+			alert("请将状态关闭后，再进行修改操作！");
+			return;
+		} else {
+			var url = "sspCreative/getUpdate?id="+id;
+			page.loadPage(url);
+		}
+	};
+
+	function deleteCreative(id){
+		var state = $("#"+id).val();
+		if(state == 1){
+			alert("请将状态关闭后，再进行删除操作！");
+			return;
+		} else {
+	        var url = "sspCreative/delete?id="+id;
+	        $.confirm({
+			    title: '删除创意',
+			    content: '是否删除该创意？',
+			    buttons: {
+			        okay: {
+		                text: '确定',
+		                btnClass: 'btn green',
+		                action: function () {
+		                	page.ajax({
+		    	                url:url,
+		    	                data :{id:id},
+		    	                type:'post',
+		    	                success:function (data) {
+		    	                    if (data.status == 0){
+		    	                        alert("删除成功").ok(function(){
+		    	                        	var url = "sspCreative/main";
+			    							page.loadPage(url);
+		    	                        });
+		    	                    }
+		    	                },
+		    	                error: function() {
+		    	                	alert("删除失败!");
+		    	                }
+		    	            });
+	                    }
+		            },
+		            no: {
+		                text: '取消',
+		                btnClass: 'btn '
+		            }
+			    }
+			});
+		}
+	};
+	
+	function enterFirst() {
+		var url = "sspAdvertiser/getPages";
+		page.loadPage(url);
+	}
+</script>
+</html>

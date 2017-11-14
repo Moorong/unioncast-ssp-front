@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<link href="plugs/bootstrap-fileinput-master/css/fileinput.css"
+	media="all" rel="stylesheet" type="text/css" />
+<!-- <script type="text/javascript" -->
+<!-- 	src="plugs/bootstrap-validator/bootstrapValidator.js"></script> -->
+<!-- <script type="text/javascript" src="plugs/bootstrap-validator/zh_CN.js"></script> -->
+<script type="text/javascript"
+	src="plugs/bootstrap-fileinput-master/js/fileinput.min.js"></script>
+<script type="text/javascript"
+	src="plugs/bootstrap-fileinput-master/js/fileinput_locale_zh.js"></script>
+
+<style>
+/* .file-input {
+		width: 300px;
+	} 
+	
+	.tiship {
+		padding: 10px 0;
+		font-size: 12px;
+		color: e1e1e1e;
+		margin: 0;
+	}
+	
+	.file-drop-zone-title {
+		padding: 80px 10px;
+	}
+	
+	.file-preview-frame img {
+		width: 100% !important;
+		height: 140px !important;
+	} */
+</style>
+<body>
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i> <a href="javascript:void(0)"
+			onclick="page.choiceMenu('46-50');">投放管理</a> <i> / </i> <a
+			href="javascript:void(0)" onclick="page.history.go(this)"
+			urlk="rest/sspCreative/main">创意库管理</a> <i> / </i> <span>新增创意</span>
+	</h2>
+	<div class="page_main">
+		<div class="page_main_white">
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<form class="form-horizontal" role="form" id="editForm"
+								action="sspCreative/addOrUpdate" method="post">
+
+								<input type="hidden" name="id" value="" /> <input type="hidden"
+									name="planId" value="${(planId)!}" />
+
+								<div class="formwarp">
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-2 control-label">所属广告主</label>
+										<div class="col-sm-8 ">
+											<!-- 											<button  class="btn  btn2 green" id="showAdvertiserName" data-toggle="modal" data-target="#myModal2"> -->
+											<!-- 											<i class="glyphicon glyphicon-plus"></i>选择广告主</button> -->
+											<a href="#" class="btn btn2 green" id="showAdvertiserName"
+												data-toggle="modal" data-target="#myModal2"><i
+												class="glyphicon glyphicon-plus"></i>选择广告主</a> <input
+												type="hidden" name="advertiserSubmit" value="" />
+										</div>
+									</div>
+									<!-- 
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-2 control-label">创意分组</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												placeholder="" maxlength="10">
+											<em>文字被控制在2-10个字符</em>
+										</div>
+									</div>
+									 -->
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-2 control-label">创意类型</label>
+										<div class="col-sm-8 ">
+											<select class="dropdown auto " name="creativeType" >
+												<option value="1" selected="selected">图片</option>
+												<option value="2" >视频</option>
+												<option value="3" disabled="disabled">信息流</option>
+												<option value="4" >Flash</option>
+											</select>
+										</div>
+									</div>
+									<div class="form-group">
+												<label for="inputEmail3" class="col-sm-2 control-label"><i>*</i>创意名称</label>
+												<div class="col-sm-8 ">
+													<input type="text" name="creativeName" value="" class="form-control input-sm ">
+													<input type="hidden" name="fileNum" value="" />
+												</div>
+											</div>
+									<div id="myTabContent" class="tab-content">
+										<div class="tab-pane fade in active" id="tab1">
+											<div class="form-group ">
+												<label class=" col-md-2 control-label">创意素材</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg，尺寸分别为：120*100、320*100、600*100</p>
+													<input type="file" name="uploadfile" id="imageinput"
+														multiple class="file-loading fileinput" />
+												</div>
+											</div>
+
+										</div>
+										<div class="tab-pane fade" id="tab2">
+											<div class="form-group ">
+												<label class=" col-md-2 control-label">创意素材</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传视频mp4、flv、avi格式，视频需小于10M，播放时间15秒</p>
+													<input type="file" name="uploadfile" id="videoinput"
+														multiple class="file-loading fileinput" />
+												</div>
+											</div>
+										</div>
+										<div class="tab-pane fade" id="tab3">
+											<div class="form-group ">
+												<label class=" col-md-2 control-label">创意素材</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg/gif，尺寸分别为：120*100、320*100、600*100</p>
+													<input type="file" name="uploadfile" id="flowinput"
+														multiple class="file-loading fileinput" />
+												</div>
+											</div>
+<!-- 											<div class="form-group "> -->
+<!-- 												<label for="inputEmail3" class="col-sm-2 control-label">广告标题</label> -->
+<!-- 												<div class="col-sm-8 "> -->
+<!-- 													<textarea class="form-control small338" rows="3" -->
+<!-- 														maxlength="14" name="advTitle"></textarea> -->
+<!-- 												</div> -->
+<!-- 											</div> -->
+										</div>
+										<div class="tab-pane fade in" id="tab4">
+											<div class="form-group ">
+												<label class=" col-md-2 control-label">创意素材</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传Flash格式swf</p>
+													<input type="file" name="uploadfile" id="flashinput"
+														multiple class="file-loading fileinput" />
+												</div>
+											</div>
+
+										</div>
+
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-2 control-label"><i>*</i>点击地址</label>
+											<div class="col-sm-8 ">
+												<input type="text" class="form-control input-sm "
+													name="creativeClickAddress" placeholder="协议://主机名[:端口号][/路径][?查询][#信息片断]" value="" />
+													<a href="#" data-toggle="tooltip" data-html="true" data-placement="bottom" title="" data-original-title="带方括号[]的为可选项">
+														<i class="iconfont icon-tanhao1"></i>
+													</a>
+											</div>
+										</div>
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-2 control-label"><i>*</i>检测地址</label>
+											<div class="col-sm-8 ">
+												<input type="text" class="form-control input-sm "
+													name="creativeMonitorAddress" placeholder="协议://主机名[:端口号][/路径][?查询][#信息片断]" value="">
+													<a href="#" data-toggle="tooltip" data-html="true" data-placement="bottom" title="" data-original-title="带方括号[]的为可选项">
+														<i class="iconfont icon-tanhao1"></i>
+													</a>
+											</div>
+										</div>
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-2 control-label">创意标签</label>
+											<input type="hidden" name="dictLabelArr" />
+											<div class="col-sm-8 ">
+												<div class="creative-labels">
+													<h4>
+														个人标签<a href="#" class="btn btnlink show">收起</a>
+													</h4>
+													<div class="label-selected">
+														<div class="label-show-box clearfix" name="dictLabels"
+															id="dictLabels"></div>
+														<input type="text" class="label-input"
+															name="creativeLabelNew" placeholder="请输入自定义标签名称" />
+														<a href="#" class="btn btn2 green label-save">保存</a> <a
+															href="#" class="btn  ">取消</a>
+													</div>
+													<div class="label-tab ">
+														<div class="label-show-box clearfix" name="otherDictLabels">
+															<label>你可能感兴趣的标签</label>
+														</div>
+														<div class="clearfix">
+															<a href="#" class="btn btnlink pull-right" id="changeLabels">换一批</a>
+														</div>
+													</div>
+
+													<div>
+														
+													</div>
+
+												</div>
+											</div>
+										</div>
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-2 control-label">HTML5创意内容</label>
+											<div class="col-sm-8 ">
+												<p class="tiship">可使用变量(仅是保存时替换掉变量):
+													<br/>
+													<span style="color: #3daded;">${r'${creativeWidth}'}</span>=创意宽度
+													<br/>
+													<span style="color: #3daded;">${r'${creativeHeight}'}</span>=创意高度
+													<br/>
+													<span style="color: #3daded;">${r'${creativeUrl}'}</span>=创意地址
+													<br/>
+													<span style="color: #3daded;">${r'${creativeFormat}'}</span>=创意文件类型
+													<br/>
+													<span style="color: #3daded;">${r'${creativeSize}'}</span>=创意文件大小
+													<br/>
+													<span style="color: #3daded;">${r'${videoDuration}'}</span>=视频创意时长(毫秒,非视频为空)
+													<br/>
+													<span style="color: #3daded;">${r'${creativeClickAddress}'}</span>=点击地址
+													<br/>
+													<span style="color: #3daded;">${r'${creativeMonitorAddress}'}</span>=监测地址--第三方检测地址
+												</p>
+												<textarea class="form-control" name="creativeData" id="creativeData" placeholder="H5创意内容" style="overflow-y: hidden;"></textarea>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="savewarp text-center">
+									<input type="submit" class="btn formbtn green" value="保存"
+										id="savebtns" /> <input type="button"
+										class="btn formbtn bk999" value="取消" />
+								</div>
+								<div id="imageDiv"></div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal  modaltitle" id="myModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog modal-dialog2" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">提示：</h4>
+				</div>
+				<div class="modal-body">退出后所填写的内容不保存，是否继续退出</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal" id="myModal2" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog modal-dialog3" role="document">
+			<div class="modal-content">
+				<form id="advertiserForm" action="sspAdvertiser/page">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">请选择广告主</h4>
+					</div>
+					<div class="modal-body">
+						<div class="search_block clearfix">
+							<div class="form-group  clearfix">
+								<div class="pull-left">
+									<div class="formgroup clearfix ">
+										<label>时间段：</label>
+										<div id="reportrange2"
+											style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+											<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span
+												id="timePeriod"></span> <b class="caret"></b> <input
+												type="hidden" name="startTime" value="" /> <input
+												type="hidden" name="endTime" value="" />
+										</div>
+									</div>
+									<div class="formgroup clearfix ">
+										<label>投放状态：</label> <select class="dropdown auto "
+											id="advertiserState">
+											<option value="0">全部</option>
+											<option value="1">开</option>
+											<option value="2">关</option>
+										</select>
+									</div>
+								</div>
+								<div class="pull-right">
+									<div class="has-feedback clearfix ">
+										<label class="control-label sr-only" for="inputSuccess2">状态</label>
+										<input type="text" class="form-control" id="advertiserName"
+											placeholder="请输入名称和ID">
+									</div>
+									<a href="javascript:void(0);" class="btn btn-sm"
+										id="searchAdvertiser">查询</a>
+								</div>
+							</div>
+						</div>
+						<table class="table">
+							<thead>
+								<tr>
+									<th></th>
+									<th>广告主名称</th>
+									<th>状态</th>
+									<th>创意数量</th>
+								</tr>
+							</thead>
+							<tbody id="advertiserList">
+								<tr>
+									<td align="center" colspan="5">暂时没有数据</td>
+								</tr>
+							</tbody>
+						</table>
+						<!-- 分页开始 -->
+						<div class="bs-component clearfix pull-right" id="advertiserPage"></div>
+						<!-- 分页结束 -->
+						<div class="savewarp text-center">
+							<a href="javascript:void(0);" class="btn btn2 formbtn green"
+								id="advertiserOk">完成</a> <a href="javascript:void(0);"
+								class="btn btn2 formbtn bk999" id="advertiserCancle">取消</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+	var clickCount = 0;
+	var totalLabelCount = 0;
+	$(function() {
+		/*组件初始化*/
+		loadswitch();
+		//下拉菜单
+		
+		var defDateFormat = "YYYY-MM-DD";
+		var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+		var defEndDate = moment().format(defDateFormat);
+		/*双日历组件*/
+		$('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+		$('#reportrange2').daterangepicker(
+				{
+					locale: page.attr.drDefaultLocal,
+					startDate : defStartDate
+				},
+				function(start, end) {
+					var choStart = start.format(defDateFormat);
+					var choEnd = end.format(defDateFormat);
+					$('#reportrange2 span').html(choStart + ' - ' + choEnd);
+					$('input[name="startTime"]').val(choStart);
+					$('input[name="endTime"]').val(choEnd);
+					$('#reportrange2 span').html(
+							start.format(defDateFormat) + ' - '
+									+ end.format(defDateFormat));
+				});
+		//默认为时间空间赋值
+		$('input[name="startTime"]').val(getMapDate(7));
+		$('input[name="endTime"]').val(getMapDate(0));
+		$('#creativeData').autoHeight();
+		countDictLabel();
+		// 加载创意标签
+		pullDownDictLabel();
+		
+// 		$('select[name=%s]'.format('creativeType')).change(function(a,b,c){
+// 			var iv = event.currentTarget.value*1;
+// 			$('#myTabContent .tab-pane').removeClass('active');
+// 			$('#myTabContent #tab%s'.format(iv)).toggleClass('active');
+// // 			switch(iv){
+// // 				case 1
+// // 			}
+// 		});
+	});
+
+	$("#advertiserCancle").click(function() {
+		$('#myModal2').modal('hide');
+	})
+	$("#advertiserOk").click(function() {
+		var checked = null;
+		checked = $("[name='advertiserId']:checked");
+		if (checked.val() != null) {
+			$("#showAdvertiserName").text(checked.parent().next().text());
+			$("[name=advertiserSubmit]").val(checked.attr('advid'));
+		}
+		$('#myModal2').modal('hide');
+		$("#savebtns").attr("disabled", false);
+		$("#savebtns").next().attr("disabled", false);
+	});
+
+	function enterFirst() {
+		var url = "sspAdvertiser/getPages";
+		page.loadPage(url);
+	}
+
+	function enterCreativeList() {
+		var url = "sspCreative/main";
+		page.loadPage(url);
+	}
+
+	function countDictLabel() {
+		page.ajax({
+			url : "sspDictLabel/count",
+			success : function(result) {
+				if (result.status == 0) {
+					totalLabelCount = result.result;
+				}
+			}
+		});
+	};
+
+	function pullDownDictLabel() {
+		//size-5,totalCount,clickCount
+		//if clickCount > totlacount/5, clickCount = 0
+		//首次进入查询前5个数据，并查询总标签数
+		console.log("clickCount----" + clickCount);
+		$("[name=otherDictLabels]").empty();
+		$("[name=otherDictLabels]").append("<label>你可能感兴趣的标签</label>");
+		page.ajax({
+			url : 'sspDictLabel/findPage',
+			cache : false,
+			data : {
+				clickCount : clickCount
+			},
+			success : function(res) {
+				var data = res.result;
+				if (data != null && data.length != 0) {
+					$.each(data, function(index, dictLabel) {
+						$("[name=otherDictLabels]").append('<a href="#" class="label-add" id="'
+							+ dictLabel.id
+							+ '"><i class="iconfont icon-jiahao"></i>'
+							+ dictLabel.name + '</a>');
+						if ($("#dictLabels").find("#" + dictLabel.id).length != 0) {
+							$("[name=otherDictLabels]").find("#" + dictLabel.id).addClass('label-add-ok').attr('disable', 'disable');
+						}
+					});
+				} else {
+					$("#dictLabels").append('<a href="#" class="label-show">暂无可选的创意标签<i class="iconfont icon-shanchu"></i></a>');
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+
+	$("#changeLabels").click(function() {
+		clickCount++;
+		if (clickCount > (totalLabelCount + 4) / 5 - 1) {
+			clickCount = 0;
+		}
+		pullDownDictLabel();
+	});
+</script>
+<script type="text/javascript" src="plugs/jqueryZoom/jquery.zoom.js"></script>
+<script type="text/javascript" src="js/ssp/creative/add.js"></script>
+</html>

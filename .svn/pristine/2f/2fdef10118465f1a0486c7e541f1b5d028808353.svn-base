@@ -1,0 +1,48 @@
+#生产地址
+prodIp1=192.168.5.1
+prodIp2=192.168.5.2
+prodIp3=192.168.5.3
+prodIp4=192.168.5.4
+prodIp5=192.168.5.5
+
+
+#	Server
+#server.servlet-path=/unioncast-ssp-front
+server.contextPath=/unioncast-ssp-front
+#server.port=8080
+#server.address=127.0.0.1  
+
+image.download.url=http://123.103.15.158/
+
+#rest
+#\u6570\u636E\u8BBF\u95EE\u5C42
+rest.restDBServiceUrl=http://localhost:9330/unioncast-db-service/
+#\u7528\u6237\u7CFB\u7EDF
+rest.restUserServiceUrl=http://localhost:8080/unioncast-user-manager/
+#prod report
+#rest.restReport=http://123.103.15.146:9999/
+rest.restReport=http://127.0.0.1:9999/unioncast-ssp-report
+#email server
+rest.restEmailHost=smtp.163.com
+rest.restEmailProtocol=smtp
+rest.restEmailPort=25
+rest.restEmailAdress=xxx@163.com
+rest.restEmailPassword=xxx
+#ϵͳ���ƣ�Ψһ��
+rest.restSystemName=SSPFront
+#	Log
+
+#logging.path=D:\\Users\\juchaochao\\Desktop\\mineLog
+#logging.file=D:\\Users\\juchaochao\\Desktop\\mineLog\\myLog.log
+#logging.level.config=DEBUG
+#logging.level.controller=DEBUG
+
+
+#elasticsearch
+spring.elasticsearch.port=9300
+
+spring.elasticsearch.host1=${prodIp1}
+spring.elasticsearch.host2=${prodIp2}
+spring.elasticsearch.host3=${prodIp3}
+spring.elasticsearch.host4=${prodIp4}
+spring.elasticsearch.host5=${prodIp5}

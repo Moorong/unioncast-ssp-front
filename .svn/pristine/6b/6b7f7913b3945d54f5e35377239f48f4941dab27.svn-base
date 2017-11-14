@@ -1,0 +1,103 @@
+package com.unioncast.ssp.front.config;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.web.servlet.ErrorPage;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
+
+import com.unioncast.ssp.front.common.freemarker.RichFreeMarkerViewResolver;
+
+/**
+ * Bean注入配置
+ * 
+ * @author changguobin@unioncast.cn
+ * @date 2016-11-15 17:40:54
+ */
+@Configuration
+public class OtherBeanConfig {
+	/**
+	 * 自定义错误页面
+	 * 
+	 * @author changguobin@unioncast.cn
+	 * @date 2016-11-15 17:41:08
+	 *
+	 * @return EmbeddedServletContainerCustomizer
+	 */
+	@Bean
+	public EmbeddedServletContainerCustomizer containerCustomizer() {
+		return new EmbeddedServletContainerCustomizer() {
+			@Override
+			public void customize(ConfigurableEmbeddedServletContainer container) {
+				ErrorPage error401Page = new ErrorPage(HttpStatus.UNAUTHORIZED, "/401.html");
+				ErrorPage error404Page = new ErrorPage(HttpStatus.NOT_FOUND, "/404.html");
+				ErrorPage error500Page = new ErrorPage(HttpStatus.INTERNAL_SERVER_ERROR, "/500.html");
+				container.addErrorPages(error401Page, error404Page, error500Page);
+			}
+		};
+	}
+
+	/**
+	 * Freemarker配置视图属性
+	 * 
+	 * @author liutiejun
+	 * @date 2016年9月13日 下午2:51:18
+	 *
+	 * @return
+	 */
+	@Bean
+	public RichFreeMarkerViewResolver freemarkerViewResolver() {
+		RichFreeMarkerViewResolver resolver = new RichFreeMarkerViewResolver();
+
+		resolver.setPrefix("/views/");
+		resolver.setSuffix(".html");
+		resolver.setContentType("text/html; charset=UTF-8");
+		resolver.setExposeRequestAttributes(false);
+		resolver.setExposeSessionAttributes(false);
+		resolver.setExposeSpringMacroHelpers(true);
+		resolver.setRequestContextAttribute("request");
+		return resolver;
+	}
+
+	/**
+	 * Freemarker配置
+	 * 
+	 * @author liutiejun
+	 * @date 2016年9月13日 下午2:51:34
+	 *
+	 * @return
+	 */
+	@Bean
+	public FreeMarkerConfigurer freemarkerConfig() {
+		FreeMarkerConfigurer freeMarkerConfigurer = new FreeMarkerConfigurer();
+
+		freeMarkerConfigurer.setTemplateLoaderPath("classpath:/templates/");
+		freeMarkerConfigurer.setDefaultEncoding("UTF-8");
+
+		Properties settings = new Properties();
+		settings.setProperty("template_update_delay", "0");
+		settings.setProperty("defaultEncoding", "UTF-8");
+		settings.setProperty("url_escaping_charset", "UTF-8");
+		settings.setProperty("locale", "zh_CN");
+		settings.setProperty("datetime_format", "yyyy-MM-dd HH:mm:ss");
+		settings.setProperty("date_format", "yyyy-MM-dd");
+		settings.setProperty("time_format", "HH:mm:ss");
+		settings.setProperty("auto_import", "/lib/index.ftl as uc");
+		settings.setProperty("number_format", "0.######");
+
+		freeMarkerConfigurer.setFreemarkerSettings(settings);
+
+		// Map<String, Object> variables = new HashMap<>();
+		// variables.put("upper", upperDirective);
+		// variables.put("core_perm", permissionDirective);
+		//
+		// freeMarkerConfigurer.setFreemarkerVariables(variables);
+
+		return freeMarkerConfigurer;
+	}
+}

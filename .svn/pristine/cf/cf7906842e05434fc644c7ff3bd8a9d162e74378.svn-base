@@ -1,0 +1,50 @@
+#测试地址
+testIp1=192.168.10.111
+testIp2=192.168.10.112
+testIp3=192.168.10.113
+testIp4=192.168.10.114
+testIp5=192.168.10.115
+testIp6=192.168.10.116
+
+
+
+#	Server
+#server.servlet-path=/unioncast-ssp-front
+server.contextPath=/unioncast-ssp-front
+server.port=8083
+#server.address=127.0.0.1  
+
+image.download.url=http://192.168.10.111/
+
+#rest
+#数据访问层
+rest.restDBServiceUrl=http://localhost:9330/v1/
+#rest.restDBServiceUrl=http://192.168.101.121:8080/unioncast-db-service/
+#用户系统
+rest.restUserServiceUrl=http://localhost:8888/UserManager/
+#lianjie dev report
+rest.restReport=http://127.0.0.1:9999/
+#email server
+rest.restEmailHost=smtp.163.com
+rest.restEmailProtocol=smtp
+rest.restEmailPort=25
+rest.restEmailAdress=xxx@163.com
+rest.restEmailPassword=xxx
+#系统名称（唯一）
+rest.restSystemName=SSPFront
+#	Log
+
+#logging.path=D:\\Users\\juchaochao\\Desktop\\mineLog
+#logging.file=D:\\Users\\juchaochao\\Desktop\\mineLog\\myLog.log
+#logging.level.config=DEBUG
+#logging.level.controller=DEBUG
+
+#elasticsearch
+spring.elasticsearch.port=9300
+
+spring.elasticsearch.host1=${testIp1}
+spring.elasticsearch.host2=${testIp2}
+spring.elasticsearch.host3=${testIp3}
+spring.elasticsearch.host4=${testIp4}
+spring.elasticsearch.host5=${testIp5}
+spring.elasticsearch.host6=${testIp6}

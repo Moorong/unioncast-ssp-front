@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<!-- 鍙充晶寮�濮� -->
+		<!-- <div class="content"> -->
+			<!-- 褰撳墠浣嶇疆寮�濮� -->
+			<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">鎶曟斁绠＄悊</a> <i> / </i> <span>璁″垝缁勫垪琛�</span></h2>
+			<!-- 褰撳墠浣嶇疆缁撴潫 -->
+			<div class="page_main">
+				<div class="page_main_white">
+				<!-- 琛ㄥ崟鍐呭寮�濮� -->
+					<div class="search_block clearfix">
+						<div class="form-group  clearfix">
+							<div class="pull-left">
+
+								<a href="javascript:void(0)" class="btn  btn2 green"  data-toggle="modal" data-target="#myModal"  id="addGroupBut"><i class="glyphicon glyphicon-plus"></i>鍒涘缓璁″垝缁�</a>
+								<!-- <a href="javascript:void(0)" class="btn btn_trash"><i class="glyphicon glyphicon-trash"></i>鎵归噺鍒犻櫎</a> -->
+								<!-- <a href="javascript:void(0)" class="btn btn_trash" id="tabbtn">绛涢��</a> -->
+							</div>
+							
+				            <div class="pull-right">
+				            	<div class="formgroup clearfix ">
+								    <label>閫氳繃鐘舵��</label>
+							      	<select class="dropdown" id="sspPlanState">
+								    	<option value="1">寮�</option>
+								    	<option value="2">鍏�</option>
+									</select>
+								</div>
+								<div class="formgroup clearfix ">
+								    <label>鏃堕棿娈碉細</label>
+							      	<div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+					                  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+					                  <span id="time"></span> <b class="caret"></b>
+					               </div>
+								</div>
+								<div class="has-feedback clearfix ">
+							  		<label class="control-label sr-only" for="inputSuccess2">鐘舵��</label>
+							 		<input type="text" class="form-control" id="idOrName" placeholder="璇疯緭鍏ュ悕绉版垨ID">
+					            </div>
+								<a href="javascript:void(0)" class="btn btn-sm" id="sspSearch">鎻愪氦</a>
+							</div>
+						</div>
+					</div>
+					<!-- 闂撮殧 -->
+					<div style="height:10px;background:#f1f2f7;"></div>
+					<!-- 闂撮殧 -->
+					<div class="block_content">
+						<div class="container-fluid">
+							
+							<div class="row">
+								<div class="col-md-12">
+									<table class="table" >
+										<thead>
+											<tr>
+												<th>鐘舵��</th>
+												<th>璁″垝缁�</th>
+												<th>璁″垝缁処D<a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='media/imgs/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a></th>
+												<th>璁″垝</th>
+												<th>寮�濮嬫椂闂�-缁撴潫鏃堕棿</th>
+												<th>杩涘害鏉�</th>
+												<th>淇敼鏃堕棿</th>
+												<th>鎿嶄綔</th>
+											</tr>
+										</thead>
+										<tbody>
+										<#list sspPlanList as sspPlan>
+											<tr>
+												<td>
+												<#if sspPlan.state==1>
+												<input type="checkbox" name="switch" checked />
+												<#else>
+												<input type="checkbox" name="switch"/>
+												</#if>
+												</td>
+												<td><a href="#">${sspPlan.name}</a></td>
+												<td>${sspPlan.id}</td>
+												<td>2/3</td>
+												<td>2017.1.1-2017.3.1</td>
+												<td>
+													<div class="progress">
+														<div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+												    	40%
+														</div>
+													</div>
+												</td>
+												<td class="font34a6fe">${sspPlan.updateTime?string('yyyy-MM-dd HH:mm:ss')}</td>
+												<td>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="淇敼" onclick="updatePlan(${sspPlan.id});"><i class="iconfont icon-xiugai"></i></a>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="鍒犻櫎" onclick="deletePlan(${sspPlan.id});"><i class="iconfont icon-shanchu"></i></a>
+												</td>
+											</tr>
+											</#list>
+										</tbody>
+									</table>
+									<!-- 鍒嗛〉寮�濮� -->
+									<div class="bs-component clearfix">
+										<ul class="pagination pagination-sm pull-right">
+											<li class="disabled"><a href="javascript:void(0)">芦</a></li>
+											<li class="active"><a href="javascript:void(0)">1</a></li>
+											<li><a href="javascript:void(0)">2</a></li>
+											<li><a href="javascript:void(0)">3</a></li>
+											<li><a href="javascript:void(0)">4</a></li>
+											<li><a href="javascript:void(0)">5</a></li>
+											<li><a href="javascript:void(0)">禄</a></li>
+										</ul>
+										<ul class="pull-right pagecontent">
+											<li><span>鍏�<em>1</em>鏉�</span></li>
+											<li>
+												<span>姣忛〉鏄剧ず</span>
+												<select class="dropdown">
+													<option value="0">10</option>
+													<option value="1">20</option>
+													<option value="2">30</option>
+													<option value="2">40</option>
+													<option value="2" selected>50</option>
+												</select>
+											</li>
+										</ul>
+									</div>
+									<!-- 鍒嗛〉缁撴潫 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				<!-- 琛ㄥ崟鍐呭缁撴潫 -->
+				</div>
+			</div>	
+		</div>
+		<!-- 鍙充晶缁撴潫 -->
+	<!-- </div> -->
+</body>
+<!-- 鍙屾棩鍘� -->
+<script type="text/javascript" src="js/base/moment.js"></script>
+<script type="text/javascript" src="js/base/daterangepicker.js"></script>
+<script>
+$(function () {
+	/*缁勪欢鍒濆鍖�*/
+	$("[data-toggle='tooltip']").tooltip();
+	$("input[name='switch']").bootstrapSwitch({  
+        onText:"寮�",  
+        offText:"鍏�",  
+        size:"mini",  
+        onSwitchChange:function(event,state){  
+            if(state==true){  
+                $(this).val("1");  
+            }else{  
+                $(this).val("2");  
+            }  
+        }  
+    }); 
+	//涓嬫媺鑿滃崟
+    $(".dropdown").selectpicker({});
+    //鍙傝�冪綉鍧� http://blog.csdn.net/zhengxiangwen/article/details/46480687
+
+	/*鏃ュ巻缁勪欢*/
+	/*$('.form_date').datetimepicker({
+        language:  'zh-CN',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		forceParse: 0
+    });*/
+	/*鍙屾棩鍘嗙粍浠�*/
+	//                                              榛樿鏌ユ壘鏃堕棿澶╂暟
+	$('#reportrange2 span').html(moment().subtract('days', 7).format('YYYY.MMMM.D') + ' - ' + moment().format('YYYY.MMMM.D'));
+	$('#reportrange2').daterangepicker({},function(start,end){
+		$('#reportrange2 span').html(start.format('YYYY.MMMM.D') + '-' + end.format('YYYY.MMMM.D') )
+	});
+  	
+	$("table input[name='checkboxall']").on('click',function(event){
+		$(this).parent().parent().parent().next('tbody').find("input").prop('checked',$(this).prop('checked'));
+		event.stopPropagation();
+	});
+	$('table input[name="checkboxed"]').on('click',function(event){
+		$(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+		event.stopPropagation();
+	});
+	$('#tabbtn').click(function(){
+		$(this).parent().parent().next('.form-group').toggleClass('hidden');
+	});
+});
+
+
+$("#sspSearch").click(function(){
+		//鏃堕棿娈甸�夋嫨
+		var time = $("#reportrange2 span").html();
+		var sspPlanState = $("#sspPlanState").val();
+		var idOrName = $("#idOrName").val().trim();
+		var url = "ssp/planGroup/query?state="+sspPlanState+"&idOrplanName="+inputSuccess2+"&time="+time;
+		page.loadPage(url);
+	});
+	
+	function updatePlan(id){
+		var url = "ssp/planGroup/edit";
+		page.loadPage(url);
+	}
+	
+	function deletePlan(id){
+		var url = "ssp/planGroup/list";
+		page.loadPage(url);
+	}
+	$("#addBut").click(function(){
+		var url = "ssp/planGroup/edit";
+		page.loadPage(url);
+	});
+	$("#addGroupBut").click(function(){
+		var url = "ssp/planGroup/edit";
+		page.loadPage(url);
+	});
+</script>
+</html>

@@ -1,0 +1,57 @@
+{
+  "groups": [{
+    "name": "rest",
+    "type": "com.unioncast.ssp.front.config.RestConfig",
+    "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+  }],
+  "properties": [
+    {
+      "name": "rest.rest-d-b-service-url",
+      "type": "java.lang.String",
+      "description": "数据访问层服务",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-email-adress",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-email-host",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-email-password",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-email-port",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-email-protocol",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-report",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-system-name",
+      "type": "java.lang.String",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    },
+    {
+      "name": "rest.rest-user-service-url",
+      "type": "java.lang.String",
+      "description": "用户系统服务",
+      "sourceType": "com.unioncast.ssp.front.config.RestConfig"
+    }
+  ],
+  "hints": []
+}

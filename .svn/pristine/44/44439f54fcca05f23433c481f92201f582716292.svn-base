@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link href="plugs/bootstrap-fileinput-master/css/fileinput.css"
+	media="all" rel="stylesheet" type="text/css" />
+<style>
+.file-input {
+	width: 300px;
+}
+
+.tiship {
+	padding: 10px 0;
+	font-size: 12px;
+	color: e1e1e1e;
+	margin: 0;
+}
+
+.file-drop-zone-title {
+	padding: 80px 10px;
+}
+
+.file-preview-frame img {
+	width: 100% !important;
+	height: 140px !important;
+}
+.file-preview-frame {
+	width: 230px;
+	height: 160px;
+}
+</style>
+</head>
+<body>
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i> <a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理</a> <i> / </i> <span>修改广告主</span>
+	</h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<form class="form-horizontal" role="form"
+				action="rest/sspAdvertiser/addOrUpdate" enctype="multipart/form-data"
+				method="post">
+				<input type="hidden" name="user.id" value="${(user.id)!''}"/>
+				<input type="hidden" name="id" value="${(advertiser.id)!''}"/>
+				
+				<div class="block_content">
+					<div class="container-fluid">
+						<div class="row">
+							<!-- 表单名称开始 -->
+							<div class="block_title white clearfix">
+								<span class="block_title_name pull-left"> 基本资料 </span>
+							</div>
+							<!-- 表单名称结束 -->
+							<div class="col-md-12">
+								<div class="formwarp">
+									<input type="hidden" name="user.id" value="${(Session.SPRING_SECURITY_CONTEXT.authentication.principal.id)!''}"/>
+									<input type="hidden" name="id" value="${(advertiser.id)!}">
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>广告主名称</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm " name="name" disabled="disabled"
+												id="name" value="${(advertiser.name)!}"
+												placeholder="请输入广告主名称">
+											<!-- <em hidden>广告主名称已被使用</em> -->
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>公司注册名称</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="companyRegName" id="companyRegName" disabled="disabled"
+												value="${(advertiser.companyRegName)!}"
+												placeholder="请输入公司注册名称">
+											<!-- <em>广告主名称已被使用</em> -->
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">外部关联ID</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="contractId" value="${(advertiser.contractId)!}"
+												placeholder=""> <a href="#" data-toggle="tooltip"
+												data-placement="right" title="修改"><i
+												class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">网址</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control input-sm " name="url"
+												value="${(advertiser.url)!}" placeholder="http://">
+											<a href="#" data-toggle="tooltip" data-placement="right"
+												title="修改"><i class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">组织机构代码证号</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="organizationCode"
+												value="${(advertiser.organizationCode)!}"
+												placeholder="请输入组织机构代码证号"> <a href="#"
+												data-toggle="tooltip" data-placement="right" title="修改"><i
+												class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>是否开启创意角标</label>
+										<div class="col-sm-8 ">
+											<label class="radio-inline"> <input type="radio"
+												name="cornerMarkState" value="1"<#if
+												(advertiser.cornerMarkState)?? &&
+												advertiser.cornerMarkState==1> checked="checked"</#if>>开启
+											</label> <label class="radio-inline"> <input type="radio"
+												name="cornerMarkState" value="2"<#if
+												(advertiser.cornerMarkState)?? &&
+												advertiser.cornerMarkState==2> checked="checked"</#if>>关闭
+											</label> <a href="javascript:void(0)" data-toggle="tooltip"
+												data-placement="right" title="修改"><i
+												class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">服务费</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm"
+												style="width: 193px;" name="serviceFee"
+												value="${(advertiser.serviceFee)!}" placeholder="">
+											<label class="radio-inline"> <input type="radio"
+												name="inlineRadioOptions" id="inlineRadio1" value="" checked>
+												百分比
+											</label> <label class="radio-inline"> <input type="radio"
+												name="inlineRadioOptions" id="inlineRadio1" value="">
+												金额(元)
+											</label>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>联系人</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="contacts" value="${(advertiser.contacts)!}"
+												placeholder=""> <a href="javascript:void(0)"
+												data-toggle="tooltip" data-placement="right" title="修改"><i
+												class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>手机</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="phone" value="${(advertiser.phone)!}" placeholder="">
+											<a href="#" data-toggle="tooltip" data-placement="right"
+												title="修改"><i class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>Email</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="email" value="${(advertiser.email)!}" placeholder="">
+											<a href="#" data-toggle="tooltip" data-placement="right"
+												title="修改"><i class="iconfont icon-tanhao1"></i></a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 间隔 -->
+				<div style="height: 10px; background: #f1f2f7;"></div>
+				<!-- 间隔 -->
+				<div class="block_content ">
+					<div class="container-fluid">
+						<div class="row">
+							<!-- 表单名称开始 -->
+							<div class="block_title white clearfix">
+								<span class="block_title_name pull-left"> 基本资质 </span>
+							</div>
+
+							<!-- 方法四 -->
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-4 control-label" name="baseQualification"><i>*</i>基本资质 ：</label>
+											
+												<div class="col-md-8">
+													<div>
+														<select class="dropdown" name="license1">
+															<option value="1" selected="selected">营业执照</option>
+															<option value="2">商务登记证（外资使用）</option>
+															<option value="3">法人登记证</option>
+														</select>
+													</div>
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput1"
+														class="file-loading fileinput" />
+													<input type="hidden" name="businessLicensePic" value="${(advertiser.businessLicensePic)!}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="otherQualification"><i>*</i>其他资质：</label>
+												<div class="col-md-8">
+													<div>
+														<select class="dropdown" name="license2">
+															<option value="1">营业执照</option>
+															<option value="2">商务登记证（外资使用）</option>
+															<option value="3" selected="selected">法人登记证</option>
+														</select>
+													</div>
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput2"
+														class="file-loading fileinput" />
+														
+													<input type="hidden" name="legalPersonCertificatePic" value="${(advertiser.legalPersonCertificatePic)!}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="logo">Logo：</label>
+												<div class="col-md-8">
+													<div>
+														<input type="text"
+															class="form-control input-sm small114 marginr10"
+															style="width: 180px" name="logoName" value="${(advertiser.logoName)!}"
+															placeholder="Logo名字 30字以内">
+													</div>
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput3"
+														class="file-loading fileinput" />
+													<input type="hidden" name="logoPic" value="${(advertiser.logoPic)!}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="organization">组织机构代码证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput4"
+														class="file-loading fileinput" />
+														<input type="hidden" name="organizationPic" value="${(advertiser.organizationPic)!}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="icp">ICP证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput5"
+														class="file-loading fileinput" />
+														<input type="hidden" name="icpPic"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="businessRegCertificate">税务登记证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput6"
+														class="file-loading fileinput" />
+													<input type="hidden" name="taxCertificatePic" value="${(advertiser.taxCertificatePic)!}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="telecomOperLicense">增值电信运营许可证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput7"
+														class="file-loading fileinput" />
+													<input type="hidden" name="telecomOperLicensePic" value="${(advertiser.telecomOperLicensePic)!}"/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 间隔 -->
+				<div style="height: 10px; background: #f1f2f7;"></div>
+				<!-- 间隔 -->
+				<div class="block_content ">
+					<div class="container-fluid">
+						<div class="row">
+							<!-- 表单名称开始 -->
+							<div class="block_title white clearfix">
+								<span class="block_title_name pull-left"> 关键词描述 </span>
+							</div>
+							<!-- 表单名称结束 -->
+							<div class="col-md-12">
+								<div class="formwarp">
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-2 control-label"><i>*</i>关键词</label>
+										<div class="col-sm-8 ">
+											<textarea class="form-control" style="resize: none;" rows="3"
+												name="keywords">${(advertiser.keywords)!}</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="savewarp text-center">
+					<!-- 
+					<a href="javascript:void(0);" class="btn savebtn">完成</a> <a
+						href="#" class="btn quxiaobtn">取消</a>
+					 -->
+					<input type="submit" class="btn formbtn green" value="保存"
+						id="savebtns" /> <input type="button" class="btn formbtn bk999"
+						value="取消" />
+				</div>
+				<input type="hidden" name="businessRegCertificatePic" value="${(advertiser.businessRegCertificatePic)!}"/>
+			</form>
+		</div>
+	</div>
+
+</body>
+
+<script type="text/javascript"
+	src="plugs/bootstrap-fileinput-master/js/fileinput.min.js"></script>
+<script type="text/javascript"
+	src="plugs/bootstrap-fileinput-master/js/fileinput_locale_zh.js"></script>
+<script type="text/javascript" src="js/ssp/advertiser/update.js"></script>
+<!-- <script type="text/javascript" -->
+<!-- 	src="plugs/bootstrap-validator/bootstrapValidator.js"></script> -->
+<!-- <script type="text/javascript" src="plugs/bootstrap-validator/zh_CN.js"></script> -->
+<script>
+	$(function() {
+		/*组件初始化*/
+		$("[data-toggle='tooltip']").tooltip();
+		$("input[name='switch']").bootstrapSwitch({
+			onText : "开",
+			offText : "关",
+			size : "mini",
+			onSwitchChange : function(event, state) {
+				if (state == true) {
+					$(this).val("1");
+				} else {
+					$(this).val("2");
+				}
+			}
+		});
+		//下拉菜单
+		$(".dropdown").selectpicker({});
+		//参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+
+		/*双日历组件*/
+		$('#reportrange2 span').html(
+				moment().subtract('days', 7).format('YYYY.MMMM.D') + ' - '
+						+ moment().format('YYYY.MMMM.D'));
+		$('#reportrange2').daterangepicker({});
+
+		$("table input[name='checkboxall']").on(
+				'click',
+				function(event) {
+					$(this).parent().parent().parent().next('tbody').find(
+							"input").prop('checked', $(this).prop('checked'));
+					event.stopPropagation();
+				});
+		$('table input[name="checkboxed"]').on(
+				'click',
+				function(event) {
+					$(this).parent().parent().parent().prev('thead').find(
+							"input[name='checkboxall']").prop(
+							'checked',
+							$(this).parent().parent().parent().find('tr').find(
+									'input:checked').length == $(this).parent()
+									.parent().parent().find('tr').length ? true
+									: false);
+					event.stopPropagation();
+				});
+		$('#tabbtn').click(function() {
+			$(this).parent().parent().next('.form-group').toggleClass(
+					'hidden');
+		});
+		
+		loadswitch();
+		
+	});
+	
+	function loadswitch(){
+		$("[data-toggle='tooltip']").tooltip();
+		$("[name=putState]").bootstrapSwitch({  
+	        onText:"开",  
+	        offText:"关",  
+	        size:"mini",  
+	        onSwitchChange:function(event,state){  
+	            if(state==true){  
+	            	updateState($(this),1);
+	                $(this).val("1");  
+	            }else{  
+	            	updateState($(this),2);
+	                $(this).val("2");  
+	            }
+	        }  
+	    }); 
+	}
+	var fileinputUrl1 = '${(advertiser.businessLicensePic)!}';
+	if(!isEmpty(fileinputUrl1))
+		fileinputUrl1 = globalVar.imgPrefix+ fileinputUrl1;
+	var fileinputUrl2 = '${(advertiser.legalPersonCertificatePic)!}';
+	if(!isEmpty(fileinputUrl2))
+		fileinputUrl2 = globalVar.imgPrefix+ fileinputUrl2;
+	var fileinputUrl3 = '${(advertiser.businessRegCertificatePic)!}';
+	if(!isEmpty(fileinputUrl3))
+		fileinputUrl3 = globalVar.imgPrefix+ fileinputUrl3;
+	var fileinputUrl4 = '${(advertiser.logoPic)!}';
+	if(!isEmpty(fileinputUrl4))
+		fileinputUrl4 = globalVar.imgPrefix+ fileinputUrl4;
+	var fileinputUrl5 = '${(advertiser.organizationPic)!}';
+	if(!isEmpty(fileinputUrl5))
+		fileinputUrl5 = globalVar.imgPrefix+ fileinputUrl5;
+	var fileinputUrl6 = '${(advertiser.icpPic)!}';
+	if(!isEmpty(fileinputUrl6))
+		fileinputUrl6 = globalVar.imgPrefix+ fileinputUrl6;
+	var fileinputUrl7 = '${(advertiser.taxCertificatePic)!}';
+	if(!isEmpty(fileinputUrl7))
+		fileinputUrl7 = globalVar.imgPrefix+ fileinputUrl7;
+	var fileinputUrl8 = '${(advertiser.telecomOperLicensePic)!}';
+	if(!isEmpty(fileinputUrl8))
+		fileinputUrl8 = globalVar.imgPrefix+ fileinputUrl8;
+	
+	//fileinputUrl1='https://img6.bdstatic.com/img/image/smallpic/weiju112.jpg';
+	if(fileinputUrl1 != '') {
+		$("#fileinput1").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl1 + '" alt="营业执照" class="file-preview-image echo-lazy" style="width:100% important">'
+			               ]
+		});
+	} else {
+		$("#fileinput1").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			}
+		});
+	}
+	
+	if(fileinputUrl2 != '') {
+		$("#fileinput2").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl2 + '" alt="法人登记证" class="file-preview-image echo-lazy" style="width:240px">'
+			               ]
+			
+		});
+	} else {
+		$("#fileinput2").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			}
+		});
+	}
+	
+	
+	if(fileinputUrl3 != '') {
+		$("#fileinput2").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl3 + '" alt="商务登记证" class="file-preview-image echo-lazy" style="width:120px">'
+			               ]
+			
+		});
+	} else {
+		$("#fileinput2").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			}
+		});
+	}
+	
+	if(fileinputUrl4 != '') {
+		$("#fileinput3").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl4 + '" alt="logo" class="file-preview-image echo-lazy" style="width:120px">'
+			               ]
+		});
+	} else {
+		$("#fileinput3").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			}
+		});
+	}
+	
+	if(fileinputUrl5 != '') {
+		$("#fileinput4").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl5 + '" alt="组织机构代码证" class="file-preview-image echo-lazy" style="width:120px">'
+			               ]
+			
+		});
+	} else {
+		$("#fileinput4").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			}
+		});
+	}
+	
+	if(fileinputUrl6 != '') {
+		$("#fileinput5").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl6 + '" alt="ICP证" class="file-preview-image echo-lazy" style="width:120px">'
+			               ]
+		});
+	} else {
+		$("#fileinput5").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			}
+		});
+	}
+	
+	if(fileinputUrl7 != '') {
+		$("#fileinput6").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl7 + '" alt="税务登记证" class="file-preview-image echo-lazy" style="width:120px">'
+			               ]
+		});
+	} else {
+		$("#fileinput6").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			validateInitialCount : true
+		});
+	}
+	
+	if(fileinputUrl8 != '') {
+		$("#fileinput7").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			validateInitialCount : true,
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			initialPreview: [ //预览图片的设置
+			                   '<img src="plugs/echojs/blank.gif" data-echo="' + fileinputUrl8 + '" alt="增值电信运营许可证" class="file-preview-image echo-lazy" style="width:120px">'
+			               ]
+		});
+	} else {
+		$("#fileinput7").fileinput({
+			language : 'zh', // 设置语言
+			uploadUrl : "rest/sspAdvertiser/imageUpload", // 上传的地址
+			allowedFileExtensions : [ 'jpg', 'png', 'bmp', 'jpeg' ],// 接收的文件后缀
+			uploadAsync : true, // 默认异步上传
+			showUpload : false, // 是否显示上传按钮
+			showRemove : true, // 显示移除按钮
+			showPreview : true, // 是否显示预览
+			showCaption : false,// 是否显示标题
+			browseClass : "btn btn-primary", // 按钮样式
+			dropZoneEnabled : true,// 是否显示拖拽区域
+			maxFileCount : 1, // 表示允许同时上传的最大文件个数
+			enctype : 'multipart/form-data',
+			layoutTemplates : {
+				main2: '{preview}\n{remove}\n{cancel}\n{browse}\n'
+			},
+			validateInitialCount : true
+		});
+		
+// 		settimeout(function(){
+			
+// 		},2000);
+			Echo.init({
+	            offset: 0,
+	            throttle: 0
+	        });
+		
+		$('img').unbind('error').bind('error', function() {
+        	var $this = $(this);
+            var retry= $this.attr("re");
+            retry = isNaN(retry)?1:retry;
+            if(retry > 5){
+            	$(this).unbind('error');
+            	$this.css('background','none');
+            }else {
+            	setTimeout(function(){
+            		$this.attr('src',$this.attr('src'));
+            	},1000);
+            }
+            $this.attr("re",++retry);
+        });
+	}
+
+</script>

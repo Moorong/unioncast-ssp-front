@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+</head>
+<!-- <script type="text/javascript" src="js/ssp/creative/creative.js"></script> -->
+<body>
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理(${(CURRENT_ADVERTISER_INFO.name)!''})</a> <i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspOrder/list">订单管理(${(CURRENT_ORDER_INFO.name)!''})</a><i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/plan/goPlanListByOrderId">策略组列表(${(CURRENT_PLAN_INFO.name)!''})</a> <i> / </i> <span>广告创意</span>
+	</h2>
+	<div class="page_main">
+		<div class="page_main_white">
+			<!-- 右侧开始 -->
+			<form action="sspCreative/page">
+				<div class="search_block clearfix">
+						<input type="hidden" value="${(planId)!}" name="planId" id="planId"/>
+						<input type="hidden" value="${(advertiserId)!}" name="advertiserId" id="advertiserId"/>
+					<div class="form-group margint10  clearfix">
+					<div class="pull-left">
+								<a href="javascript:void(0)" class="btn  btn2 green"
+								data-toggle="modal" data-target="#myModal" id="distributionCreative">
+								<i class="glyphicon glyphicon-plus"></i>分配创意</a>
+							<!-- <a href="javascript:void(0)" class="btn btn_trash" id="tabbtn">筛选</a> -->
+						</div>
+						<div class="pull-right">
+							<div class="formgroup clearfix ">
+								<label>创意状态：</label> <select class="dropdown auto " name="state">
+									<option value="">全部</option>
+									<option value="1">开</option>
+									<option value="2">关</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>创意类型：</label> <select class="dropdown auto " name="creativeType">
+									<option value="">全部</option>
+									<option value="1">图片</option>
+									<option value="2">视频</option>
+									<option value="3">信息流</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>创意标签：</label> <select class="dropdown auto " name="creativeLabel">
+									<option value="">全部</option>
+								</select>
+							</div>
+							<div class="has-feedback clearfix ">
+								<input type="text" class="form-control" name="creativeName" value=""
+									placeholder="请输入名称">
+							</div>
+							<a href="javascript:void(0)" class="btn btn-sm" id="search">查询</a>
+						</div>
+					</div>
+				</div>
+			
+			</form>
+			<!-- 间隔 -->
+			<div style="height: 10px; background: #f1f2f7;"></div>
+			<!-- 间隔 -->
+
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>投放状态</th>
+										<th>创意预览</th>
+										<th>创意名称</th>
+										<th>创意类型</th>
+										<th>类型-大小</th>
+										<th>修改时间</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody id="creativeList">
+									<tr><td align="center" colspan="8">暂时没有数据</td></tr>
+
+								</tbody>
+							</table>
+						<!-- 分页开始 -->
+							<div class="bs-component clearfix pull-right" id="page"></div>
+							<!-- 分页结束 -->
+						</div>
+					</div>
+				</div>
+			</div>
+	
+		</div>
+	</div>
+</body>
+
+<script>
+	$(function() {
+		/*组件初始化*/
+		
+		loadSwith();
+		//下拉菜单
+		
+		//参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+		$('#tabbtn').click(
+				function() {
+					$(this).parent().parent().parent().next('.form-group')
+							.toggleClass('hidden');
+				});
+	});
+	
+	$(function() {
+
+	/* 组件初始化 */
+	loadSwitch();
+	// 初始化加载
+	loadData(1);
+	getAllCreativeLabel();
+	
+ 	// 新增
+	$("#addCreative").click(function() {
+		var url = "sspCreative/getAdd";
+		page.loadPage(url);
+	});
+	
+     //搜索按钮   
+	 $("#search").click(function() {
+	var creativeName = $("[name=creativeName]").val();
+	var state = $("[name=state]").val();
+	var creativeType = $("[name=creativeType]").val();
+	var creativeLabel = $("[name=creativeLabel]").val();
+	//var creativeLabel = $("[name=creativeLabel]").val();
+	var planId = $("[name=planId]").val();
+	page.ajax({
+	url:'ssp/plan/searchPlanCreativeRelationPage',
+	type:'post',
+	data:{
+	creativeName:creativeName,
+	state:state,
+	creativeType:creativeType,
+	creativeLabel:creativeLabel,
+	planId:planId
+	},
+	success:function(data){
+	if(data!=null&&data.result!=null&&data.result.dataArray!=null&&data.result.dataArray.length>0){
+	 loadPage(data);
+	}else{
+	$("#creativeList").html("");
+	$("#page").empty();
+	$("#creativeList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+	 return false;
+	}
+	}
+	})
+	})
+
+
+	function pullDownCreativeGroup() {
+		page.ajax({
+			url : 'sspCreativeGroup/find',
+			cache : false,
+			success : function(res) {
+				var data = res.result;
+				if (data != null && data.length != 0) {
+					$.each(data, function(index, creativeGroup) {
+						$("[name=creativeGroup]").append(
+								'<option value=' + creativeGroup.id + '>'
+										+ creativeGroup.name + '</option>');
+						$("[name=creativeGroupEdit]").append(
+								'<option value=' + creativeGroup.id + '>'
+										+ creativeGroup.name + '</option>');
+					});
+					$("[name=creativeGroup]").selectpicker('refresh');
+					$("[name=creativeGroupEdit]").selectpicker('refresh');
+				} else {
+					$("[name=creativeGroup]").append(
+							'<option value="">暂无创意分组</option>');
+					$("[name=creativeGroupEdit]").append(
+							'<option value="">暂无创意分组</option>');
+					$("[name=creativeGroup]").selectpicker('refresh');
+					$("[name=creativeGroupEdit]").selectpicker('refresh');
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+	/** 日期转换工具 */
+	function getMoth(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd");
+		return oDate;
+	};
+	//日期转换 天
+function getDay(str){
+        var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+        return oDate;
+    };
+	// 处理默认时间工具
+	function addDate(dd, dadd) {
+		var a = new Date(dd)
+		a = a.valueOf()
+		a = a + dadd * 24 * 60 * 60 * 1000
+		a = new Date(a)
+		return a;
+	}
+	function getMapDate(dayss) {
+		var now = new Date();
+		var NextNow = addDate(now, -dayss);
+		var years = NextNow.getFullYear();
+		var months = NextNow.getMonth() + 1;
+		var days = NextNow.getDate();
+		var beginTime = years + "-" + months + "-" + days;
+		return beginTime;
+	}
+
+})
+// 加载数据
+	function loadData(currentPageNo) {
+		 var planId = $("#planId").val();
+		page.ajax({
+			url : 'ssp/plan/searchPlanCreativeRelationPage',
+			data : {
+				currentPageNo : currentPageNo,
+				planId : planId,
+				name : $("[name=creativeName]").val(),
+				advertiserId : $("[name=advertiser]").val(),
+				state : $("[name=state]").val(),
+				creativeType : $("[name=creativeType]").val(),
+				creativeLabel : $("[name=creativeLabel]").val()
+			},
+			success : function(data) {
+				if (data!=null&&data.result!=null&&data.result.dataArray!=null&&data.result.dataArray.length != 0) {
+					$("#creativeList").html("");
+					$("#page").empty();
+					loadPage(data);
+				} else {
+					$("#creativeList").html("");
+					$("#page").empty();
+					$("#creativeList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+				    return false;	
+				}
+			},
+			error : function(err) {
+alert("加载失败")
+			}
+		});
+	}
+                                   
+	function loadPage(data) {
+		console.info(data);
+		var datas = data.result.dataArray;
+		$("#creativeList").empty();
+		$.each(datas, function(index, pcr) {
+			var creative = pcr.sspCreative;
+			var html = "<tr>";
+			 html += "<td style='display: none' class='creativeId'>"+creative.id+"</td>";                      
+            if(pcr.state==1){
+           	html += "<td><input type='checkbox' id='switch-"+creative.id+"' name='switch' value= '1' checked /></td>";
+			} else {
+			html += "<td><input type='checkbox' name='switch' value='2' id='switch-"+creative.id+"' /></td>";
+			}
+            var imgUrl = creative.creativeUrl;
+			if(!isEmpty(imgUrl))
+				imgUrl = globalVar.imgPrefix+imgUrl;
+			var clickAddress = creative.creativeClickAddress;
+			if(isEmpty(clickAddress)){
+				clickAddress = 'javascript:void(0);';
+			}else if(!/^(http|https)/.test(clickAddress)){
+				clickAddress = 'http://'+clickAddress;
+			}
+			html += "<td><a href='"+clickAddress+"' target='_blank' data-toggle='tooltip' data-placement='top' data-original-title=\"<img src='"+imgUrl+"' height='100' >\"data-html='true' ><img src='"+imgUrl+"' width='57'height='32'></a></td>";
+			/* html += "<td><a href='#'><img src='images/chuangyi01.jpg' width='57' height='32'></a></td>";//预览 */
+			html += "<td style='vertical-align: middle;text-align:center;'>"
+					+ creative.creativeName + "</td>";//名称
+					if(creative.creativeType==1){
+					 html += "<td style='vertical-align: middle;text-align:center;'>图片</td>";//创意类型
+			       }else if(creative.creativeType==2){
+			         html += "<td style='vertical-align: middle;text-align:center;'>视频</td>";//创意类型
+			       }else if(creative.creativeType==3){
+			         html += "<td style='vertical-align: middle;text-align:center;'>信息流</td>";//创意类型
+			       }else{
+			         html += "<td style='vertical-align: middle;text-align:center;'>未定义</td>";//创意类型
+			       }
+			html += "<td style='vertical-align: middle;text-align:center;'>"
+					+ creative.creativeFormat
+					+ "-"
+					+ creative.picSize + "k </td>";//类型就是 格式-大小 呵呵
+			html += "<td style='vertical-align: middle;text-align:center;'>"
+					+ getDay(creative.updateTime)+ "</td>";//修改时间
+
+		/* 	html += "<td><a href='#' data-toggle='tooltip' data-placement='top' onclick='updateCreative("
+					+ creative.id
+					+ ");' title='修改'><i class='iconfont icon-xiugai'></i></a>"
+					+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='deleteCreative("
+					+ creative.id
+					+ ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";//操作 */
+					html += "<td> <a href='#' data-toggle='tooltip' data-placement='top' onclick='deleteCreative("
+					+ creative.id
+					+ ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";
+			html += "</tr>";
+			$("#creativeList").append(html);
+			loadSwitch();
+			//加载预览
+			 
+		});
+	
+		var totalPage = data.result.totalPage; 
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page').html('');
+		$('#page')
+				.html(
+						'<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',// 分页容器，ID
+			totalPages : totalPage, // 总页数
+			count : totalCount, // 总记录数
+			startPage : startPage,
+			onPageClick : function(env, thisPage) {
+				// CurrentPageNo = thisPage;
+				loadData(thisPage);
+			}
+		});
+	}
+	//删除创意
+	function deleteCreative(id){
+	console.log("要删除的id是---"+id);
+	 var planId = $("#planId").val();
+	var putAllowedState= $("#switch-"+id).val();
+	if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行删除操作！");
+			return;
+		} else {
+			$.confirm({
+				title : '删除',
+				content : '是否删除该创意？',
+				buttons : {
+					okay : {
+						text : '确定',
+						btnClass : 'btn green',
+						action : function() {
+							page.ajax({
+	                             url:'sspCreative/deletePlanCreativeById',
+	                             type:'POST',
+	                             data:{
+	                             creativeId:id,
+	                             planId:planId
+	                             },
+                                 success:function(data){
+                                 if(data!=null&&data.result==1){
+                                 alert("删除成功").ok(function(){
+                                 loadData(1);
+                                 });
+                                 }else{
+                                 alert("未选择任何创意");
+                                 loadData(1);
+                                 }
+                                 }
+	                        });
+						}
+					},
+					no : {
+						text : '取消',
+						btnClass : 'btn '
+					}
+				}
+			});
+	
+	}
+	}
+	//加载所有的创意标签
+	function getAllCreativeLabel() {
+		page.ajax({
+			url : 'sspDictLabel/find',
+			cache : false,
+			success : function(res) {
+				var data = res.result;
+				if (data != null && data.length > 0) {
+					$.each(data, function(index, sspDictLabel) {
+						$("[name=creativeLabel]").append(
+								'<option value=' + sspDictLabel.id + '>'
+										+ sspDictLabel.name + '</option>');
+					});
+					$("[name=creativeLabel]").selectpicker('refresh');
+				} else {
+					$("[name=creativeLabel]").append(
+							'<option value="">暂无广告主</option>');
+					$("[name=creativeLabel]").selectpicker('refresh');
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+	
+	//状态开关转换
+	function changeState(_this,val){
+	//debugger;
+	var id =  _this.closest('tr').find('.creativeId').text();
+	console.log(id);
+	 var planId = $("#planId").val();
+	page.ajax({
+	         url: "sspCreative/changePlanCreativeRelationState",
+	         type:"post",
+	         data:{
+	              creativeId:id,
+	              creativeState:val,
+	              planId:planId
+	             },
+	        success : function(data) {
+				if (data.status == 200) {
+					} else {
+					}
+			},
+	         error:function(){
+	         }    
+	})
+	}
+	
+	//点击分配创意
+	$("#distributionCreative").click(function(){
+	var planId = $("#planId").val();
+	var advertiserId = $("#advertiserId").val();
+	console.log("advertiserId----"+advertiserId);
+	var url = "sspCreative/findAllcreativeByAdvId?advertiserId="+advertiserId+"&planId="+planId;
+	page.loadPage(url);
+	})
+	
+	function loadSwitch() {
+		$("input[name='switch']").bootstrapSwitch({
+			onText : "开",
+			offText : "关",
+			size : "mini",
+			onSwitchChange : function(event, state) {
+				if (state == true) {
+					changeState($(this), 1);
+					$(this).val("1");
+				} else {
+					changeState($(this), 2);
+					$(this).val("2");
+				}
+			}
+		});
+	}
+</script>
+</html>

@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<#assign path=request.contextPath/>
+<base href="${path}/">
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" type="text/css" href="css/base/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/base/bootstrap-theme.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" type="text/css" href="css/fonts/fontsize/iconfont.css">
+    <!-- 表单验证 -->
+    <link rel="stylesheet" type="text/css" href="plugs/bootstrap-validator/bootstrapValidator.css">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" type="text/css" href="css/base/style.css">
+    <link rel="stylesheet" type="text/css" href="css/base/custom.css">
+</head>
+<style type="text/css">
+    .help-block[data-bv-result='INVALID'] {
+        display: inline-block !important;
+    }
+
+    .has-success .help-block, .has-success .control-label, .has-success .radio,
+    .has-success .checkbox, .has-success .radio-inline, .has-success .checkbox-inline,
+    .has-success.radio label, .has-success.checkbox label, .has-success.radio-inline label,
+    .has-success.checkbox-inline label {
+        color: #333;
+    }
+
+    .current_loc a {
+        color: #3daded;
+    }
+
+    .mycode {
+        display: inline-block;
+        width: 60px;
+        height: 30px;
+        vertical-align: middle;
+        background: #e2e2e2;
+        margin-left: 10px;
+    }
+</style>
+<body>
+<div class="containered">
+    <div class="header clearfix">
+        <ul class="logogroup">
+            <li><a href="#">广告投放媒体管理系统</a></li>
+        </ul>
+        <!-- <ul class="user_info clearfix">
+            <li><span>zhuc</span><a href="javascript:;" class="goout">退出</a></li>
+        </ul> -->
+    </div>
+    <div class="denglubox bknone">
+        <div class="block_content passwoedwarp">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix ">
+							<span class="block_title_name pull-left">
+								找回密码&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                <span style="color: red;"><small>${(err)!}</small></span>
+							</span>
+
+                    </div>
+
+                    <!-- 表单名称结束 -->
+                    <div class="zhmabox">
+                        <div class="zoumadeng">
+                            <span class='gradient one on'><em>1</em>确认账号</span>
+                            <span class='gradient two'><em>2</em>安全认证</span>
+                            <span class='gradient tree'><em>3</em>重置密码</span>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="formwarp ">
+                                <form class="form-horizontal" role="form" action="register/findPwdByEmail"
+                                      method="post">
+                                    <div class="form-group leftlable">
+
+                                        <label class="control-label">找回方式：</label>
+                                        <div class="col-sm-8 ">
+                                            <label class="radio-inline">
+                                                <input type="radio" id="emailoption" name="opaction" checked>邮箱找回
+                                            </label>
+                                            <label class="radio-inline">
+                                                <input type="radio" id="iphoneoption" name="opaction">手机号找回
+                                            </label>
+
+                                        </div>
+                                    </div>
+                                    <!-- 邮箱找回 -->
+                                    <div id="email">
+                                        <div class="form-group ">
+                                            <input type="text" id="emailStr" class="form-control input-sm " name="email"
+                                                   placeholder="请输入注册时填写的邮箱号码">
+                                        </div>
+                                        <div class="form-group clearfix">
+                                            <div class="input-group yzm">
+                                                <input class="form-control small180" id="inputCode" type="text"
+                                                       placeholder="请输入验证码"/>
+                                                <span id="code" class="mycode"></span>
+                                                <span id="login_error" style="color: red;margin-left: 10px;"></span>
+                                            </div>
+                                        </div>
+                                        <a href="javascript:void(0)" id="submitEmail"
+                                           class="btn btn2 green wczcbtn">确定</a>
+                                    </div>
+                                </form>
+                                <form class="form-horizontal" id="findPwdByPhone" role="form"
+                                      action="register/findPwdByPhone"
+                                      method="post">
+                                    <!-- 手机号找回 -->
+                                    <div id='iphone' class="hidden">
+                                        <div class="form-group ">
+                                            <input type="text" class="form-control input-sm "
+                                                   placeholder="请输入注册时填写的手机号码" id="phone" name="phone">
+                                        </div>
+                                        <div class="form-group clearfix">
+                                            <input name="smsCode" id="smsCode" class="form-control small180" type="text"
+                                                   placeholder="请输入验证码">
+                                            <input type="button" id="btn" class="btn "
+                                                   onclick="sendCode(this)" value="获取验证码"/>
+                                            <span id="login_error1" style="color: red;margin-left: 10px;"></span>
+                                        </div>
+                                        <a href="javascript:void(0)" id="submitPhone"
+                                           class="btn btn2 green wczcbtn" onclick="findByPhone()">确定</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/base/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="js/base/bootstrap.min.js"></script>
+<!-- 表单验证 -->
+<script type="application/x-javascript" src="plugs/bootstrap-validator/bootstrapValidator.min.js"></script>
+<script type="text/javascript" src="plugs/bootstrap-validator/zh_CN.js" charset="UTF-8"></script>
+<script type="text/javascript" src="js/base/jquery-form.js"></script>
+<!--验证码-->
+<script type="text/javascript" src="plugs/kinerCode/js.KinerCode.js"></script>
+<script>
+    $('#emailoption').click(function () {
+        if ($(this).is(":checked")) {
+            $('#email').removeClass('hidden');
+            $('#iphone').addClass('hidden');
+        }
+    });
+    $('#iphoneoption').click(function () {
+        if ($(this).is(":checked")) {
+            $('#iphone').removeClass('hidden');
+            $('#email').addClass('hidden');
+        }
+    });
+    function isEmpty(str) {
+        return str == undefined || str == null || $.trim(str) == '';
+    }
+    //点击Enter键实现登录
+
+    $('form').eq(0).bootstrapValidator({
+        fields: {
+            email: {
+                validators: {
+                    notEmpty: {
+                        message: '邮箱不能为空'
+                    },
+                    callback: {
+                        message: '邮箱不存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            var email = $("#emailStr").val();
+                            if (!isEmpty(email)) {
+                                $.ajax({
+                                    url: 'register/findByUserAndSystem',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {email: email},
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null) {
+                                            if (data.result.length <= 0) {
+                                                res = false;
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    },
+                }
+            }
+        }
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        //alert("00")
+        $.post($form.attr('action'), $form.serialize(), function (result) {
+
+            var email = $("#emailStr").val();
+            window.location.href = encodeURI("register/emailCertificate?email='" + email + "'");
+        });
+
+    });
+    $('form').eq(1).bootstrapValidator({
+        fields: {
+            phone: {
+                validators: {
+                    notEmpty: {
+                        message: '手机号码不能为空'
+                    },
+                    callback: {
+                        message: '手机号不存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            var phone = $("#phone").val();
+                            if (!isEmpty(phone)) {
+                                $.ajax({
+                                    url: 'register/findByUserAndSystem',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data: {phone: phone},
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null) {
+                                            if (data.result.length <= 0) {
+                                                $("#login_error1").text("");
+                                                res = false;
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    }
+                }
+            },
+            /*smsCode: {
+             validators: {
+             notEmpty: {
+             message: '验证码不能为空'
+             },
+             callback: {
+             message: '验证码错误',
+             callback: function (value, validator) {
+             var res = false;
+             debugger;
+             var smsCode = $("#smsCode").val();
+             var phone = $("#phone").val();
+             $.ajax({
+             url: 'register/checkSmsCode',
+             type: 'post',
+             dataType: 'json',
+             data: {smsCode: smsCode,phone:phone},
+             async: false,
+             success: function (data) {
+             res = data;
+             }
+             });
+             return res;
+             }
+             }
+             }
+             }*/
+        }
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        //alert("00")
+        var smsCode = $("#smsCode").val();
+        var phone = $("#phone").val();
+        if (isEmpty(smsCode)) {
+            $("#login_error1").text("验证码不能为空");
+            return;
+        } else {
+            $.ajax({
+                url: "register/checkSmsCode",
+                cache: false,
+                type: "post",
+                async: true,
+                data: {phone: phone, smsCode: smsCode},
+                success: function (restResponse) {
+                    if (restResponse) {
+                        var data = $('#findPwdByPhone').serialize();
+                        $.post("register/resetPwdByPhone", data, function (result) {
+                            document.write(result);
+                        });
+                    }
+                    else {
+                        $("#login_error1").text("验证码错误");
+                    }
+                }, error: function () {
+                }
+            });
+        }
+
+    });
+    function findByPhone() {
+        $('form').eq(1).submit();
+    }
+
+    var countdown = 60;
+    function sendCode(val) {
+        if ($('form').eq(1).data('bootstrapValidator').isValid()) {
+            setTime(val);
+            $.post($('form').eq(1).attr('action'), $('form').eq(1).serialize(), function (result) {
+                $("#login_error1").text("");
+            });
+        } else {
+            $("#login_error1").text("手机号有误");
+        }
+    }
+    function setTime(val) {
+        if (countdown == 0) {
+            val.removeAttribute("disabled");
+            val.value = "获取验证码";
+            countdown = 60;
+            return false;
+        } else {
+            val.setAttribute("disabled", true);
+            val.value = "重新发送(" + countdown + ")";
+            countdown--;
+        }
+        setTimeout(function () {
+            setTime(val)
+        }, 1000)
+    }
+
+
+    var inp = document.getElementById('inputCode');
+    var code = document.getElementById('code');
+    var submit = document.getElementById('submitEmail');
+    var c = new KinerCode({
+        len: 4,//需要产生的验证码长度
+        //        chars: ["1+2","3+15","6*8","8/4","22-15"],//问题模式:指定产生验证码的词典，若不给或数组长度为0则试用默认字典
+        chars: [
+            1, 2, 3, 4, 5, 6, 7, 8, 9, 0,
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        ],//经典模式:指定产生验证码的词典，若不给或数组长度为0则试用默认字典
+        question: false,//若给定词典为算数题，则此项必须选择true,程序将自动计算出结果进行校验【若选择此项，则可不配置len属性】,若选择经典模式，必须选择false
+        copy: false,//是否允许复制产生的验证码
+        bgColor: "",//背景颜色[与背景图任选其一设置]
+        bgImg: "bg.jpg",//若选择背景图片，则背景颜色失效
+        randomBg: false,//若选true则采用随机背景颜色，此时设置的bgImg和bgColor将失效
+        inputArea: inp,//输入验证码的input对象绑定【 HTMLInputElement 】
+        codeArea: code,//验证码放置的区域【HTMLDivElement 】
+        click2refresh: true,//是否点击验证码刷新验证码
+        false2refresh: true,//在填错验证码后是否刷新验证码
+        validateObj: submit,//触发验证的对象，若不指定则默认为已绑定的输入框inputArea
+        validateEven: "click",//触发验证的方法名，如click，blur等
+        validateFn: function (result, code) {//验证回调函数
+            ;
+            var code = $("#inputCode").val();
+            if (isEmpty(code)) {
+                $("#login_error").text("请输入正确的验证码");
+                $('form').eq(0).submit();
+                return;
+            }
+            if (result) {
+                $('form').eq(0).submit();
+            } else {
+                $('form').eq(0).submit();
+                if (this.opt.question) {
+                    //alert('验证失败:' + code.answer);
+                    $("#login_error").text("请输入正确的验证码");
+                } else {
+                    //alert('验证失败:' + code.strCode);
+                    //alert('验证失败:' + code.arrCode);
+                    $("#login_error").text("请输入正确的验证码");
+                }
+            }
+        }
+    });
+
+</script>
+</html>

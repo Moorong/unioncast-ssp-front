@@ -1,0 +1,12 @@
+/* 下拉框标志变黑 */
+.btn-primary .caret, .btn-success .caret, .btn-warning .caret,
+	.btn-danger .caret, .btn-info .caret {
+	border-top-color: #000;
+}
+.sldataBodyHeader {
+	display: none;
+}
+
+.sldataBodyTemplate {
+	display: none;
+}

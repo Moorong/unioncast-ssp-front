@@ -1,0 +1,470 @@
+package com.unioncast.ssp.front.controller.ssp;
+
+
+import com.unioncast.common.page.*;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.restClient.RestResponseFactory;
+import com.unioncast.common.ssp.model.SspAdvertiser;
+import com.unioncast.common.ssp.model.SspOrder;
+import com.unioncast.common.util.CommonUtil;
+import com.unioncast.ssp.front.common.util.Const;
+import com.unioncast.ssp.front.controller.common.BaseController;
+import com.unioncast.ssp.front.model.SecurityUser;
+import com.unioncast.ssp.front.service.ssp.SspAdvertiserService;
+import com.unioncast.ssp.front.service.ssp.SspOrderService;
+import com.unioncast.ssp.front.service.ssp.elasticsearchData.ElasticsearchADReport;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+@Api("订单")
+@Controller
+@RequestMapping("rest/sspOrder")
+public class SspOrderController extends BaseController {
+
+    private static final Logger LOG = LogManager.getLogger(SspOrderController.class);
+
+    @Resource
+    private SspOrderService sspOrderService;
+    @Resource
+    private SspAdvertiserService sspAdvertiserService;
+    @Resource
+    private ElasticsearchADReport elasticsearchADReport;
+
+
+    /**
+     * @Author dxy
+     * @Date 2017/1/16 14:41
+     * @Description (订单列表页面跳转)
+     */
+    @ApiOperation(value = "订单列表页面跳转", httpMethod = "GET")
+    @RequestMapping(value = {"/list"}, method = RequestMethod.GET)
+    public ModelAndView list(Long advertiserId,HttpSession session) {
+        ModelAndView model = new ModelAndView("ssp/order/orderlist");
+        model.addObject("advertiserId", advertiserId);
+        if(CommonUtil.isNotNull(advertiserId)){
+        	RestResponse restResponse = sspAdvertiserService.find(advertiserId);
+        	if(CommonUtil.isNotNull(restResponse)&&restResponse.isSuccess()){
+        		List<SspAdvertiser> listAdv = restResponse.getResultArr(SspAdvertiser.class);
+        		session.setAttribute(Const.CURRENT_ADVERTISER_INFO, listAdv.get(0));
+        	}
+        }
+        return model;
+    }
+
+    @ApiOperation(value = "订单添加页面", httpMethod = "GET")
+    @RequestMapping(value = "/addOrder", method = RequestMethod.GET)
+    public String addOrder(String advertiserId, Model model) {
+        model.addAttribute("advertiserId", advertiserId);
+        return "ssp/order/addOrder";
+    }
+
+    @ApiOperation(value = "订单修改页面", httpMethod = "GET")
+    @RequestMapping(value = "/editOrder", method = RequestMethod.GET)
+    public String editOrder(HttpServletRequest request, HttpServletResponse response, String advertiserId, Model model) {
+        Long id = Long.parseLong(request.getParameter("id"));
+//        Long.parseLong(request.getParameter("id"));
+        //Long id = 1L;
+        RestResponse restResponse = null;
+        String sta = null;
+        String end = null;
+        try {
+            restResponse = sspOrderService.find(id);
+
+            ArrayList<Object> arr = (ArrayList<Object>) restResponse.getResult();
+            LinkedHashMap o = (LinkedHashMap) arr.get(0);
+            if ((Integer) o.get("putTimeState") == 1) {
+                Date putStartTime = new Date((Long) o.get("putStartTime"));
+                sta = new SimpleDateFormat("yyyy-MM-dd").format(putStartTime);
+                Date putEndTime = new Date((Long) o.get("putEndTime"));
+                end = new SimpleDateFormat("yyyy-MM-dd").format(putEndTime);
+            } else {
+                sta = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+                end = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+            }
+            model.addAttribute("sta", sta);
+            model.addAttribute("end", end);
+            model.addAttribute("sspOrder", o);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        model.addAttribute("advertiserId", advertiserId);
+        return "ssp/order/editOrder";
+    }
+
+    @ApiOperation(value = "检查订单名称", httpMethod = "POST")
+    @ApiImplicitParam(name = "name", required = true, dataType = "String", paramType = "String")
+    @ResponseBody
+    @RequestMapping(value = "/orderName/{name}", method = RequestMethod.POST)
+    public String validatorName(@PathVariable String name) {
+        LOG.info("orderName name:{}", name);
+        RestResponse restResponse = null;
+        try {
+            restResponse = sspOrderService.find(name);
+            ArrayList<Object> arr = (ArrayList<Object>) restResponse.getResult();
+            if (arr != null && arr.size() != 0) {
+                return "fals";
+            } else {
+                return "tru";
+            }
+        } catch (Exception e) {
+            LOG.error("检查计划名称出错");
+            return "fals";
+        }
+    }
+
+    @ApiOperation(value = "查询订单信息", httpMethod = "POST", response = RestResponse.class)
+    @ResponseBody
+    @RequestMapping(value = "/findById", method = RequestMethod.POST)
+    public RestResponse find(Long id) {
+        LOG.info("find sspOrder id:{}", id);
+        try {
+            return sspOrderService.find(id);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return RestResponseFactory.exception(e);
+        }
+    }
+
+    @ApiOperation(value = "增加订单", httpMethod = "POST", response = RestResponse.class)
+    @ApiImplicitParam(name = "sspOrder", required = true, dataType = "SspOrder", paramType = "body")
+    @ResponseBody
+    @RequestMapping(value = "/add", method = RequestMethod.POST)
+    public RestResponse add(SspOrder sspOrder, HttpServletRequest request) {
+        LOG.info("add sspOrder:{}", sspOrder);
+        SecurityUser user = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            if (sspOrder != null && sspOrder.getPutTimeState() == 1) {
+                String putStartTimeStr = request.getParameter("putStartTimeStr");
+                String putEndTimeStr = request.getParameter("putEndTimeStr");
+                Date putStartTime = new SimpleDateFormat("yyyy-MM-dd").parse(putStartTimeStr);
+                Date putEndTime = new SimpleDateFormat("yyyy-MM-dd").parse(putEndTimeStr);
+                sspOrder.setPutStartTime(putStartTime);
+                sspOrder.setPutEndTime(putEndTime);
+            }
+            sspOrder.setOrderIdentifying(UUID.randomUUID().toString().replace("-", ""));
+            //订单开关状态默认为1开
+            sspOrder.setAdPutState(1);
+            //订单删除状态默认为1未删除
+            sspOrder.setDeleteState(1);
+            sspOrder.setCreateTime(new Date());
+            sspOrder.setUpdateTime(new Date());
+            sspOrder.setUser(user);
+            sspOrderService.save(sspOrder);
+            return RestResponseFactory.ok();
+        } catch (Exception e) {
+            LOG.error("新增订单出错");
+            return RestResponseFactory.exception(e);
+        }
+//        return "ssp/order/orderlist";
+    }
+
+    @ApiOperation(value = "更新订单", httpMethod = "POST")
+    @ApiImplicitParam(name = "sspOrder", required = true, dataType = "SspOrder", paramType = "body")
+    @ResponseBody
+    @RequestMapping(value = "/update", method = RequestMethod.POST)
+    public RestResponse update(SspOrder sspOrder, HttpServletRequest request, String advertiserId) {
+        LOG.info("update sspOrder:{}", sspOrder);
+        SecurityUser user = (SecurityUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            if (sspOrder != null && sspOrder.getPutTimeState() != null) {
+                if (sspOrder.getPutTimeState() == 1) {
+                    String putStartTimeStr = request.getParameter("putStartTimeStr");
+                    String putEndTimeStr = request.getParameter("putEndTimeStr");
+                    Date putStartTime = new SimpleDateFormat("yyyy-MM-dd").parse(putStartTimeStr);
+                    Date putEndTime = new SimpleDateFormat("yyyy-MM-dd").parse(putEndTimeStr);
+                    sspOrder.setPutStartTime(putStartTime);
+                    sspOrder.setPutEndTime(putEndTime);
+                }
+            }
+            sspOrder.setUpdateTime(new Date());
+            //广告主ID
+            SspAdvertiser advertiser = new SspAdvertiser();
+            advertiser.setId(Long.parseLong(advertiserId));
+            sspOrder.setUser(user);
+            sspOrder.setSspAdvertiser(advertiser);
+            sspOrderService.update(sspOrder);
+            return RestResponseFactory.ok();
+        } catch (Exception e) {
+            LOG.error("更新订单出错");
+            return RestResponseFactory.exception(e);
+        }
+//        return "ssp/order/orderlist";
+
+    }
+
+
+    @ApiOperation(value = "根据广告主id查询订单信息", httpMethod = "POST", response = RestResponse.class)
+    @ResponseBody
+    @RequestMapping(value = "/findByAdverId", method = RequestMethod.POST)
+    public RestResponse findByAdverId(Long id) {
+        LOG.info("find sspOrder id:{}", id);
+        try {
+            return sspOrderService.findByAdverId(id);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return RestResponseFactory.exception(e);
+        }
+    }
+
+    @ApiOperation(value = "根据广告主id查询订单信息", httpMethod = "POST", response = RestResponse.class)
+    @ResponseBody
+    @RequestMapping(value = "/findCreativeByAdverId", method = RequestMethod.POST)
+    public RestResponse findCreativeByAdverId(Long id) {
+        LOG.info("find sspOrder id:{}", id);
+        try {
+            return sspOrderService.findCreativeByAdverId(id);
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return RestResponseFactory.exception(e);
+        }
+    }
+
+
+    /**
+     * @param adPutState
+     * @param orderName     订单名称
+     * @param pageSize      显示个数
+     * @param currentPageNo 页数
+     * @param pushStartTime 创建开始时间
+     * @param pushEndTime   结束时间
+     *                      advertiserId 广告位Id
+     * @Author dxy
+     * @Date 2017/1/19 19:25
+     * @Description (分页获取数据)
+     */
+    @ApiOperation(value = "条件分页查询", httpMethod = "POST", response = RestResponse.class)
+    @ApiImplicitParam(name = "pageCriteria", value = "分页查询条件", required = true, dataType = "PageCriteria", paramType = "body")
+    @ResponseBody
+    @RequestMapping(value = "/page", method = RequestMethod.POST)
+    public Pagination<SspOrder> page(@RequestParam(value = "adPutState", required = false) String adPutState,
+                                     @RequestParam(value = "orderName", required = false) String orderName,
+                                     @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                                     @RequestParam(value = "currentPageNo", required = false, defaultValue = "1") int currentPageNo,
+                                     @RequestParam(value = "pushStartTime", required = false) String pushStartTime,
+                                     @RequestParam(value = "pushEndTime", required = false) String pushEndTime,
+                                     String advertiserId) {
+        ModelAndView model = new ModelAndView("ssp/order/orderlist");
+        Pagination<SspOrder> result = null;
+        try {
+            PageCriteria pageCriteria = new PageCriteria();
+            List<SearchExpression> seplist = new ArrayList<>(); //搜索条件集合
+            List<OrderExpression> orderExpressionList = new ArrayList<>();//排序集合
+
+            pageCriteria.setCurrentPageNo(currentPageNo);
+            pageCriteria.setPageSize(pageSize);
+            pageCriteria.setEntityClass(SspOrder.class);
+            pageCriteria.setPredicate(Operation.AND);
+
+            OrderExpression orderExpression = new OrderExpression();
+            orderExpression.setPropertyName("update_time");
+            orderExpression.setOp("DESC");
+            orderExpressionList.add(orderExpression);
+            pageCriteria.setOrderExpressionList(orderExpressionList);
+            SearchExpression sep = null;
+            if (orderName != "" && orderName != null) {
+                sep = new SearchExpression();
+                sep.setPropertyName("name");
+                sep.setValue(orderName);
+                sep.setOperation(Operation.LIKE);
+                seplist.add(sep);
+            }
+            if (adPutState != "" && adPutState != null) {
+                sep = new SearchExpression();
+                sep.setPropertyName("ad_put_state");
+                sep.setValue(adPutState);
+                sep.setOperation(Operation.EQ);
+                seplist.add(sep);
+            }
+            if (pushStartTime != "" && pushStartTime != null) {
+                sep = new SearchExpression();
+                sep.setPropertyName("update_time");
+                sep.setValue(pushStartTime);
+                sep.setOperation(Operation.GE);
+                seplist.add(sep);
+            }
+            if (pushEndTime != "" && pushEndTime != null) {
+                sep = new SearchExpression();
+                sep.setPropertyName("update_time");
+                sep.setValue(pushEndTime + " 23:59:59");
+                sep.setOperation(Operation.LE);
+                seplist.add(sep);
+            }
+            if (CommonUtil.isNotNull(advertiserId)) {
+                sep = new SearchExpression();
+                sep.setPropertyName("advertiser_id");
+                sep.setValue(advertiserId);
+                sep.setOperation(Operation.EQ);
+                seplist.add(sep);
+            }
+            pageCriteria.setSearchExpressionList(seplist);
+            result = sspOrderService.page(pageCriteria);
+        } catch (Exception e) {
+            LOG.error("获取订单分页出错");
+        }
+        return result;
+    }
+
+    //含有广告主状态的方法查询
+    @ApiOperation(value = "含广告主状态条件分页查询", httpMethod = "POST", response = RestResponse.class)
+    @ApiImplicitParam(name = "pageCriteria", value = "分页查询条件", required = true, dataType = "PageCriteria", paramType = "body")
+    @ResponseBody
+    @RequestMapping(value = "/AdStatePage", method = RequestMethod.POST)
+    public Pagination<SspOrder> AdStatePage(@RequestParam(value = "orders", required = false) String orderId,
+                                            @RequestParam(value = "orderName", required = false) String orderName,
+                                            @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize,
+                                            @RequestParam(value = "currentPageNo", required = false, defaultValue = "1") int currentPageNo,
+                                            @RequestParam(value = "pushStartTime", required = false) String pushStartTime,
+                                            @RequestParam(value = "pushEndTime", required = false) String pushEndTime,
+                                            @RequestParam(value = "advertisers", required = false) String advertiserId) {
+
+        ModelAndView model = new ModelAndView("ssp/finance/orderRecharge");
+        Pagination<SspOrder> result = null;
+        AdvertiserOrderModel params = new AdvertiserOrderModel();
+
+        try {
+
+            if (orderName != "" && orderName != null) {
+                params.setOrderName(orderName);
+            }
+            if (orderId != "" && orderId != null) {
+                params.setOrderId(Long.valueOf(orderId));
+            }
+
+            if (pushStartTime != "" && pushStartTime != null) {
+                pushStartTime += " 23:59:59";
+                //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                //params.setPushStartTime(sdf.parse(pushStartTime));
+                params.setPushStartTime(pushStartTime);
+            }
+            if (pushEndTime != "" && pushEndTime != null) {
+                pushEndTime += " 23:59:59";
+                //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                //params.setPushStartTime(sdf.parse(pushEndTime));
+                params.setPushEndTime(pushEndTime);
+            }
+            //这个是广告主的状态
+            if (advertiserId != "" && advertiserId != null) {
+                params.setAdvertiserId(Long.valueOf(advertiserId));
+            }
+            params.setCurrentPageNo(currentPageNo);
+            params.setPageSize(pageSize);
+            result = sspOrderService.AdStatePage(params);
+        } catch (Exception e) {
+            LOG.error("获取订单分页出错");
+        }
+        return result;
+    }
+
+    @ApiOperation(value = "删除一个订单", httpMethod = "POST", response = RestResponse.class)
+    @ApiImplicitParam(name = "id", required = true, dataType = "long", paramType = "body")
+    @ResponseBody
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    public RestResponse delete(SspOrder sspOrder) {
+        LOG.info("delete sspOrder id:{}", sspOrder.getId());
+        try {
+            sspOrder.setUpdateTime(new Date());
+            sspOrder.setDeleteState(2);
+            sspOrderService.update(sspOrder);
+            /*sspOrderService.deleteById(id);*/
+
+            //删除es对应的报表
+            elasticsearchADReport.esADRepordDelete("orderId",sspOrder.getId());
+
+            return RestResponseFactory.ok();
+        } catch (Exception e) {
+            LOG.error("删除订单出错");
+            return RestResponseFactory.exception(e);
+        }
+
+    }
+
+    @ApiOperation(value = "批量删除订单", httpMethod = "POST", response = RestResponse.class)
+    @ApiImplicitParam(name = "ids", required = true, dataType = "List<Long>", paramType = "body")
+    @ResponseBody
+    @RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
+    public RestResponse batchDelete(@RequestParam Long[] ids) {
+        LOG.info("batchDelete sspOrder ids:{}", (Object[]) ids);
+        try {
+            SspOrder order = null;
+            for(Long id :ids){
+                if(CommonUtil.isNotNull(id)){
+                    order = new SspOrder();
+                    order.setUpdateTime(new Date());
+                    order.setId(id);
+                    order.setDeleteState(2);
+                    sspOrderService.update(order);
+                    //删除es对应的报表
+                    elasticsearchADReport.esADRepordDelete("orderId",id);
+                }
+            }
+            /*sspOrderService.batchDelete(ids);*/
+            return RestResponseFactory.ok();
+        } catch (Exception e) {
+            LOG.error("删除订单出错");
+            return RestResponseFactory.exception(e);
+        }
+    }
+
+    /**
+     * 根据广告主id查询订单数
+     *
+     * @param id
+     * @return
+     * @author 刘蓉
+     * @date 2017年2月17日 下午4:22:57
+     */
+    @ApiOperation(value = "根据广告主id查询订单数，id为空时查询所有", httpMethod = "POST", response = RestResponse.class)
+    @RequestMapping(value = "/findByAdvertiserId", method = RequestMethod.POST)
+    @ResponseBody
+    public RestResponse findByAdvertiserId(Long id) {
+        LOG.info("id:{}", id);
+        try {
+            RestResponse response = sspOrderService.findByAdvertiserId(id);
+            LOG.info("sspCreativeGroups", response);
+            return response;
+        } catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return RestResponseFactory.exception(e);
+        }
+    }
+    
+    /**
+     * 根据订单id查询投放时间范围
+     * @author 刘蓉
+     * @date 2017年5月22日 上午11:32:34
+     *
+     * @param id
+     * @return
+     */
+    @ApiOperation(value = "根据订单id查询投放时间范围", httpMethod = "GET", response = RestResponse.class)
+    @RequestMapping(value = "/findByOrderId", method = RequestMethod.POST)
+    @ResponseBody
+    public RestResponse findPutTimeRangeByOrderId(SspOrder sspOrder) {
+    	LOG.info("orderId:{}", sspOrder.getId());
+    	try {
+    		RestResponse response = sspOrderService.find(sspOrder);
+    		LOG.info("time range : {}", response.getResult());
+    		return response;
+    	} catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+            return RestResponseFactory.exception(e);
+        }
+    }
+
+}

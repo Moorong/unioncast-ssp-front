@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);">财务管理</a> <i> / </i> <span>编辑财务信息</span>
+	</h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 财务信息 </span>
+						</div>
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<form class="form-horizontal" role="form" id="updateFM" action="ssp/finance/saveFinaceInfo" method="post">
+								<input type="hidden" name="id" value="${(financeInfo.id)!""}"/>
+								<div class="formwarp">
+									<p class="text-muted">
+										<i class="iconfont icon-tanhao1"></i>以下信息关系到您的收益，请您准确的填写真实有效的信息，我们将确保您的信息安全
+									</p>
+									<div class="form-group">
+										<label class="col-sm-1 control-label">财务对象:</label>
+										<div class="col-sm-8 ">
+											<label class="radio-inline"> <input type="radio" name="financeType"
+												id="inlineCheckbox1" value="1" <#if ((financeInfo.financeType)?? && 1==(financeInfo.financeType)!"")||(!(financeInfo.id)??)>checked="checked"</#if>>个人
+											</label> <label class="radio-inline"> <input type="radio" name="financeType"
+												id="inlineCheckbox1" value="2" <#if (financeInfo.financeType)?? && 2==(financeInfo.financeType)!"">checked="checked"</#if>> 企业
+											</label>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-1 control-label">收款银行:</label>
+										<div class="col-sm-8 ">
+											<select class="dropdown small marginr33 bs-select-hidden">
+												<option value="1">北京</option>
+												<option value="2">天津</option>
+											</select>
+											<div
+												class="btn-group bootstrap-select dropdown small marginr33">
+												<button type="button"
+													class="btn dropdown-toggle btn-default"
+													data-toggle="dropdown" title="北京" aria-expanded="false">
+													<span class="filter-option pull-left">北京</span>&nbsp;<span
+														class="caret"></span>
+												</button>
+												<div class="dropdown-menu open"
+													style="max-height: 187px; overflow: hidden; min-height: 0px;">
+													<ul class="dropdown-menu inner" role="menu"
+														style="max-height: 175px; overflow-y: auto; min-height: 0px;">
+														<li data-original-index="0" class="selected"><a
+															tabindex="0" class="" style="" data-tokens="null"><span
+																class="text">北京</span><span
+																class="glyphicon glyphicon-ok check-mark"></span></a></li>
+														<li data-original-index="1"><a tabindex="0" class=""
+															style="" data-tokens="null"><span class="text">天津</span><span
+																class="glyphicon glyphicon-ok check-mark"></span></a></li>
+													</ul>
+												</div>
+											</div>
+											<em>请选择正确的开户地</em>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-1 control-label">收款银行:</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												placeholder="" name="recipientBank" value="${(financeInfo.recipientBank)!""}"> <em>示例：招商银行—北京分行上地支行，请填写开户行全称（如无法确认请致电银行客服）</em>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-sm-1 control-label">银行账号:</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												placeholder="" name="bankAccount" value="${(financeInfo.bankAccount)!""}"> <em>款项将寄往此帐号，请填写正确的账号信息</em>
+										</div>
+									</div>
+									<div id="personalShow" style="display: none;">
+										<div class="form-group">
+											<label class="col-sm-1 control-label">收款人姓名:</label>
+											<div class="col-sm-8 ">
+												<input type="text" class="form-control input-sm "
+													placeholder="" name="recipientName" value="${(financeInfo.recipientName)!""}"> <em>收款人姓名需与您银行账户中的姓名一致</em>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-1 control-label">收款人身份证:</label>
+											<div class="col-sm-8 ">
+												<input type="text" class="form-control input-sm "
+													placeholder="" name="recipientIdentityNum" value="${(financeInfo.recipientIdentityNum)!""}"> <em>请填入收款人的身份证号，务必填写真实有效的信息，我们将确保您的信息安全。</em>
+											</div>
+										</div>
+									</div>
+									<div id="enterpriseShow" style="display: none;">
+										<div class="form-group">
+											<label class="col-sm-1 control-label">发票类型:</label>
+											<div class="col-sm-8 ">
+												<label class="radio-inline">
+													<input type="radio" name="invoiceType" value="1" <#if ((financeInfo.invoiceType)?? && 1==(financeInfo.invoiceType)!"")||(!(financeInfo.id)??)>checked="checked"</#if>>增值税普通发票
+												</label> 
+												<label class="radio-inline"> 
+													<input type="radio" name="invoiceType" value="2" <#if (financeInfo.invoiceType)?? && 2==(financeInfo.invoiceType)!"">checked="checked"</#if>> 增值税专用发票
+												</label>
+												<label class="radio-inline"> 
+													<input type="radio" name="invoiceType" value="3" <#if (financeInfo.invoiceType)?? && 3==(financeInfo.invoiceType)!"">checked="checked"</#if>> 境外发票
+												</label>
+											</div>
+										</div>
+										<div class="form-group">
+											<label class="col-sm-1 control-label">税号:</label>
+											<div class="col-sm-8 ">
+												<input type="text" class="form-control input-sm "
+													placeholder="" name="taxNum" value="${(financeInfo.taxNum)!""}"> <em>请仔细确认所选发票类型及税率，否则将影响您的分成支付。如您对发票类型、税号和税率有疑问，请咨询您公司的税务部门。</em>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="savewarp text-center">
+									<a href="javascript:void(0);" class="btn btn2 formbtn green" onclick="$('#updateFM').submit()">更新</a> <a href="javascript:void(0);"
+										class="btn btn2 formbtn bk999" data-toggle="modal"
+										data-target="#myModal" onclick="page.history.go('rest/ssp/finance/finaceInfo')">取消</a>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 表单内容结束 -->
+	<script type="text/javascript">
+		$(function(){
+			$(':input[name="financeType"]').change(function(){
+				if(this.checked){
+					$('#personalShow').hide();
+					$('#enterpriseShow').hide();
+					var val = this.value;
+					if(1==val){
+						$('#personalShow').show();
+					}else{
+						$('#enterpriseShow').show();
+					}
+				}
+			}).change();
+			
+			$('#updateFM').submit(function(){
+				page.ajaxSubmit(this,function(result){
+					if(result&&result.success){
+						alert('更新成功!').ok(function(){
+							page.loadPage('ssp/finance/finaceInfo');
+						});
+					}else{
+						alert('操作失败!');
+					}
+				});
+				return false;
+			});
+		});
+	</script>
+</body>
+</html>

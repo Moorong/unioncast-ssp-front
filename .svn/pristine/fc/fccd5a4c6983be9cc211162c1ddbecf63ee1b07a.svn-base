@@ -1,0 +1,184 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.adx.model.UploadFileInfo;
+import com.unioncast.common.page.Operation;
+import com.unioncast.common.page.OrderExpression;
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.page.PlanCreativeModel;
+import com.unioncast.common.page.SearchExpression;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspAdPositionInfo;
+import com.unioncast.common.ssp.model.SspCreative;
+import com.unioncast.common.ssp.model.SspPlanCreativeRelation;
+import com.unioncast.common.util.CommonUtil;
+import com.unioncast.ssp.front.common.util.RestUtil;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspCreativeService;
+
+@Component
+public class SspCreativeServiceImpl implements SspCreativeService {
+
+	@Resource
+	private RestTemplate restTemplate;
+
+	@Override
+	public RestResponse deleteById(Long id) {
+		HttpEntity<Long> httpEntity = new HttpEntity<Long>(id);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/deleteById", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public void batchDelete(Long[] ids) {
+	}
+
+	@Override
+	public RestResponse page(Long accountId, Integer currentPageNo, Integer pageSize, String name, Long advertiserId, Integer creativeState, Integer creativeType, Long creativeGroupId) {
+		PageCriteria pageCriteria = new PageCriteria();
+
+		pageCriteria.setPageSize(pageSize);
+		pageCriteria.setCurrentPageNo(currentPageNo);
+		pageCriteria.setEntityClass(SspCreative.class);
+		pageCriteria.setPredicate(Operation.AND);
+		List<OrderExpression> orderExpressionList = new ArrayList<OrderExpression>();
+		// 封装排序，按照updateTime倒序
+		OrderExpression orderExpression = new OrderExpression();
+		orderExpression.setPropertyName("update_time");
+		orderExpression.setOp("DESC");
+		orderExpressionList.add(orderExpression);
+		pageCriteria.setOrderExpressionList(orderExpressionList);
+
+		List<SearchExpression> searchExpressionList = new ArrayList<SearchExpression>();
+		
+		if(accountId != null){
+			SearchExpression  accountExpression = new SearchExpression();
+			accountExpression.setPropertyName("account_id"); accountExpression.setValue(accountId);
+			accountExpression.setOperation(Operation.EQ); searchExpressionList.add(accountExpression);
+		}
+		if(name != null && !name.equals("")){
+			SearchExpression  nameExpression = new SearchExpression();
+			nameExpression.setPropertyName("creative_name");
+			nameExpression.setValue(name);
+			nameExpression.setOperation(Operation.LIKE);
+			searchExpressionList.add(nameExpression);
+		}
+		if(advertiserId != null){
+			SearchExpression  advertiserExpression = new SearchExpression();
+			advertiserExpression.setPropertyName("advertiser_id");
+			advertiserExpression.setValue(advertiserId);
+			advertiserExpression.setOperation(Operation.EQ);
+			searchExpressionList.add(advertiserExpression);
+		}
+		if(creativeState != null){
+			SearchExpression  stateExpression = new SearchExpression();
+			stateExpression.setPropertyName("creative_state");
+			stateExpression.setValue(creativeState);
+			stateExpression.setOperation(Operation.EQ);
+			searchExpressionList.add(stateExpression);
+		}
+		if(creativeType != null){
+			SearchExpression  typeExpression = new SearchExpression();
+			typeExpression.setPropertyName("creative_type");
+			typeExpression.setValue(creativeType);
+			typeExpression.setOperation(Operation.EQ);
+			searchExpressionList.add(typeExpression);
+		}
+		
+		pageCriteria.setSearchExpressionList(searchExpressionList);
+		HttpEntity<PageCriteria> httpEntity = new HttpEntity<PageCriteria>(pageCriteria);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/page", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public void update(SspAdPositionInfo sspAdPositionInfo) {
+	}
+
+	@Override
+	public RestResponse save(SspCreative sspCreative) {
+		HttpEntity<SspCreative> httpEntity = new HttpEntity<SspCreative>(sspCreative);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/add", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse find(Long id) {
+		return null;
+	}
+
+	@Override
+	public RestResponse findByAdvertiserId(Long id) {
+		HttpEntity<Long> httpEntity = new HttpEntity<Long>(id);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/findByAdvertiserId", httpEntity, RestResponse.class);
+	}
+	@Override
+	public RestResponse findCreativeByAdvertiser(Long advertiserId,Integer creativeType,String creativeLabel,String creativeName) {
+		Map<String,Object> params = new HashMap<String,Object>();
+		if(CommonUtil.isNotNull(advertiserId))
+			params.put("advertiserId",advertiserId);
+		if(CommonUtil.isNotNull(creativeType))
+			params.put("creativeType",creativeType);
+		if(CommonUtil.isNotNull(creativeLabel))
+			params.put("creativeLabel",creativeLabel);
+		if(CommonUtil.isNotNull(creativeName))
+			params.put("creativeName",creativeName);
+		return RestUtil.postForObjectForDB("rest/ssp/creative/findCreativeByAdvertiser", params, RestResponse.class);
+	}
+	@Override
+	public RestResponse findCreativeRelationByPlanId(Long planId) {
+		HttpEntity<Long> httpEntity = new HttpEntity<Long>(planId);
+		return restTemplate.postForObjectForDB("rest/ssp/planCreativeRelation/findByPlanId", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse page(Long accountId, Long planId,
+			Integer currentPageNo, Integer pageSize, String name,
+			Long advertiserId, Integer creativeState, Integer creativeType,
+			Long creativeGroupId) {
+		
+		PlanCreativeModel planCreativeModel = new PlanCreativeModel(currentPageNo, pageSize, name, planId, accountId, advertiserId, creativeState, creativeType, creativeGroupId);
+		
+		HttpEntity<PlanCreativeModel> httpEntity = new HttpEntity<PlanCreativeModel>(planCreativeModel);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/pageByPlanId", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse saveFile(UploadFileInfo uploadFile) {
+		HttpEntity<UploadFileInfo> httpEntity = new HttpEntity<UploadFileInfo>(uploadFile);
+		return restTemplate.postForObjectForDB("rest/image/upload", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse update(SspCreative sspCreative) {
+		HttpEntity<SspCreative> httpEntity = new HttpEntity<SspCreative>(sspCreative);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/update", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse find(SspCreative creative) {
+		HttpEntity<SspCreative> httpEntity = new HttpEntity<SspCreative>(creative);
+		return restTemplate.postForObjectForDB("rest/ssp/creative/findT", httpEntity, RestResponse.class);
+	}
+
+	
+	public RestResponse changePlanCreativeRelationState(SspPlanCreativeRelation sspCreative) {
+		HttpEntity<SspPlanCreativeRelation> httpEntity = new HttpEntity<SspPlanCreativeRelation>(sspCreative);
+		 return restTemplate.postForObjectForDB("rest/ssp/planCreativeRelation/changePlanCreativeRelationState", httpEntity, RestResponse.class);
+		
+	}
+
+	@Override
+	public RestResponse deletePlanCreativeRelationById(SspPlanCreativeRelation pcr) {
+		
+		HttpEntity<SspPlanCreativeRelation> httpEntity = new HttpEntity<SspPlanCreativeRelation>(pcr);
+		 return restTemplate.postForObjectForDB("rest/ssp/planCreativeRelation/deletePlanCreativeRelationById", httpEntity, RestResponse.class);
+	}
+
+}

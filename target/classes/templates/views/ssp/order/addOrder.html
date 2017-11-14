@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<body>
+<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);"  onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理(${(CURRENT_ADVERTISER_INFO.name)!''})</a> <i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspOrder/list">订单管理</a> <i> / </i> <span>新建订单</span>
+	</h2>
+<div class="page_main">
+<div class="page_main_white">
+    <form class="form-horizontal" role="form" action="sspOrder/add" id="orderFrom">
+        <div class="block_content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										订单信息
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <input type="hidden" name="user.id"
+                               value="${(Session.SPRING_SECURITY_CONTEXT.authentication.principal.id)!''}"/>
+                        <input type="hidden" id="advertiserId" name="sspAdvertiser.id" value="${advertiserId!''}"/>
+                        <div class="formwarp">
+                            <div class="form-group ">
+                                <label for="name" class="col-sm-4 control-label"><i>*</i>订单名称</label>
+                                <div class="col-sm-8 ">
+                                    <input id="name" name="name" type="text" class="form-control input-sm "
+                                           placeholder="">
+                                    <!--<em>订单名称已被使用</em>-->
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="budget" class="col-sm-4 control-label"><i>*</i>预算</label>
+                                <div class="col-sm-8 ">
+                                    <input id="budget" name="budget" type="text" class="form-control input-sm "
+                                           placeholder="">
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="contractId" class="col-sm-4 control-label">外部关联ID</label>
+                                <div class="col-sm-8 ">
+                                    <input id="contractId" name="contractId" type="text" class="form-control input-sm "
+                                           placeholder="">
+                                    <!--<a href="#" data-toggle="tooltip" data-placement="right" title="修改"><i-->
+                                    <!--class="iconfont icon-tanhao1"></i></a>-->
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="col-sm-4 control-label"><i>*</i>投放周期</label>
+                                <div class="col-sm-8 ">
+                                    <!-- <input type="checkbox" name="switch"  /> -->
+
+                                    <!--<input type="button" onclick="edit()" class="btn btn2 green" value="修改">-->
+                                    <label class="radio-inline">
+                                        <input type="radio" onclick="$('#reportrange2').hide();"
+                                               class="btn btn2 green" name="putTimeState" value="2">不限
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" onclick="$('#reportrange2').show();"
+                                               class="btn btn2 red" name="putTimeState" value="1" checked="checked">限制
+                                    </label>
+                                    <!--<div id="reportrange2"-->
+                                    <!--style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">-->
+                                    <!--<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>-->
+                                    <!--<span></span> <b class="caret"></b>-->
+                                    <!--</div>-->
+                                    <div id="reportrange2"
+                                         style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span></span>
+                                        <input type="hidden" name="putStartTimeStr"/>
+                                        <input type="hidden" name="putEndTimeStr"/>
+                                        <b class="caret"></b>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="col-sm-4 control-label"><i>*</i>结算方式</label>
+                                <div class="col-sm-8">
+                                    <div class="pull-left marginr26">
+                                        <select id="settlementType" name="settlementType" class="dropdown">
+                                            <option value="">请选择结算方式</option>
+                                            <option value="1">CPM</option>
+                                            <option value="2">CPA</option>
+                                            <option value="3">CPC</option>
+                                            <option value="4">CPT</option>
+                                            <option value="5">CPD</option>
+                                        </select>
+                                    </div>
+                                    <!--<div class="col-sm-8 ">-->
+                                    <div class="pull-left marginr26">
+                                        <label for="agentFeeRatio" class="control-label">单价&nbsp;</label>
+                                        <input id="settlementFee" name="settlementFee" type="text"
+                                               class="form-control input-sm small" placeholder="金额">&nbsp;元
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="serviceFeeRatio" class="col-sm-4 control-label">费用</label>
+                                <div class="col-sm-8 ">
+                                    <div class="pull-left marginr26">
+                                        <label for="serviceFeeRatio" class="control-label">服务费</label>
+                                        <input id="serviceFeeRatio" name="serviceFeeRatio" type="text"
+                                               class="form-control input-sm small" placeholder="百分比">
+                                        %
+                                    </div>
+                                    <!--<div class="col-sm-8 ">-->
+                                    <div class="pull-left marginr26">
+                                        <label for="agentFeeRatio" class="control-label">代理费</label>
+                                        <input id="agentFeeRatio" name="agentFeeRatio" type="text"
+                                               class="form-control input-sm small" placeholder="百分比">
+                                        %
+                                    </div>
+                                    <!--                                    <div class="pull-left">
+                                                                            <label for="serviceFee" class="control-label">服务费</label>
+                                                                            <input id="serviceFee" name="serviceFee" type="text"
+                                                                                   class="form-control input-sm small" placeholder="金额">
+                                                                        </div>-->
+                                </div>
+                            </div>
+
+                            <!--                            <div class="form-group ">
+                                                            <label for="agentFeeRatio" class="col-sm-4 control-label">&nbsp;</label>
+                                                            <div class="col-sm-8 ">
+                                                                <div class="pull-left marginr26">
+                                                                    <label for="agentFeeRatio" class="control-label">代理费</label>
+                                                                    <input id="agentFeeRatio" name="agentFeeRatio" type="text"
+                                                                           class="form-control input-sm small" placeholder="百分比">
+                                                                    %
+                                                                </div>
+                            &lt;!&ndash;                                    <div class="pull-left">
+                                                                    <label for="agentFee" class="control-label">代理费</label>
+                                                                    <input id="agentFee" name="agentFee" type="text"
+                                                                           class="form-control input-sm small" placeholder="金额">
+                                                                </div>&ndash;&gt;
+                                                            </div>
+                                                        </div>-->
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 间隔 -->
+        <div style="height:10px;background:#f1f2f7;"></div>
+        <!-- 间隔 -->
+        <div class="block_content ">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										投放设置
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <!--<form class="form-horizontal" role="form">-->
+                        <div class="formwarp">
+                            <div class="form-group ">
+                                <label for="singlePeriodShowTimes"
+                                       class="col-sm-4 control-label ">频次设置</label>
+                                <div class="col-sm-8 ">
+                                    <div class="pull-left marginr26">
+                                        <label for="singlePeriodShowTimes"
+                                               class="control-label marginr15">投放周期内单人曝光不超过</label>
+                                        <input id="singlePeriodShowTimes" name="singlePeriodShowTimes" type="text"
+                                               class="form-control input-sm small114 marginr10">
+                                        次
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="col-sm-4 control-label"></label>
+                                <div class="col-sm-8 ">
+                                    <div class="pull-left marginr26">
+                                        <label class="control-label">每人每</label>
+                                        <select id="showCalculationType" name="showCalculationType"
+                                                class="dropdown small marginr33">
+                                            <option value="1">天</option>
+                                            <option value="2">小时</option>
+                                        </select>
+                                        <label for="singleShowTimes" class="control-label">曝光不超过</label>
+                                        <input id="singleShowTimes" name="singleShowTimes" type="text"
+                                               class="form-control input-sm small marginr10">
+                                        次
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="col-sm-4 control-label"></label>
+                                <div class="col-sm-8 ">
+                                    <div class="pull-left marginr26">
+                                        <label class="control-label">每人每</label>
+                                        <select id="clickCalculationType" name="clickCalculationType"
+                                                class="dropdown small marginr33">
+                                            <option value="1">天</option>
+                                            <option value="2">小时</option>
+                                        </select>
+                                        <label for="singleClickTimes" class="control-label">点击不超过</label>
+                                        <input id="singleClickTimes" name="singleClickTimes" type="text"
+                                               class="form-control input-sm small marginr10">
+                                        次
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="dailyBudgetCap" class="col-sm-4 control-label">每日预算上限</label>
+                                <div class="col-sm-8 ">
+                                    <input id="dailyBudgetCap" name="dailyBudgetCap" type="text"
+                                           class="form-control input-sm small302 marginr10"
+                                           placeholder="每日预算上限N元">
+                                    元
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="dailyShowCap" class="col-sm-4 control-label">每日曝光上限</label>
+                                <div class="col-sm-8 ">
+                                    <input id="dailyShowCap" name="dailyShowCap" type="text"
+                                           class="form-control input-sm small302 marginr10"
+                                           placeholder="每日曝光上限N次">
+                                    次
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label for="dailyClickCap" class="col-sm-4 control-label">每日点击上限</label>
+                                <div class="col-sm-8 ">
+                                    <input id="dailyClickCap" name="dailyClickCap" type="text"
+                                           class="form-control input-sm small302 marginr10"
+                                           placeholder="每日点击上限N次">
+                                    次
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <label class="col-sm-4 control-label"><i>*</i>KPI</label>
+                                <div class="col-sm-8 ">
+                                    <select id="kpi" name="kpi" class="dropdown small225 ">
+                                        <option value="1">CPA</option>
+                                        <option value="2">CPC</option>
+                                        <option value="3">CPM</option>
+                                    </select>
+                                    <input id="kpiFee" name="kpiFee" type="text"
+                                           class="form-control input-sm small marginr10"
+                                           placeholder="">
+                                    元
+                                </div>
+                            </div>
+                        </div>
+                        <!--</form>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 间隔 -->
+        <div style="height:10px;background:#f1f2f7;"></div>
+        <!-- 间隔 -->
+        <div class="block_content ">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										关键词描述
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <!--<form class="form-horizontal" role="form">-->
+                        <div class="formwarp">
+                            <div class="form-group">
+                                <label for="keywords" class="col-sm-2 control-label">关键词</label>
+                                <div class="col-sm-8 ">
+                                        <textarea id="keywords" name="keywords" class="form-control"
+                                                  rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!--</form>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 间隔 -->
+        <div style="height:10px;background:#f1f2f7;"></div>
+        <!-- 间隔 -->
+        <div class="block_content ">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										备注
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <!--<form class="form-horizontal" role="form">-->
+                        <div class="formwarp">
+                            <div class="form-group">
+                                <label for="comment" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-8 ">
+                                    <textarea id="comment" name="comment" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <!--</form>-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="savewarp text-center">
+        <button class="btn formbtn green" id="submit">完成</button>
+        <button class="btn formbtn bk999" onclick="cancel()" id="cancel">取消</button>
+    </div>
+
+</div>
+</div>
+</body>
+<script>
+    $(function () {
+//         var defDateFormat = "YYYY-MM-DD";
+//         var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+//         var defEndDate = moment().format(defDateFormat);
+//         /*双日历组件*/
+//         $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+//         //默认为时间空间赋值
+//         $('input[name="putStartTimeStr"]').val(getMapDate(7));
+//         $('input[name="putEndTimeStr"]').val(getMapDate(0));
+
+//         $('#reportrange2').daterangepicker({
+//                 startDate: defStartDate
+//             },
+//             function (start, end, label) {
+//                 var choStart = start.format(defDateFormat);
+//                 var choEnd = end.format(defDateFormat);
+//                 $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+//                 ;
+//                 $('input[name="putStartTimeStr"]').val(choStart);
+//                 $('input[name="putEndTimeStr"]').val(choEnd);
+//             });
+    	var defDateFormat = "YYYY-MM-DD";
+        var defStartDate =moment().format(defDateFormat); 
+        var defEndDate = moment().add('days', 7).format(defDateFormat);
+        /* 投放周期初始化 */
+        var putTimeState = $(':input[name="putTimeState"]:checked').val();
+        var putStartTimeStr = $("#putStartTimeStr").val();
+        var putEndTimeStr = $("#putEndTimeStr").val();
+        if(isNotEmpty(putTimeState)&&1==putTimeState*1&&isNotEmpty(putStartTimeStr)&&isNotEmpty(putEndTimeStr)){
+        	defStartDate = putStartTimeStr;
+        	defEndDate = putEndTimeStr;
+        }
+        $('input[name="putStartTimeStr"]').val(defStartDate);
+        $('input[name="putEndTimeStr"]').val(defEndDate);
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+        $('#reportrange2').daterangepicker({
+        	locale: page.attr.drDefaultLocal,
+        	startDate : defStartDate,
+     	   endDate : defEndDate,
+         }, function(start, end, label) {
+             var choStart = start.format(defDateFormat);
+             var choEnd = end.format(defDateFormat);
+             $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+             $('input[name="putStartTimeStr"]').val(choStart);
+             $('input[name="putEndTimeStr"]').val(choEnd);
+         }).on('apply.daterangepicker',function(ev,picker){
+        	 	var pstartDate = picker.startDate.format('YYYY-MM-DD');
+        	 	var pendDate = picker.endDate.format('YYYY-MM-DD');
+    			$('input[name="putStartTimeStr"]').val(pstartDate);
+    			$('input[name="putEndTimeStr"]').val(pendDate);
+    			$('#reportrange2 span').html(String.format("%s-%s",pstartDate,pendDate));
+    	}).on('cancel.daterangepicker',function(ev, picker) {
+    			$('input[name="putStartTimeStr"]').val('');
+    			$('input[name="putEndTimeStr"]').val('');
+    			$('#reportrange2 span').html('&nbsp;');
+    	});
+
+
+        //下拉菜单
+        
+        //参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+
+
+        $("table input[name='checkboxall']").on('click', function (event) {
+            $(this).parent().parent().parent().next('tbody').find("input").prop('checked', $(this).prop('checked'));
+            event.stopPropagation();
+        });
+        $('table input[name="checkboxed"]').on('click', function (event) {
+            $(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+            event.stopPropagation();
+        });
+        $('#tabbtn').click(function () {
+            $(this).parent().parent().next('.form-group').toggleClass('hidden');
+        });
+    });
+    $('form').eq(0).bootstrapValidator({
+        fields: {
+            name: {
+                validators: {
+                    stringLength: {
+                        enabled: true,
+                        min: 2,
+                        max: 20,
+                        message: '订单名称限制2-20个字符! '
+                    },
+                    notEmpty: {},
+                    callback: {
+                        message: '订单名称已存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            ;
+                            $.ajax({
+                                url: 'rest/sspOrder/orderName/' + $("#name").val(),
+                                type: 'post',
+                                //dataType: 'json',
+                                async: false,
+                                success: function (data) {
+                                    ;
+                                    if (data == 'fals') {
+                                        res = false;
+                                    }
+                                }, error: function (data) {
+                                    ;
+                                }
+                            });
+                            return res;
+                        }
+                    }
+                    /*                    remote: {
+                     threshold : 8,
+                     type: 'POST',
+                     url: 'rest/sspOrder/orderName',
+                     message: '订单名称不可用'
+                     }*/
+                }
+            },
+            budget: {
+                validators: {
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '预算不能大于1000w元 '
+                    },
+                    notEmpty: {},
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            },
+            settlementType: {
+                validators: {
+                    notEmpty: {}
+                }
+            },
+            settlementFee: {
+                validators: {
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '金额不能大于1000w元 '
+                    },
+                    notEmpty: {},
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            },
+            serviceFeeRatio: {
+                validators: {
+                    between: {
+                        min: 0,
+                        max: 100,
+                        message: '服务费用百分比在0-100之间 '
+                    },
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            },
+            serviceFee: {
+                validators: {
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '服务费金额不超过1000w元 '
+                    },
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            },
+            agentFeeRatio: {
+                validators: {
+                    between: {
+                        min: 0,
+                        max: 100,
+                        message: '代理费用百分比在0-100之间 '
+                    },
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            },
+            agentFee: {
+                validators: {
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '代理费金额不超过1000w元 '
+                    },
+                    numeric: {
+                        message: '请输入数字格式 '
+                    }
+                }
+            },
+            singlePeriodShowTimes: {
+                validators: {
+                    integer: {
+                        message: '请输入整数格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '投放周期内单人曝光不超过1000w次 '
+                    }
+                }
+            },
+            singleShowTimes: {
+                validators: {
+                    integer: {
+                        message: '请输入整数格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '每人每天（选择包括天、小时），曝光不超过1000w次 '
+                    }
+                }
+            },
+            singleClickTimes: {
+                validators: {
+                    integer: {
+                        message: '请输入整数格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '每人每天（选择包括天、小时），点击不超过1000w次 '
+                    }
+                }
+            },
+            dailyBudgetCap: {
+                validators: {
+                    numeric: {
+                        message: '请输入数字格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '每日预算上限1000w元 '
+                    }
+                }
+            },
+            dailyShowCap: {
+                validators: {
+                    integer: {
+                        message: '请输入整数格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '每日曝光上限1000w次 '
+                    }
+                }
+            },
+            dailyClickCap: {
+                validators: {
+                    integer: {
+                        message: '请输入整数格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: '每日点击上限1000w次 '
+                    }
+                }
+            },
+            kpiFee: {
+                validators: {
+                    notEmpty: {},
+                    numeric: {
+                        message: '请输入数字格式 '
+                    },
+                    between: {
+                        min: 0,
+                        max: 10000000,
+                        message: 'KPI上限1000w元 '
+                    }
+                }
+            }
+//            ,
+//            putStartTime:{
+//                validators: {
+//                    date: {
+//                        enable:false,
+//                        format: 'YYYY-MM-DD',
+//                        message: '日期格式异常'
+//                    }
+//                }
+//            },
+//            putEndTime:{
+//                validators: {
+//                    date: {
+//                        enable:false,
+//                        format: 'YYYY-MM-DD',
+//                        message: '日期格式异常'
+//                    }
+//                }
+//            }
+        }
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        page.ajaxSubmit(e.target, function (result) {
+//            
+            alert("新增数据成功").ok(function(){
+            	 console.log(result);
+                 var advertiserId = $("#advertiserId").val();
+                 var url = "sspOrder/list?advertiserId=" + advertiserId;
+                 page.loadPage(url);
+            });
+           
+//            var url = "sspOrder/list";
+//            page.loadPage(url);
+
+        });
+    });
+    $("#submit").click(function () {
+        $('form').eq(0).submit();
+    });
+
+    //    $("#submit").click(function () {
+    ////        ;
+    //        $("#orderFrom").ajaxSubmit({
+    //            url: "rest/sspOrder/add",
+    //            datatype: "json",
+    //            type: "POST",
+    //            success: function (returnData) {
+    //                console.info(returnData);
+    //                if (returnData.result == "OK") {
+    //                    alert("创建成功");
+    //                    var url = "sspOrder/list";
+    //                    page.loadPage(url);
+    //                }
+    //            },
+    //            error: function () {
+    //                alert("创建失败");
+    //                var url = "sspOrder/list";
+    //                page.loadPage(url);
+    //            }
+    //        });
+    //    });
+
+    //    $("#orderFrom").bootstrapValidator({
+    //        message: 'This value is not valid',
+    //        feedbackIcons: {
+    //            valid: 'glyphicon glyphicon-ok',
+    //            invalid: 'glyphicon glyphicon-remove',
+    //            validating: 'glyphicon glyphicon-refresh'
+    //        },
+    //        fields: {
+    //            name: {
+    //                validators: {
+    //                    notEmpty: {
+    //                        message: '订单名称不能为空'
+    //                    }
+    //                }
+    //            },
+    //            budget: {
+    //                validators: {
+    //                    notEmpty: {
+    //                        message: '预算不能为空'
+    //                    }
+    //                }
+    //            },
+    //            settlementType: {
+    //                validators: {
+    //                    notEmpty: {
+    //                        message: '结算方式不能为空'
+    //                    }
+    //                }
+    //            },
+    //            kpiFee: {
+    //                validators: {
+    //                    notEmpty: {
+    //                        message: 'kpi不能为空'
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    });
+
+
+    //        $("#submit").click(function () {
+    //            $("#orderFrom").submit()
+    //        });
+
+    function cancel() {
+        confirm('确定退出吗？退出后，修改的内容将不保存!', "确认退出", "确定", "取消").ok(function () {
+            var advertiserId = $("#advertiserId").val();
+            var url = "sspOrder/list?advertiserId=" + advertiserId;
+            page.loadPage(url);
+            return true;
+        })
+
+
+    }
+
+    function getMapDate(dayss) {
+        var now = new Date();
+        var NextNow = addDate(now, -dayss);
+        var years = NextNow.getFullYear();
+        var months = NextNow.getMonth() + 1;
+        var days = NextNow.getDate();
+        var beginTime = years + "-" + months + "-" + days;
+        return beginTime;
+    }
+
+    //    function edit() {
+    //        var url = "sspOrder/editOrder";
+    //        page.loadPage(url);
+    //    }
+
+
+    //    function add() {
+    //        var url = "rest/sspOrder/findById";
+    //        $.ajax({
+    //
+    //            type: 'POST',
+    //            url: url,
+    //            dataType: "json",
+    //            success: function (data) {
+    //                alert(data)
+    //            }
+    //        })
+    //
+    //    }
+
+</script>
+</html>

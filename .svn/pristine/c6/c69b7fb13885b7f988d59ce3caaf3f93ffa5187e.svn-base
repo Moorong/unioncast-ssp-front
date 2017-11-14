@@ -1,0 +1,105 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.page.Operation;
+import com.unioncast.common.page.OrderExpression;
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.page.SearchExpression;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspAdvertiser;
+import com.unioncast.common.ssp.model.SspFinanceInfo;
+import com.unioncast.common.ssp.model.SspWithdrawRequestInfo;
+import com.unioncast.common.user.model.User;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspDevoloperService;
+
+@Component
+public class SspDevoloperServiceImpl implements SspDevoloperService {
+
+	@Resource
+	private RestTemplate restTemplate;
+	
+	/**
+	 * 条件分页查询开发者
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public RestResponse page(String username, Integer userType, String startTime , String endTime , Integer currentPageNo , Integer pageSize) {
+		PageCriteria pageCriteria = new PageCriteria();
+		
+		pageCriteria.setPageSize(pageSize);
+		pageCriteria.setCurrentPageNo(currentPageNo);
+		pageCriteria.setEntityClass(SspAdvertiser.class);
+		pageCriteria.setPredicate(Operation.AND);
+		
+		// 封装排序，按照createTime倒序
+		List<OrderExpression> orderExpressionList = new ArrayList<OrderExpression>();
+		OrderExpression orderExpression = new OrderExpression();
+		orderExpression.setPropertyName("update_time");
+		orderExpression.setOp("DESC");
+		orderExpressionList.add(orderExpression);
+		pageCriteria.setOrderExpressionList(orderExpressionList);
+		
+		//条件查询
+		List<SearchExpression> searchExpressionList = new ArrayList<SearchExpression>();
+		
+		//开发者名称
+		if (!StringUtils.isBlank(username)) {
+				SearchExpression nameExpression = new SearchExpression();
+				nameExpression.setPropertyName("username");
+				nameExpression.setValue(username);
+				nameExpression.setOperation(Operation.LIKE);
+				searchExpressionList.add(nameExpression);
+		}
+		
+		if(userType != null && userType != 0) {
+			SearchExpression typeExpression = new SearchExpression();
+			typeExpression.setPropertyName("user_type");
+			typeExpression.setValue(userType);
+			typeExpression.setOperation(Operation.EQ);
+			searchExpressionList.add(typeExpression);
+		}
+		
+		//起始时间
+		if (StringUtils.isNotEmpty(startTime)) {
+			SearchExpression startTimeExpression = new SearchExpression();
+			startTimeExpression.setPropertyName("update_time");
+			startTimeExpression.setValue(startTime);
+			startTimeExpression.setOperation(Operation.GE);
+			searchExpressionList.add(startTimeExpression);
+		}
+		 
+		//结束时间
+		if(StringUtils.isNotEmpty(endTime)) {
+			SearchExpression endTimeExpression = new SearchExpression();
+			endTimeExpression.setPropertyName("update_time");
+			endTimeExpression.setValue(endTime+"23:59:59");
+			endTimeExpression.setOperation(Operation.LE);
+			searchExpressionList.add(endTimeExpression);
+		}
+ 
+		pageCriteria.setSearchExpressionList(searchExpressionList);
+		HttpEntity<PageCriteria> httpEntity = new HttpEntity<PageCriteria>(pageCriteria);
+		return restTemplate.postForObjectForDB("rest/user/page", httpEntity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse findByDeveloperId(Long id) {
+		User user = new User();
+		user.setId(id);
+		SspFinanceInfo financeInfo = new SspFinanceInfo();
+		financeInfo.setUser(user);
+		HttpEntity<SspFinanceInfo> httpEntity = new HttpEntity<SspFinanceInfo>(financeInfo);
+		RestResponse response = restTemplate.postForObjectForDB("rest/ssp/financeInfo/find", httpEntity, RestResponse.class);
+		return response;
+	}
+}

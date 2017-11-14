@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<!-- 表单内容开始 -->
+	<div class="block_content">
+		<div class="container-fluid">
+			<div class="search_block clearfix">
+				<div class="form-group  clearfix">
+					<div class="pull-left">
+						<a href="javascript:void(0)" class="btn btn_add"
+							data-toggle="modal" data-target="#myModal"><i
+							class="glyphicon glyphicon-plus"></i>新增移动应用</a> <a
+							href="javascript:void(0)" class="btn btn_trash"><i
+							class="glyphicon glyphicon-trash"></i>批量删除</a> <a
+							href="javascript:void(0)" class="btn btn_trash" id="tabbtn">筛选</a>
+					</div>
+					<div class=" inline_block has-feedback pull-right clearfix">
+						<label class="control-label sr-only" for="inputSuccess2">Input
+							with success</label> <input type="text" class="form-control"
+							id="inputSuccess2"> <span
+							class="glyphicon glyphicon-search form-control-feedback"></span>
+					</div>
+				</div>
+				<div class="form-group hidden clearfix">
+					<div class="pull-left">
+						<select class="dropdown">
+							<option value="1">所属平台</option>
+							<option value="2">所属应用 2</option>
+							<option value="3">所属应用 3</option>
+							<option value="4">所属应用 4</option>
+						</select> <select class="dropdown">
+							<option value="0">接入方式</option>
+							<option value="2" selected>SDK</option>
+							<option value="3">API</option>
+						</select> <select class="dropdown">
+							<option value="0" selected>审核状态</option>
+							<option value="1">审核完毕</option>
+							<option value="2">未审核</option>
+						</select>
+					</div>
+					<div class="pull-right">
+						<a href="javascript:void(0)" class="btn btn-sm">提交</a> <a
+							href="javascript:void(0)" class="btn btn-sm">取消</a>
+					</div>
+				</div>
+				<!-- <div class="pull-right clearfix">
+								<div class="form-group pull-left has-feedback clearfix">
+					                <div class="form-group">
+									    <label class="sr-only " for="exampleInputEmail2">Email address</label>
+									    <input type="text" class="form-control"  placeholder="Enter email">
+									  </div>
+							  		<label class="control-label sr-only" for="inputSuccess2">Input with success</label>
+							 		<input type="text" class="form-control" id="inputSuccess2">
+							  		<span class="glyphicon glyphicon-search form-control-feedback"></span>
+										
+					            </div> -->
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table">
+					<thead>
+						<tr>
+							<th><input type="checkbox" value="" name="checkboxall"></th>
+							<th>应用ID</th>
+							<th>名称</th>
+							<th>接入方式</th>
+							<th>平台</th>
+							<th>创建日期</th>
+							<th>审核状态</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td><input type="checkbox" name="checkboxed"></td>
+							<td>1</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td><a href="#" data-toggle="tooltip" data-placement="top"
+								title="修改"><i class="iconfont icon-xiugai"></i></a> <a href="#"
+								data-toggle="tooltip" data-placement="top" title="添加"><i
+									class="iconfont icon-tianjia"></i></a> <a href="#"
+								data-toggle="tooltip" data-placement="top" title="删除"><i
+									class="iconfont icon-shanchu"></i></a></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="checkboxed"></td>
+							<td>1</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td><a href="#" data-toggle="tooltip" data-placement="top"
+								title="修改"><i class="iconfont icon-xiugai"></i></a> <a href="#"
+								data-toggle="tooltip" data-placement="top" title="添加"><i
+									class="iconfont icon-tianjia"></i></a> <a href="#"
+								data-toggle="tooltip" data-placement="top" title="删除"><i
+									class="iconfont icon-shanchu"></i></a></td>
+						</tr>
+						<tr>
+							<td><input type="checkbox" name="checkboxed"></td>
+							<td>1</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td>2</td>
+							<td style="width: 165px;"><a href="#" data-toggle="tooltip"
+								data-placement="top" title="修改"><i
+									class="iconfont icon-xiugai"></i></a> <a href="#"
+								data-toggle="tooltip" data-placement="top" title="添加"><i
+									class="iconfont icon-tianjia"></i></a> <a href="#"
+								data-toggle="tooltip" data-placement="top" title="删除"><i
+									class="iconfont icon-shanchu"></i></a></td>
+						</tr>
+					</tbody>
+				</table>
+				<!-- 分页开始 -->
+				<div class="bs-component clearfix">
+					<div id="page" class="pull-right"></div>
+				</div>
+				<!-- 分页结束 -->
+			</div>
+		</div>
+	</div>
+	</div>
+	<!-- 表单内容结束 -->
+	<script type="text/javascript">
+	/**初始化分页组件**/
+		UC.ajaxPage("page",{
+			totalPages: 5, //总页数
+			startPage: 1,  //当前页
+			count: 30, //总记录数
+	//		onPageClick: function(event, thisPage){//thisPage选择的页码
+	//		}
+		});
+	</script>
+</body>
+</html>

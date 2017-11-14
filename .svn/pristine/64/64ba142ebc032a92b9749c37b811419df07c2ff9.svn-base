@@ -1,0 +1,269 @@
+ <!DOCTYPE html>
+<html>
+<head>
+  <title>DSP</title>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="media/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="media/css/bootstrap-theme.min.css">
+  <!-- 日历 -->
+  <link rel="stylesheet" type="text/css" href="media/css/bootstrap-datetimepicker.css">
+  <!-- 下拉菜单 -->
+  <link rel="stylesheet" type="text/css" href="media/js/select/css/bootstrap-select.min.css">
+  <!-- 开关按钮 -->
+  <link rel="stylesheet" type="text/css" href="media/js/swich/bootstrap-switch.min.css">
+  <!-- 公共样式 -->
+  <link rel="stylesheet" type="text/css" href="media/css/style.css">
+  <!-- 图标 -->
+  <link rel="stylesheet" type="text/css" href="media/fonts/fontsize/iconfont.css">
+</head> 
+<body>
+	<div class="containered">
+		<div class="header clearfix">
+			<ul class="logogroup">
+				<li><a href="#">易通SSP媒体服务平台</a></li>
+			</ul>
+			<ul class="user_info clearfix">
+				<li><a href="javascript:;">John Smith<i class="glyphicon glyphicon-chevron-down"></i></a></li>
+			</ul>
+		</div>
+		<div class="sidebar">
+			<div class="ui_nav"> 
+				<ul>
+					<li class="on">
+						<a href="#"><i class="iconfont icon-shezhi"></i>应用管理</a>
+						<ul class="ui_nav_sub_wrap">
+							<li >
+								<a href="javascript:;">APP管理</a>
+							</li>
+							<li class="on">
+								<a href="javascript:;">广告位管理</a>
+							</li>
+						</ul>
+					</li>
+					<li>  
+						<a href="#"><i class="iconfont icon-wealth"></i>财富管理</a>
+					</li>
+					<li>  
+						<a href="#"><i class="iconfont icon-reportMg"></i>报表管理</a>
+					</li>
+					<li>
+						<a href="#"><i class="iconfont icon-yonghuguanli"></i>用户管理</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<!-- 右侧开始 -->
+		<div class="content">
+			<!-- 当前位置开始 -->
+   			<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">应用管理</a> <i> / </i> <span>APP管理</span></h2>
+			<!-- 当前位置结束 -->
+			<div class="page_main">
+				<div class="page_main_white">
+					<!-- 表单名称开始 -->
+					<!-- <div class="block_title white clearfix">
+						<span class="block_title_name pull-left">
+							提现记录
+						</span>
+					</div> -->
+					<!-- 表单名称结束 -->		
+					<!-- 表单内容开始 -->
+					<div class="block_content">
+						<div class="container-fluid">
+							<div class="search_block clearfix">
+								<div class="form-group  clearfix">
+									<div class="pull-left">
+										<a href="javascript:void(0)" class="btn btn_add"  data-toggle="modal" data-target="#myModal"><i class="glyphicon glyphicon-plus"></i>新增移动应用</a>
+										<a href="javascript:void(0)" class="btn btn_trash"><i class="glyphicon glyphicon-trash"></i>批量删除</a>
+										<a href="javascript:void(0)" class="btn btn_trash" id="tabbtn">筛选</a>
+									</div>
+									<div class=" inline_block has-feedback pull-right clearfix">
+								  		<label class="control-label sr-only" for="inputSuccess2">Input with success</label>
+								 		<input type="text" class="form-control" id="inputSuccess2">
+								  		<span class="glyphicon glyphicon-search form-control-feedback"></span>
+						            </div>
+								</div>
+								<div class="form-group hidden clearfix">
+									<div class="pull-left">
+										<select class="dropdown">
+										    <option value="1">所属平台</option>
+										    <option value="2">所属应用 2</option>
+										    <option value="3">所属应用 3</option>
+										    <option value="4">所属应用 4</option>
+										</select>
+										<select class="dropdown">
+											<option value="0" >接入方式</option>
+											<option value="2" selected>SDK</option>
+											<option value="3">API</option>
+										</select>
+										<select class="dropdown">
+											<option value="0" selected>审核状态</option>
+											<option value="1">审核完毕</option>
+											<option value="2" >未审核</option>
+										</select>
+									</div>
+									<div class="pull-right">
+										<a href="javascript:void(0)" class="btn btn-sm">提交</a>
+										<a href="javascript:void(0)" class="btn btn-sm">取消</a>
+									</div>
+								</div>
+								<!-- <div class="pull-right clearfix">
+									<div class="form-group pull-left has-feedback clearfix">
+						                <div class="form-group">
+										    <label class="sr-only " for="exampleInputEmail2">Email address</label>
+										    <input type="text" class="form-control"  placeholder="Enter email">
+										  </div>
+								  		<label class="control-label sr-only" for="inputSuccess2">Input with success</label>
+								 		<input type="text" class="form-control" id="inputSuccess2">
+								  		<span class="glyphicon glyphicon-search form-control-feedback"></span>
+											
+						            </div> -->
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
+									<table class="table" >
+										<thead>
+											<tr>
+												<th><input type="checkbox" value="" name="checkboxall"></th>
+												<th>应用ID</th>
+												<th>名称</th>
+												<th>接入方式</th>
+												<th>平台</th>
+												<th>创建日期</th>
+												<th>审核状态</th>
+												<th>操作</th>
+											</tr>
+										</thead>
+										<tbody>
+											<tr>
+												<td><input type="checkbox" name="checkboxed"></td>
+												<td>1</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>
+													2
+												</td>
+												<td>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="修改"><i class="iconfont icon-xiugai"></i></a>
+													
+													<a href="#" data-toggle="tooltip" data-placement="top" title="添加"><i class="iconfont icon-tianjia"></i></a>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="删除"><i class="iconfont icon-shanchu"></i></a>
+												</td>
+											</tr>
+											<tr>
+												<td><input type="checkbox" name="checkboxed"></td>
+												<td>1</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="修改"><i class="iconfont icon-xiugai"></i></a>
+													
+													<a href="#" data-toggle="tooltip" data-placement="top" title="添加"><i class="iconfont icon-tianjia"></i></a>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="删除"><i class="iconfont icon-shanchu"></i></a>
+												</td>
+											</tr>
+											<tr>
+												<td><input type="checkbox" name="checkboxed"></td>
+												<td>1</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td>2</td>
+												<td style="width:165px;">
+													<a href="#" data-toggle="tooltip" data-placement="top" title="修改"><i class="iconfont icon-xiugai"></i></a>
+													
+													<a href="#" data-toggle="tooltip" data-placement="top" title="添加"><i class="iconfont icon-tianjia"></i></a>
+													<a href="#" data-toggle="tooltip" data-placement="top" title="删除"><i class="iconfont icon-shanchu"></i></a>
+												</td>
+											</tr>
+										</tbody>
+									</table>
+									<!-- 分页开始 -->
+									<div class="bs-component clearfix">
+										<ul class="pagination pagination-sm pull-right">
+											<li class="disabled"><a href="javascript:void(0)">«</a></li>
+											<li class="active"><a href="javascript:void(0)">1</a></li>
+											<li><a href="javascript:void(0)">2</a></li>
+											<li><a href="javascript:void(0)">3</a></li>
+											<li><a href="javascript:void(0)">4</a></li>
+											<li><a href="javascript:void(0)">5</a></li>
+											<li><a href="javascript:void(0)">»</a></li>
+										</ul>
+										<ul class="pull-right pagecontent">
+											<li><span>共<em>1</em>条</span></li>
+											<li>
+												<span>每页显示</span>
+												<select class="dropdown">
+													<option value="0">10</option>
+													<option value="1">20</option>
+													<option value="2">30</option>
+													<option value="2">40</option>
+													<option value="2" selected>50</option>
+												</select>
+											</li>
+										</ul>
+									</div>
+									<!-- 分页结束 -->
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 表单内容结束 -->
+				</div>
+			</div>	
+		</div>
+		<!-- 右侧结束 -->
+	</div>
+</body>
+<script type="text/javascript" src="media/js/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="media/js/bootstrap.min.js"></script>
+<!-- 日历 -->
+<script type="text/javascript" src="media/js/bootstrap-datetimepicker.js"></script>
+<!-- 左侧导航 -->
+<script type="text/javascript" src="media/js/menu.js"></script>
+<!-- 下拉菜单 -->
+<script type="text/javascript" src="media/js/select/js/bootstrap-select.min.js"></script>
+<!-- 开关按钮 -->
+<script type="text/javascript" src="media/js/swich/bootstrap-switch.min.js"></script>
+<!-- 图表 -->
+<script type="text/javascript" src="media/js/echarts.min.js"></script>
+<script>
+$(function () {
+	/*组件初始化*/
+	$("[data-toggle='tooltip']").tooltip();
+	//下拉菜单
+	$(".dropdown").selectpicker({});
+	/*日历组件*/
+	/*$('.form_date').datetimepicker({
+        language:  'zh-CN',
+        weekStart: 1,
+        todayBtn:  1,
+		autoclose: 1,
+		todayHighlight: 1,
+		startView: 2,
+		minView: 2,
+		forceParse: 0
+    });*/
+	$("table input[name='checkboxall']").on('click',function(event){
+		$(this).parent().parent().parent().next('tbody').find("input").prop('checked',$(this).prop('checked'));
+		event.stopPropagation();
+	});
+	$('table input[name="checkboxed"]').on('click',function(event){
+		$(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+		event.stopPropagation();
+	});
+	$('#tabbtn').click(function(){
+		$(this).parent().parent().next('.form-group').toggleClass('hidden');
+	});
+});
+
+</script>
+</html>

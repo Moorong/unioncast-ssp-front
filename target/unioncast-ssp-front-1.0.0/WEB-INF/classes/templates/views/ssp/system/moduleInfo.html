@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<!-- 右侧开始 -->
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="returnPage()">账号管理</a> <i> / </i> <span>模块管理</span></h2>
+<!-- 当前位置结束 -->
+<!-- 表单内容开始 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <div class="search_block clearfix">
+            <div class="form-group  clearfix">
+                <div class="pull-left">
+                    <a id="add" href="javascript:void(0)" class="btn  btn2 green" data-toggle="modal"
+                       data-target="#myModal"><i
+                            class="glyphicon glyphicon-plus"></i>新增模块</a>
+                </div>
+
+                <div class="pull-right">
+                    <div class="formgroup clearfix ">
+                        <label>修改时间：</label>
+                        <div id="reportrange2"
+                             style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                            <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                            <span></span><input type="hidden" name="updateTime" id="updateTime" value=""/> <b
+                                class="caret"></b>
+                        </div>
+                    </div>
+                    <div class="has-feedback clearfix ">
+                        <label class="control-label sr-only" for="moduleName">状态</label>
+                        <input type="text" class="form-control" id="moduleName" placeholder="请输入名称">
+                    </div>
+                    <a href="javascript:void(0)" class="btn btn-sm" id="search">查询</a>
+                </div>
+            </div>
+        </div>
+        <!-- 间隔 -->
+        <div style="height:10px;background:#f1f2f7;"></div>
+        <!-- 间隔 -->
+        <div class="block_content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th width='150'>模块名称</th>
+                                <th>映射地址</th>
+                                <th>模块父节点</th>
+                                <th>备注</th>
+                                <th width='150'>修改时间</th>
+                                <th width='100'>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody class="sldataBody">
+                            <tr class="sldataBodyHeader">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                            <tbody class="sldataBodyTemplate">
+                            <tr class="sldataBodyRow">
+                                <td>{name}</td>
+                                <td>{elementUrl}</td>
+                                <td>{parentId}</td>
+                                <td>{remark}</td>
+                                <td>{updateTime}</td>
+                                <td>{operate}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- 分页开始 -->
+                        <div class="bs-component pull-right" id="pageModuleList"></div>
+                        <!-- 分页结束 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input value="${(systemId)!}" id="systemId" hidden>
+<!-- 表单内容结束 -->
+<!-- 右侧结束 -->
+</body>
+<script>
+    var currentPage = 1;
+    var pageInit = {
+        init: function () {
+            this.loadData();
+        },
+        loadData: function () {
+            if (currentPage == null || currentPage <= 0) {
+                currentPage = 1;
+            }
+            var name = $("#moduleName").val();
+            var updateTime = $("#updateTime").val();
+            var systemId = $("#systemId").val();
+            var data = {}
+            if (name != null && name != "") {
+                data = {
+                    'currentPageNo': currentPage,
+                    'pageSize': 10,
+                    'searchExpressionList[0].value': systemId,
+                    'searchExpressionList[0].propertyName': 'system_id',
+                    'searchExpressionList[0].operation': 'EQ',
+                    'searchExpressionList[1].value': updateTime,
+                    'searchExpressionList[1].propertyName': 'update_time',
+                    'searchExpressionList[1].operation': 'AND',
+                    'searchExpressionList[2].value': name,
+                    'searchExpressionList[2].propertyName': 'name',
+                    'searchExpressionList[2].operation': 'LIKE',
+                    'orderExpressionList[0].op': 'desc',
+                    'orderExpressionList[0].propertyName': 'update_time',
+                    'orderExpressionList[0].operation': 'AND',
+                    'predicate': 'AND'
+                };
+            } else {
+                data = {
+                    'currentPageNo': currentPage,
+                    'pageSize': 10,
+                    'searchExpressionList[0].value': systemId,
+                    'searchExpressionList[0].propertyName': 'system_id',
+                    'searchExpressionList[0].operation': 'EQ',
+                    'searchExpressionList[1].value': updateTime,
+                    'searchExpressionList[1].propertyName': 'update_time',
+                    'searchExpressionList[1].operation': 'AND',
+                    'orderExpressionList[0].op': 'desc',
+                    'orderExpressionList[0].propertyName': 'update_time',
+                    'orderExpressionList[0].operation': 'AND',
+                    'predicate': 'AND'
+                };
+            }
+            $
+                .ajax({
+                    type: "post",
+                    asyne: true,
+                    cache: false,
+                    datatype: "json",
+                    data: data,
+                    url: "rest/ssp/module/page",
+                    success: function (restResponse) {
+                        $(".sldataBody .sldataBodyRow").remove();
+                        var totalPages = 1;
+                        var startPage = 1;
+                        var count = 0;
+                        if ((restResponse.restErrors == null) && (restResponse.result.dataArray!=null)) {
+                            totalPages = restResponse.result.totalPage; //总页数
+                            startPage = restResponse.result.currentPageNo; //当前页
+                            count = restResponse.result.totalCount; //总记录数
+                            for (var i = 0; i < restResponse.result.dataArray.length; i++) {
+                                var parentModule = "";
+                                var row = restResponse.result.dataArray[i];
+                                var rowHtml = $(".sldataBodyTemplate")
+                                    .html();
+                                for (var j = 0; j < restResponse.result.dataArray.length; j++) {
+                                    var row1 = restResponse.result.dataArray[j];
+                                    if (row1.id == row.parentId) {
+                                        parentModule = row1.name;
+                                    }
+                                }
+                                /*rowHtml = rowHtml.replace(/{id}/g, (row.id == null) ? '' : row.id);*/
+                                rowHtml = rowHtml.replace(/{name}/g,
+                                    (row.name == null) ? '' : row.name);
+                                rowHtml = rowHtml.replace(/{elementUrl}/g,
+                                    (row.elementUrl == null) ? '' : row.elementUrl);
+                                rowHtml = rowHtml.replace(/{parentId}/g, parentModule);
+                                rowHtml = rowHtml.replace(/{createTime}/g,
+                                    getMyDate(row.createTime));
+                                rowHtml = rowHtml.replace(/{updateTime}/g,
+                                    getMyDate(row.updateTime));
+                                rowHtml = rowHtml.replace(/{remark}/g,
+                                    (row.remark == null) ? '' : row.remark);
+                                rowHtml = rowHtml
+                                    .replace(
+                                        /{operate}/g,
+                                        "<a data-toggle='tooltip' data-placement='top' title='修改' href=\"javascript:void(0)\" onclick=\"updateInfo('"
+                                        + row.id
+                                        + "')\"><i class='iconfont icon-xiugai'></i></a>&nbsp;<a data-toggle='tooltip' data-placement='top' title='删除' href=\"javascript:void(0)\" onclick=\"deleteInfo('"
+                                        + row.id
+                                        + "','"
+                                        + restResponse.result.currentPageNo
+                                        + "')\"><i class='iconfont icon-shanchu'></i></a>");
+                                $(".sldataBody").append($(rowHtml));
+                            }
+                        } else {
+                            $(".sldataBody .sldataBodyRow").remove();
+                            $(".sldataBody").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"6\">暂时没有数据</td></tr>");
+                        }
+                        $('#pageModuleList').html('');
+                        $('#pageModuleList').html('<ul id="pageModuleListUl" class="bs-component pull-right"></ul>');
+                        UC
+                            .ajaxPage(
+                                "pageModuleListUl",
+                                {
+                                    totalPages: totalPages, //总页数
+                                    startPage: startPage, //当前页
+                                    count: count, //总记录数
+                                    visiblePages: 5,
+                                    onPageClick: function (event, thisPage) {
+                                        currentPage = thisPage;
+                                        pageInit.init();
+                                    }
+                                });
+                    },
+                    error: function () {
+                        $(".sldataBody .sldataBodyRow").remove();
+                        $(".sldataBody").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"6\">暂时没有数据</td></tr>");
+                    }
+
+                });
+        }
+    }
+    $("#add").click(function () {
+        var url = "ssp/module/add";
+        page.loadPage(url);
+    });
+    $("#search").click(function () {
+        pageInit.init();
+    });
+
+    function updateInfo(id) {
+        var url = "ssp/module/update?id=" + id;
+        page.loadPage(url);
+    }
+
+    function deleteInfo(id, currentPageNo) {
+        confirm("是否删除?").ok(function () {
+            $.ajax({
+                type: "post",
+                asyne: true,
+                cache: false,
+                datatype: "json",
+                data: {
+                    moduleIds: id
+                },
+                url: "rest/ssp/module/deleteModules",
+                success: function (restResponse) {
+                    if (restResponse.restErrors == null) {
+                        alert('删除成功！');
+                        currentPage = currentPageNo;
+                        pageInit.init(currentPageNo);
+                    } else {
+                        alert('删除失败！');
+                    }
+                },
+                error: function () {
+                    alert('删除失败！');
+                }
+            });
+        })
+
+
+    }
+    $(function () {
+        /!*组件初始化*!/
+         
+        $("input[name='switch']").bootstrapSwitch({
+            onText: "开",
+            offText: "关",
+            size: "mini",
+            onSwitchChange: function (event, state) {
+                if (state == true) {
+                    $(this).val("1");
+                } else {
+                    $(this).val("2");
+                }
+            }
+        });
+        //下拉菜单
+        
+
+
+        var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().subtract('days', 60).format(defDateFormat);
+        var defEndDate = moment().format(defDateFormat);
+        /*双日历组件*/
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+        $('#reportrange2').daterangepicker({
+        		locale: page.attr.drDefaultLocal,
+        		startDate: defStartDate
+            },
+            function (start, end) {
+                var choStart = start.format(defDateFormat);
+                var choEnd = end.format(defDateFormat);
+                $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+                $('input[name="updateTime"]').val(choStart + ' / ' + choEnd);
+                $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+            });
+        //默认为时间空间赋值
+        $('input[name="updateTime"]').val(getMapDate(60) + "/" + getMapDate(0));
+        pageInit.init();
+    });
+    function returnPage() {
+        var url = "ssp/user/currentAccountInfo";
+        page.choiceMenu('55')
+        page.loadPage(url);
+    }
+</script>
+</html>

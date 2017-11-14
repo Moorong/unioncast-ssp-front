@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<link href="plugs/bootstrap-fileinput-master/css/fileinput.css"
+	media="all" rel="stylesheet" type="text/css" />
+<style>
+.file-input {
+	width: 300px;
+}
+
+.tiship {
+	padding: 10px 0;
+	font-size: 12px;
+	color: e1e1e1e;
+	margin: 0;
+}
+
+.file-drop-zone-title {
+	padding: 80px 10px;
+}
+
+.file-preview-frame img {
+	width: 100% !important;
+	height: 140px !important;
+}
+</style>
+</head>
+<body>
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i> <a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理</a> <i> / </i> <span>新增广告主</span>
+	</h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<form class="form-horizontal" role="form"
+				action="rest/sspAdvertiser/addOrUpdate" enctype="multipart/form-data"
+				method="post">
+				<div class="block_content">
+					<div class="container-fluid">
+						<div class="row">
+							<!-- 表单名称开始 -->
+							<div class="block_title white clearfix">
+								<span class="block_title_name pull-left"> 基本资料 </span>
+							</div>
+							<!-- 表单名称结束 -->
+							<div class="col-md-12">
+								<div class="formwarp">
+									<input type="hidden" name="user.id" value="${(Session.SPRING_SECURITY_CONTEXT.authentication.principal.id)!''}"/>
+									<input type="hidden" name="id" value="${(advertiser.id)!}">
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>广告主名称</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm " name="name"
+												id="name" value="${(advertiser.name)!}"
+												placeholder="请输入广告主名称，创建成功后不可修改">
+											<!-- <em hidden>广告主名称已被使用</em> -->
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>公司注册名称</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="companyRegName" id="companyRegName"
+												value="${(advertiser.companyRegName)!}"
+												placeholder="请输入公司注册名称，创建成功后不可修改">
+											<!-- <em>广告主名称已被使用</em> -->
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">外部关联ID</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="contractId" value="${(advertiser.contractId)!}"
+												placeholder=""> 
+										</div>
+									</div>
+<!-- 									<div class="form-group "> -->
+<!-- 										<label for="inputEmail3" class="col-sm-4 control-label">投放状态</label> -->
+<!-- 										<div class="col-sm-8 switchgroup"> -->
+
+<!-- 											<input type="checkbox" id="putState" name="putState" checked="checked">  -->
+<!-- 										</div> -->
+<!-- 									</div> -->
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">网址</label>
+										<div class="col-sm-8">
+											<input type="text" class="form-control input-sm " name="url"
+												value="${(advertiser.url)!}" placeholder="http://">
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">组织机构代码证号</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="organizationCode"
+												value="${(advertiser.organizationCode)!}"
+												placeholder="请输入组织机构代码证号"> 
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>是否开启创意角标</label>
+										<div class="col-sm-8 ">
+											<label class="radio-inline"> <input type="radio" checked="checked"
+												name="cornerMarkState" value="1">开启
+											</label> <label class="radio-inline"> <input type="radio"
+												name="cornerMarkState" value="2">关闭
+											</label> 
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label">服务费</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm"
+												style="width: 193px;" name="serviceFee"
+												value="${(advertiser.serviceFee)!}" placeholder="">
+											<label class="radio-inline"> <input type="radio"
+												name="inlineRadioOptions" id="inlineRadio1" value="" checked>
+												百分比
+											</label> <label class="radio-inline"> <input type="radio"
+												name="inlineRadioOptions" id="inlineRadio1" value="">
+												金额(元)
+											</label>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>联系人</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="contacts" value="${(advertiser.contacts)!}"
+												placeholder=""> 
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>手机</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="phone" value="${(advertiser.phone)!}" placeholder="">
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>Email</label>
+										<div class="col-sm-8 ">
+											<input type="text" class="form-control input-sm "
+												name="email" value="${(advertiser.email)!}" placeholder="">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 间隔 -->
+				<div style="height: 10px; background: #f1f2f7;"></div>
+				<!-- 间隔 -->
+				<div class="block_content ">
+					<div class="container-fluid">
+						<div class="row">
+							<!-- 表单名称开始 -->
+							<div class="block_title white clearfix">
+								<span class="block_title_name pull-left"> 基本资质 </span>
+							</div>
+
+							<!-- 方法四 -->
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-4 control-label" name="baseQualification"><i>*</i>基本资质 ：</label>
+											
+												<div class="col-md-8">
+													<div>
+														<select class="dropdown" name="license1">
+															<option value="1" selected="selected">营业执照</option>
+															<option value="2">商务登记证（外资使用）</option>
+															<option value="3">法人登记证</option>
+														</select>
+													</div>
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput1"
+														class="file-loading fileinput"  />
+													<input type="hidden" name="businessLicensePic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="otherQualification"><i>*</i>其他资质：</label>
+												<div class="col-md-8">
+													<div>
+														<select class="dropdown" name="license2">
+															<option value="1">营业执照</option>
+															<option value="2">商务登记证（外资使用）</option>
+															<option value="3" selected="selected">法人登记证</option>
+														</select>
+													</div>
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput2"
+														class="file-loading fileinput" />
+													<input type="hidden" name="legalPersonCertificatePic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="logo">Logo：</label>
+												<div class="col-md-8">
+													<div>
+														<input type="text"
+															class="form-control input-sm small114 marginr10"
+															style="width: 180px" name="logoName" value="${(advertiser.logoName)!}"
+															placeholder="Logo名字 30字以内">
+													</div>
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput3"
+														class="file-loading fileinput" />
+													<input type="hidden" name="logoPic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="organization">组织机构代码证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput4"
+														class="file-loading fileinput" />
+														<input type="hidden" name="organizationPic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="icp">ICP证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput5"
+														class="file-loading fileinput" />
+														<input type="hidden" name="icpPic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="businessRegCertificate">税务登记证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput6"
+														class="file-loading fileinput" />
+													<input type="hidden" name="taxCertificatePic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div class="col-md-6">
+									<div class="formwarp">
+										<div class="form-group form-groupselect clearfix">
+											<div class="form-group">
+												<label class=" col-md-2 control-label" name="telecomOperLicense">增值电信运营许可证：</label>
+												<div class="col-md-8">
+													<p class="tiship">请上传图片格式jpg/png/jpeg,文件<=500k</p>
+													<input type="file" name="uploadfile" id="fileinput7"
+														class="file-loading fileinput" />
+													<input type="hidden" name="telecomOperLicensePic" value=""/>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 间隔 -->
+				<div style="height: 10px; background: #f1f2f7;"></div>
+				<!-- 间隔 -->
+				<div class="block_content ">
+					<div class="container-fluid">
+						<div class="row">
+							<!-- 表单名称开始 -->
+							<div class="block_title white clearfix">
+								<span class="block_title_name pull-left"> 关键词描述 </span>
+							</div>
+							<!-- 表单名称结束 -->
+							<div class="col-md-12">
+								<div class="formwarp">
+									<div class="form-group">
+										<label for="inputEmail3" class="col-sm-2 control-label"><i>*</i>关键词</label>
+										<div class="col-sm-8 ">
+											<textarea class="form-control" style="resize: none;" rows="3"
+												name="keywords">${(advertiser.keywords)!}</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="savewarp text-center">
+					<!-- 
+					<a href="javascript:void(0);" class="btn savebtn">完成</a> <a
+						href="#" class="btn quxiaobtn">取消</a>
+					 -->
+					<input type="submit" class="btn formbtn green" value="保存"
+						id="savebtns" /> <input type="button" class="btn formbtn bk999"
+						value="取消" />
+				</div>
+			</form>
+		</div>
+	</div>
+
+</body>
+
+
+<script type="text/javascript"
+	src="plugs/bootstrap-fileinput-master/js/fileinput.min.js"></script>
+<script type="text/javascript"
+	src="plugs/bootstrap-fileinput-master/js/fileinput_locale_zh.js"></script>
+
+
+<!-- 
+<link href="css/bootstrap-imgupload.css" rel="stylesheet">
+<script type="text/javascript" src="plugs/Image-Upload-Preview-Plugin-With-jQuery-Bootstrap-img-upload/js/bootstrap-imgupload.js"></script>
+ -->
+<script type="text/javascript" src="js/ssp/advertiser/add.js"></script>
+<!-- <script type="text/javascript" -->
+<!-- 	src="plugs/bootstrap-validator/bootstrapValidator.js"></script> -->
+<!-- <script type="text/javascript" src="plugs/bootstrap-validator/zh_CN.js"></script> -->
+<script>
+	$(function() {
+		
+		/*组件初始化*/
+		 
+
+		//下拉菜单
+		
+		//参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+		/*双日历组件*/
+		$('#reportrange2 span').html(
+				moment().subtract('days', 7).format('YYYY.MMMM.D') + ' - '
+						+ moment().format('YYYY.MMMM.D'));
+		$('#reportrange2').daterangepicker({locale: page.attr.drDefaultLocal});
+
+		$("table input[name='checkboxall']").on('click',
+			function(event) {
+				$(this).parent().parent().parent().next('tbody').find(
+						"input").prop('checked', $(this).prop('checked'));
+				event.stopPropagation();
+			});
+		$('table input[name="checkboxed"]').on('click',
+			function(event) {
+				$(this).parent().parent().parent().prev('thead').find(
+						"input[name='checkboxall']").prop(
+						'checked',
+						$(this).parent().parent().parent().find('tr').find(
+								'input:checked').length == $(this).parent()
+								.parent().parent().find('tr').length ? true
+								: false);
+				event.stopPropagation();
+			});
+		$('#tabbtn').click(function() {
+			$(this).parent().parent().next('.form-group').toggleClass('hidden');
+		});
+		
+	});
+	
+</script>

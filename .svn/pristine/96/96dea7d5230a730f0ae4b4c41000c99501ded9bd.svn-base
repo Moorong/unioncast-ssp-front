@@ -1,0 +1,15 @@
+package com.unioncast.ssp.front.service.common;
+
+import java.io.Serializable;
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.restClient.RestResponse;
+
+public interface GeneralService <T extends Serializable> {
+	
+	public String getPrefix();
+	public RestResponse find(T t);
+	public RestResponse add(T t);
+	public RestResponse update(T t);
+	public RestResponse page(PageCriteria pageCriteria);
+	public RestResponse batchDelete(Long[] ids);
+}

@@ -1,0 +1,12 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.restClient.RestResponse;
+
+public interface SspDevoloperService {
+
+	RestResponse page(String username, Integer userType, String startTime, String endTime, Integer currentPageNo,
+			Integer pageSize);
+
+	RestResponse findByDeveloperId(Long id);
+
+}

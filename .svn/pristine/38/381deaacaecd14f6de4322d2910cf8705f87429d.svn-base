@@ -1,0 +1,250 @@
+package com.unioncast.ssp.front.service.user.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.annotation.Resource;
+
+import com.unioncast.common.user.model.*;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.rest.response.common.UserArrayResponse;
+import com.unioncast.common.rest.response.common.UserPaginationResponse;
+import com.unioncast.common.rest.response.common.UserResponse;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.util.CommonUtil;
+import com.unioncast.common.util.Md5PwdEncoder;
+import com.unioncast.ssp.front.common.util.MyHttpEntity;
+import com.unioncast.ssp.front.model.SecurityUser;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.user.UserSystemService;
+
+/**
+ * 用户系统请求实现
+ * 
+ * @author changguobin@unioncast.cn
+ */
+@Component
+public class UserSystemServiceImpl implements UserSystemService {
+
+	@Resource
+	private RestTemplate restTemplate;
+	@Resource
+	private Environment env;
+
+	private static final Logger logger = LogManager.getLogger(UserSystemServiceImpl.class);
+
+	@Override
+	public boolean validateLogin(String username, String password) {
+		logger.info("login in sysytem [-u:{}-p:{}]", username, password);
+		/*
+		 * User user = new User(); user.setLoginName(username);
+		 * user.setLoginPassword(password); HttpEntity<User> entity = new
+		 * HttpEntity<User>(user); UserRestResponse restResponse =
+		 * postForObjectForUser("validateLogin", entity,
+		 * UserRestResponse.class); Boolean flag =
+		 * ObjectUtils.isEmpty(restResponse.getResult())?false:true;
+		 */
+		Boolean flag = false;
+		if (StringUtils.isNotEmpty(username) && StringUtils.isNotEmpty(password) && username.equals("admin")
+				&& password.equals("21232f297a57a5a743894a0e4a801fc3"))
+			flag = true;
+		return flag;
+	}
+
+	@Override
+	public boolean registerUser(String username, String password) {
+		logger.info("register in sysytem [-u:{}-p:{}]", username, password);
+		User user = new User();
+		user.setUsername(username);
+		user.setLoginPassword(Md5PwdEncoder.encodePassword(password));
+		user.setUpdateTime(new Date());
+		HttpEntity<User> entity = new HttpEntity<User>(user);
+		RestResponse restResponse = restTemplate.postForObjectForUser("add", entity, RestResponse.class);
+		System.out.println(restResponse.getStatus());
+		if (CommonUtil.isNull(restResponse))
+			return false;
+		return restResponse.getStatus() == restResponse.OK;
+	}
+
+	@Override
+	public User findUserByName(String username) {
+		return null;
+	}
+
+	@Override
+	public UserDetails loadUserByUsername(String loginName, String password) {
+		String url = "rest/user/findUserByUserSystem";
+		User userSearch = new User();
+		userSearch.setLoginName(loginName);
+		String systemName = env.getProperty("rest.restSystemName");
+		userSearch.setRemark(systemName);
+		HttpEntity<User> entity = new HttpEntity<User>(userSearch);
+		UserArrayResponse result = restTemplate.postForObjectForDB(url, entity, UserArrayResponse.class);
+		User[] users = result.getResult();
+		User user = new User();
+		if (users != null && users.length > 0) {
+			user = users[0];
+		}
+		if (user == null) {
+			throw new UsernameNotFoundException("验证失败");
+		}
+		String encodePassword = Md5PwdEncoder.encodePassword(password);
+		if (!encodePassword.equals(user.getLoginPassword())) {
+			throw new BadCredentialsException("密码错误");
+		}
+		// TODO 此处添加是否审核通过
+
+		List<Role> roleList = user.getRoleList();
+		if (roleList.size() <= 0) {
+			throw new BadCredentialsException("用户未分配角色");
+		}
+		return new SecurityUser(user);
+	}
+
+	@Override
+	public User findUserByLoginname(String loginName) {
+		String url = "rest/user/findUserByUserSystem";
+		User userSearch = new User();
+		userSearch.setLoginName(loginName);
+		String systemName = env.getProperty("rest.restSystemName");
+		userSearch.setRemark(systemName);
+		HttpEntity<User> entity = new HttpEntity<User>(userSearch);
+		UserArrayResponse result = restTemplate.postForObjectForDB(url, entity, UserArrayResponse.class);
+		User[] users = result.getResult();
+		User user = new User();
+		if (users != null && users.length > 0) {
+			user = users[0];
+		}
+		return user;
+	}
+
+	@Override
+	public RestResponse findByLoginName(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/findUserByUser", httpEntity,
+				RestResponse.class);
+		return result;
+	}
+
+	@Override
+	public RestResponse findByUserName(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/findUserByUser", httpEntity,
+				RestResponse.class);
+		return result;
+	}
+
+	@Override
+	public User[] findByUser(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		UserArrayResponse result = restTemplate.postForObjectForDB("/rest/user/findUserByUser", httpEntity,
+				UserArrayResponse.class);
+		return result.getResult();
+	}
+
+	@Override
+	public RestResponse update(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/update", httpEntity, RestResponse.class);
+		return result;
+	}
+
+	@Override
+	public User[] findById(Long id) throws Exception {
+		HttpEntity<Long> httpEntity = new MyHttpEntity<Long>(id);
+		UserArrayResponse result = restTemplate.postForObjectForDB("/rest/user/find", httpEntity,
+				UserArrayResponse.class);
+		return result.getResult();
+	}
+
+	@Override
+	public RestResponse pageAll(PageCriteria pageCriteria) throws Exception {
+		HttpEntity<PageCriteria> httpEntity = new MyHttpEntity<PageCriteria>(pageCriteria);
+		UserPaginationResponse result = restTemplate.postForObjectForDB("/rest/user/sspUserPage", httpEntity,
+				UserPaginationResponse.class);
+		return result;
+	}
+
+	@Override
+	public RestResponse save(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/add", httpEntity, RestResponse.class);
+		return result;
+	}
+
+	@Override
+	public void deleteByUserId(Long userId) throws Exception {
+		HttpEntity<Long> httpEntity = new MyHttpEntity<Long>(userId);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/deleteUserRoleByUserId", httpEntity,
+				RestResponse.class);
+	}
+
+	@Override
+	public void saveUserRole(UserRole[] userRoles) throws Exception {
+		HttpEntity<UserRole[]> httpEntity = new MyHttpEntity<UserRole[]>(userRoles);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/batchAddUserRole", httpEntity,
+				RestResponse.class);
+	}
+
+	@Override
+	public RestResponse updateByEmail(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/updateByEmail", httpEntity,
+				RestResponse.class);
+		return result;
+	}
+
+	@Override
+	public User[] findByUserAndSystem(User user) throws Exception {
+		HttpEntity<User> httpEntity = new MyHttpEntity<User>(user);
+		UserArrayResponse result = restTemplate.postForObjectForDB("/rest/user/findUserByUserSystem", httpEntity,
+				UserArrayResponse.class);
+		return result.getResult();
+	}
+
+	@Override
+	public void saveUserSystem(UserSystem[] userSystems) {
+		HttpEntity<UserSystem[]> httpEntity = new MyHttpEntity<UserSystem[]>(userSystems);
+		RestResponse result = restTemplate.postForObjectForDB("/rest/user/batchAddUserSystem", httpEntity,
+				RestResponse.class);
+	}
+
+	/*@Override
+	public void createNewToken(PersistentLogins persistentLogins) {
+		String url = "rest/token/createNewToken";
+		HttpEntity<PersistentLogins> entity = new HttpEntity<PersistentLogins>(persistentLogins);
+		RestResponse result = restTemplate.postForObjectForDB(url, entity, RestResponse.class);
+	}
+
+	@Override
+	public void updateToken(PersistentLogins persistentLogins) {
+		String url = "rest/token/updateToken";
+		HttpEntity<PersistentLogins> entity = new HttpEntity<PersistentLogins>(persistentLogins);
+		RestResponse result = restTemplate.postForObjectForDB(url, entity, RestResponse.class);
+	}
+
+	@Override
+	public RestResponse getTokenForSeries(PersistentLogins persistentLogins) {
+		String url = "rest/token/getTokenForSeries";
+		HttpEntity<PersistentLogins> entity = new HttpEntity<PersistentLogins>(persistentLogins);
+		return restTemplate.postForObjectForDB(url, entity, RestResponse.class);
+	}
+
+	@Override
+	public void removeUserTokens(PersistentLogins persistentLogins) {
+		String url = "rest/token/removeUserTokens";
+		HttpEntity<PersistentLogins> entity = new HttpEntity<PersistentLogins>(persistentLogins);
+		RestResponse result = restTemplate.postForObjectForDB(url, entity, RestResponse.class);
+	}*/
+}

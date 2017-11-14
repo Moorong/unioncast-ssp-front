@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Implementation-Title: unioncast-ssp-front
+Implementation-Version: 1.0.0
+Built-By: haha
+Implementation-Vendor-Id: com.unioncast
+Build-Jdk: 1.8.0_111
+Implementation-URL: http://projects.spring.io/spring-boot/unioncast-ss
+ p-front/
+Created-By: Maven Integration for Eclipse
+Implementation-Vendor: Pivotal Software, Inc.
+

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<!-- 表单内容开始 -->
+	<div class="block_content">
+		<div class="container-fluid">
+		<@uc.seach_head >
+				<@uc.aBtn aHtml="新增移动应用" aClass="btn btn_add" dataToggle="modal" dataTarget="#myModal" iClass="glyphicon glyphicon-plus"/>
+				<@uc.aBtn aHtml="批量删除" aClass="btn btn_trash" iClass="glyphicon glyphicon-trash"/>
+				<@uc.aBtn aHtml="筛选" aClass="btn btn_trash" id="tabbtn"/>
+		</@>
+			<@uc.listTab 
+				head=[
+							{'label':'编号','key':'id','size':'5%','hide':true},
+							{'label':'标题','key':'title','callback':true},
+							{'label':'名称','key':'name','size':'10%'}
+							] 
+				optHead={'label':'操作','size':'10%'} 
+				datas=[
+							{'id':'1',"title":"标题1","name":"名称1"},
+							{'id':'2',"title":"标题2","name":"名称2"},
+							{'id':'3',"title":"标题3","name":"名称3"},
+							{'id':'4',"title":"标题4","name":"名称4"},
+							{'id':'5',"title":"标题5","name":"名称5"}
+							]
+				page={
+							'totalPages' : 5, 
+							'startPage': 4, 
+							'count': 30, 
+							'onPageClick':'showAlert()'
+							}
+							;callbackParams>
+				<@uc.aBtn title="修改"  iClass="iconfont icon-xiugai" dataToggle="tooltip" dataPlacement="top" onclick="javascript:alert('修改');"/>
+				<@uc.aBtn title="删除[${(callbackParams?eval).title}]" iClass="iconfont icon-shanchu" dataToggle="tooltip" dataPlacement="top" onclick="javascript:alert('删除');"/>
+			</@>
+		</div>
+	</div>
+	<!-- 表单内容结束 -->
+	<@uc.alert id="myModal" title="新建应用" saveBtn={'show':true,'label':'修改','click':'javascript:alert("a");'} cancelBtn={'show':true}>
+	
+	
+		<form class="form-horizontal" role="form">
+		  <div class="form-group">
+		    <label for="inputEmail3" class="col-sm-2 control-label">应用名称：</label>
+		    <div class="col-sm-10">
+		      <input type="text" class="form-control input-sm" id="inputEmail3" placeholder="">
+		      <em>请提供与应用市场中一致的应用名称</em>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">所属行业：</label>
+		    <div class="col-sm-10">
+		      	<select class="dropdown">
+				    <option value="1">所属应用： 1</option>
+				    <option value="2">所属应用： 2</option>
+				    <option value="3">所属应用： 3</option>
+				</select>
+				<select class="dropdown">
+				    <option value="1">所属应用： 1</option>
+				    <option value="2">所属应用： 2</option>
+				    <option value="3">所属应用： 3</option>
+				</select>
+				<em>正确的填写行业能够提升广告的匹配程度</em>
+		    </div>
+		  </div>
+		  
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">系统平台：</label>
+		    <div class="col-sm-10">
+	    		<a href="#" class="btn on">Android</a>
+	    		<a href="#" class="btn">IOS</a>
+	    		<em>只能选择一种操作系统，请求时将进行校验，系统平台错误时请求无效</em>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">适用终端：</label>
+		    <div class="col-sm-10">
+		      	<select class="dropdown">
+				    <option value="1">所属应用： 1</option>
+				    <option value="2">所属应用： 2</option>
+				    <option value="3">所属应用： 3</option>
+				</select>
+				<em>只能选择一种操作系统，请求时将进行校验，系统平台错误时请求无效</em>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">接入方式：</label>
+		    <div class="col-sm-10">
+				<div class="radio">
+				  <label>
+				    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+				   	SDk
+				  </label>
+				  <label>
+				    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+				    API
+				  </label>
+				</div>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputEmail3" class="col-sm-2 control-label">下载地址：</label>
+		    <div class="col-sm-10">
+		      <input type="text" class="form-control input-sm" id="inputEmail3" placeholder="" >
+		      <em>请填写应用商店的下载地址以便后台审核</em>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">包名：</label>
+		    <div class="col-sm-10">
+		      	<input type="text" class="form-control input-sm" id="inputEmail3" placeholder="" >
+		        <em>包名必须唯一，一个包名代表一个应用，不允许两个应用使用同样的包名</em>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label">应用关键词 ：</label>
+		    <div class="col-sm-10">
+		      	<input type="text" class="form-control input-sm" id="inputEmail3" placeholder="" >
+		        <em>正确的填写关键词能够提升广告的匹配度；以“，”分割。例：购物，旅游</em>
+		    </div>
+		  </div>
+		  <div class="form-group">
+		    <label for="inputPassword3" class="col-sm-2 control-label ">应用简介 ：</label>
+		    <div class="col-sm-10">
+		      	<textarea class="form-control" rows="3"></textarea>
+		        <em>正确的填写应用简介能够提升广告的匹配度及收益，至少40个字</em>
+		    </div>
+		  </div>
+		</form>
+	</@uc.alert>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdPositionInfo/list">广告位管理</a> <i> / </i> <span>新增广告位</span></h2>
+<!-- 当前位置结束 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <form class="form-horizontal" role="form" action="sspAdPositionInfo/addInfo" method="post">
+            <div class="block_content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <!-- 表单名称开始 -->
+                        <div class="block_title white clearfix">
+										<span class="block_title_name pull-left">
+											广告位信息
+										</span>
+                        </div>
+                        <!-- 表单名称结束 -->
+                        <div class="col-md-12">
+                            <div class="formwarp">
+                                <div class="block_content ">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="formwarp">
+                                                    <div class="form-group clearfix">
+                                                        <label class="col-md-4 control-label "><i>*</i>广告位名称</label>
+                                                        <div class="col-md-8 ">
+                                                            <input type="text" class="form-control input-sm  "
+                                                                   placeholder="" name="name" id="name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <label class="col-md-4 control-label "><i>*</i>所属应用</label>
+                                                        <div class="col-md-8 ">
+                                                            <select id="appInfo"
+                                                                    class="dropdown marginr33 bs-select-hidden" name="sspAppInfo.id">
+
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <label class="col-md-4 control-label "><i>*</i>广告位类型</label>
+                                                        <div class="col-md-8 ">
+
+                                                            <#list positionType as type>
+                                                                <#if type_index==0>
+                                                                    <label class="radio-inline">
+                                                                        <input class="guanggaowei" type="radio" name='sspDictAdPositionTypeList.code'
+                                                                               value="${(type.code)!}"
+                                                                               checked="true"> ${(type.name)!}
+                                                                    </label>
+                                                                    <#else>
+                                                                        <label class="radio-inline">
+                                                                            <input class="guanggaowei" type="radio" name='sspDictAdPositionTypeList.code'
+                                                                                   value="${(type.code)!}"
+                                                                            > ${(type.name)!}
+                                                                        </label>
+                                                                </#if>
+                                                            </#list>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <label class="col-md-4 control-label sr-only"><i>*</i>广告位类型</label>
+                                                        <div class="col-md-8 " id="guanggaowei-show">
+                                                            <img id="type" src="images/hengping.jpg">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group clearfix">
+                                                        <label class="col-md-4 control-label sr-only"><i>*</i>广告位类型</label>
+                                                        <div class="col-md-8 ">
+                                                            <a href="javascript:void(0)" class="btn formbtn green" id="submit">保存</a>
+                                                            <a href="javascript:void(0)" class="btn formbtn bk999"
+                                                               id="cancel">取消</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 右侧结束 -->
+<input type="hidden" value="${(appId)!}" id="appId">
+</body>
+<script>
+    var pageInit = {
+        init: function () {
+            this.loadAppInfo();
+            this.initRadio();
+        }, initRadio: function () {
+            var val = "type" + $("input[class='guanggaowei']:checked").val();
+            $('#guanggaowei-show').find('img').prop('src', 'images/' + val + '.jpg');
+        }, loadAppInfo: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspAppInfo/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    if (restResponse.result != null) {
+                        $('#appInfo').empty();
+                        options.push("<option value='0'>--请选择--</option>");
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            var id = $("#appId").val();
+                            if (id == row.id) {
+                                options.push("<option value=\"" + row.id + "\" selected>" + row.name + "</option>");
+                            } else {
+                                options.push("<option value=\"" + row.id + "\">" + row.name + "</option>");
+                            }
+                        }
+                        $("#appInfo").append(options.join(''));
+                        $('#appInfo').selectpicker('refresh');
+
+                    }
+                }, error: function () {
+                    alert('加载应用信息失败！');
+                }
+            });
+        }
+    }
+    $(function () {
+        pageInit.init();
+    });
+    $('input[class="guanggaowei"]').on('click', function () {
+        var val = "type" + $(this).val();
+        $('#guanggaowei-show').find('img').prop('src', 'images/' + val + '.jpg');
+    });
+    $("#cancel").click(function () {
+        var url = "sspAdPositionInfo/list";
+        page.loadPage(url);
+    });
+    $('form').eq(0).bootstrapValidator({
+        fields: {
+            name: {
+                validators: {
+                    stringLength: {
+                        enabled: true,
+                        max: 20
+                    },
+                    notEmpty: {
+                        message: '广告位名称不能为空'
+                    },
+                    callback: {
+                        message: '广告位名称已存在',
+                        callback: function (value, validator) {
+                            var res = true;
+                            var val = $("#name").val();
+                            if (val != "") {
+                                $.ajax({
+                                    url: 'rest/sspAdPositionInfo/find',
+                                    type: 'post',
+                                    dataType: 'json',
+                                    data:{name:val},
+                                    async: false,
+                                    success: function (data) {
+                                        if (data.result != null && data.result.length > 0) {
+                                            res = false;
+                                        }
+                                    }
+                                });
+                            }
+                            return res;
+                        }
+                    },
+                }
+            },
+        }
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        //alert("00")
+        page.ajaxSubmit(e.target, function (result) {
+            //alert("创建完毕")
+            console.log(result);
+            alert("新增数据成功").ok(function () {
+                var url = "sspAdPositionInfo/list";
+                page.loadPage(url);
+            });
+        });
+    });
+    $("#submit").click(function () {
+        $('form').eq(0).submit();
+    });
+</script>
+</html>

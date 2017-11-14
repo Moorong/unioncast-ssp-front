@@ -1,0 +1,371 @@
+ <!DOCTYPE html>
+<html>
+<body>
+<!-- 右侧开始 -->
+<!-- 表单内容开始 -->
+			
+<h2 class="current_loc">
+	<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i> <span>广告主管理</span>
+</h2>
+<div class="page_main">
+	<div class="page_main_white">
+		<form id="advertiserForm" action="sspAdvertiser/page">
+			<div class="search_block clearfix">
+				<div class="form-group  clearfix">
+					<div class="pull-left">
+						<a href="javascript:void(0)" class="btn  btn2 green"  data-toggle="modal" data-target="#myModal" id="addBtn"><i class="glyphicon glyphicon-plus"></i>新增广告主</a>
+					</div>
+					
+		            <div class="pull-right">
+		            	<div class="formgroup clearfix ">
+						    <label>投放状态：</label>
+					      	<select class="dropdown" name="state" id="state">
+					      		<option value="0">全部</option>
+					      		 <option value="1">开</option>
+		                         <option value="2">关</option> 
+							</select>
+						</div>
+						<div class="formgroup clearfix ">
+						    <label>修改时间：</label>
+					      	<div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+			                  <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+			                  <span id="timePeriod"></span> <b class="caret"></b>
+								<input type="hidden" name="startTimeTem" value=""/>
+								<input type="hidden" name="endTimeTem" value=""/>
+			                  <input type="hidden" name="startTime" value=""/>
+                              <input type="hidden" name="endTime" value=""/>
+			               </div>
+						</div>
+						<div class="has-feedback clearfix ">
+					 		<input type="text" class="form-control" name="name" id="name" value=""  placeholder="请输入广告主名称">
+			            </div>
+						<a href="javascript:void(0)" class="btn btn-sm" id="search" >查询</a>
+					</div>
+				</div>
+			</div>
+		</form>
+		<!-- 间隔 -->
+		<div style="height:10px;background:#f1f2f7;"></div>
+		<!-- 间隔 -->
+		<div class="block_content">
+			<div class="container-fluid">
+				
+				
+				<div class="row">
+					<div class="col-md-12">
+						<table class="table" >
+							<thead>
+								<tr>
+									<th>投放状态</th>
+									<th>广告主名称</th>
+									<th>广告主ID</th>
+									<th>订单数</th>
+									<th>修改时间</th>
+									<th>操作</th>
+								</tr>
+							</thead>
+							<tbody id="advertiserList">
+								
+								
+							</tbody>
+						</table>
+						<!-- 分页开始 -->
+                         <div class="bs-component clearfix pull-right" id="page">
+
+                         </div>
+                         <!-- 分页结束 -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>	
+</div>
+<!-- 表单内容结束 -->
+<!-- 右侧结束 -->
+</body>
+<script>
+
+	$(function () {
+		/*组件初始化*/
+		loadswitch();
+		//下拉菜单
+	     $(".dropdown").selectpicker({});
+        var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+        var defEndDate = moment().format(defDateFormat);
+        /*双日历组件*/
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+
+        //默认为时间空间赋值
+        $('input[name="startTimeTem"]').val(getMapDate(7));
+        $('input[name="endTimeTem"]').val(getMapDate(0));
+
+        $('#reportrange2').daterangepicker({
+                startDate: defStartDate
+            },
+            function (start, end) {
+                var choStart = start.format(defDateFormat);
+                var choEnd = end.format(defDateFormat);
+                $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+                $('input[name="startTimeTem"]').val(choStart);
+                $('input[name="endTimeTem"]').val(choEnd);
+                $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+            });
+
+        //初始化加载
+        loadData(1);
+	});
+	
+	function loadswitch(){
+		$("[data-toggle='tooltip']").tooltip();
+		$("input[name='switch']").bootstrapSwitch({  
+	        onText:"开",  
+	        offText:"关",  
+	        size:"mini",  
+	        onSwitchChange:function(event,state){  
+	            if(state==true){  
+	            	updateState($(this),1);
+	                $(this).val("1");  
+	            }else{  
+	            	updateState($(this),2);
+	                $(this).val("2");  
+	            }
+	        }  
+	    }); 
+	}
+	//起始页
+	 var CurrentPageNo = 1;
+	 
+	 /*搜索按钮提交*/
+	 $("#search").click(function () {
+	 	//var state = $("#state").val();
+         $('input[name="startTime"]').val($('input[name="startTimeTem"]').val());
+         $('input[name="endTime"]').val($('input[name="endTimeTem"]').val());
+
+        page.ajaxSubmit($("#advertiserForm").eq(0)[0],function (resultJson,resultMsg,xmlHttpResponse) {
+            
+            if(resultJson.result.dataArray.length!=0){
+            	$("#advertiserList").html("");
+				$("#page").empty();
+            	loadPage(resultJson);
+            	
+            }else{
+            	$("#advertiserList").html("<tr><td colspan='6' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+            	$("#page").empty();
+            }
+        },function (xmlHttpRequest,errorMsg,errorObj) {
+
+        });
+    });
+	 
+	//加载数据
+	function loadData(currentPageNo){
+		var state = $("#state").val();
+		var startTime = $('input[name="startTime"]').val();
+        var endTime = $('input[name="endTime"]').val();
+        var name = $('#name').val();
+		page.ajax({
+			url : 'sspAdvertiser/page',
+			data : {
+				startTime : startTime,
+				endTime : endTime,
+				currentPageNo : currentPageNo,
+				state : state,
+				name : name
+			},
+			success : function(data) {
+
+				if (data.result.dataArray.length != null) {
+					$("#advertiserList").html("");
+					$("#page").empty();
+					loadPage(data);
+				} else {
+					$("#advertiserList").html("<tr><td colspan='6' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+					$("#page").empty();
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+
+	}
+
+	function loadPage(data) {
+
+		var datas = data.result.dataArray;
+		$
+				.each(
+						datas,
+						function(index, advertiser) {
+							var html = "<tr>";
+							if (advertiser.putAllowedState == 1) {
+								html += "<td><input type='checkbox' name='switch' value='1' id='switch"+ advertiser.id +"' checked /></td>";
+							}
+							if (advertiser.putAllowedState == 2) {
+								html += "<td><input type='checkbox' name='switch' value='2' id='switch"+ advertiser.id +"' /></td>";
+							}
+							html += "<td style='vertical-align: middle;text-align:center;'><a href='javascript:void(0)' onclick='enterOrder("
+									+ advertiser.id
+									+ ");'>"
+									+ advertiser.name
+									+ "</a></td>";
+							html += "<td style='vertical-align: middle;text-align:center;' class='advertiserId'>"
+									+ advertiser.advertiserIdentifying
+									+ "</td>";
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ advertiser.orderNumber + "</td>";
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ getDay(advertiser.updateTime) + "</td>";
+							html += "<td><a href='#' data-toggle='tooltip' data-placement='top' onclick='updateAd("
+									+ advertiser.id
+									+ ");' title='修改'><i class='iconfont icon-xiugai'></i></a>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='deleteAd("
+									+ advertiser.id
+									+ ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";
+							html += "<input type='hidden' name='hiddenId' value='" + advertiser.id + "'/>"
+							html += "</tr>";
+							$("#advertiserList").append(html);
+							loadswitch();
+
+						});
+
+		var totalPage = data.result.totalPage;
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page').html('');
+		$('#page')
+				.html(
+						'<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',//分页容器，ID
+			totalPages : totalPage, //总页数
+			count : totalCount, //总记录数
+			startPage : startPage,
+			onPageClick : function(env, thisPage) {
+				// CurrentPageNo = thisPage;
+				loadData(thisPage);
+			}
+		});
+	}
+
+	function enterOrder(id) {
+		var url = "sspOrder/list?advertiserId=" + id;
+		page.loadPage(url);
+	}
+
+	//新增
+	$("#addBtn").click(function() {
+		var url = "sspAdvertiser/getAdd";
+		page.loadPage(url);
+	});
+
+	//修改
+	function updateAd(id) {
+		var putAllowedState = $("#switch" + id).val();
+		if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行修改操作！");
+			return;
+		} else {
+			var url = "sspAdvertiser/getUpdate?id=" + id;
+			page.loadPage(url);
+		}
+	}
+
+	//更改开关状态
+	function updateState(_this, val) {
+
+		var id = _this.closest('tr').find('input[type="hidden"]').val();
+		var url = "sspAdvertiser/addOrUpdate";
+		page.ajax({
+			url : url,
+			data : {
+				id : id,
+				putState : val
+			},
+			type : 'post',
+			success : function(data) {
+				/* if (data.status == 200){
+				   var url = "sspAdvertiser/getPages";
+				page.loadPage(url);
+				} */
+			},
+			error : function() {
+				alert("修改状态失败！");
+			}
+		});
+
+	}
+
+	//删除
+	function deleteAd(id) {
+		var putAllowedState = $("#switch" + id).val();
+		if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行删除操作！");
+			return;
+		} else {
+			var url = "sspAdvertiser/delete?id=" + id;
+			$.confirm({
+				title : '删除广告主',
+				content : '是否删除该广告主？',
+				buttons : {
+					okay : {
+						text : '确定',
+						btnClass : 'btn green',
+						action : function() {
+							page.ajax({
+								url : url,
+								data : {
+									id : id
+								},
+								type : 'post',
+								success : function(data) {
+
+									if (data.status == 0) {
+										alert("删除成功").ok(function() {
+											var url = "sspAdvertiser/getPages";
+											page.loadPage(url);
+										});
+									}
+								}
+							});
+						}
+					},
+					no : {
+						text : '取消',
+						btnClass : 'btn '
+					}
+				}
+			});
+		}
+	}
+
+	/**日期转换工具*/
+	function getMoth(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd");
+		return oDate;
+	};
+	function getDay(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+		return oDate;
+	};
+
+	//处理默认时间工具
+	function addDate(dd, dadd) {
+		var a = new Date(dd)
+		a = a.valueOf()
+		a = a + dadd * 24 * 60 * 60 * 1000
+		a = new Date(a)
+		return a;
+	}
+	function getMapDate(dayss) {
+		var now = new Date();
+		var NextNow = addDate(now, -dayss);
+		var years = NextNow.getFullYear();
+		var months = NextNow.getMonth() + 1;
+		var days = NextNow.getDate();
+		var beginTime = years + "-" + months + "-" + days;
+		return beginTime;
+	}
+</script>
+</html>

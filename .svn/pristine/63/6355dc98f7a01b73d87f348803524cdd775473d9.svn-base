@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html> 
+<body>
+	<!-- 右侧开始 -->
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">媒体管理</a> <i> / </i> <span>开发者管理</span></h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+		 	<ul class="nav nav-tabs" role="tablist">
+	            <li role="presentation" class="active">
+	            	<a href="#ggbb" role="tab" data-toggle="tab" onclick="showDevelopers();">开发者列表</a>
+	            </li>
+	            <li role="presentation">
+	            	<a href="#mtbb" role="tab" data-toggle="tab" onclick="showWithdrawRequests();">提现请求</a>
+	            </li>
+	        </ul>
+			<div class="tab-content">
+				<!-- 开发者列表 -->
+				<div role="tabpanel" class="tab-pane active" id="ggbb">
+					<form id="developerSearchForm" action="sspDeveloper/page">
+						<div class="search_block clearfix">
+							<div class="form-group  clearfix">
+								<div class="pull-left">
+									<div class="formgroup clearfix ">
+									    <label>修改时间：</label>
+								      	<div id="reportrange1"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+											<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+											<span></span> <b class="caret"></b>
+										</div>
+										<input type="hidden" name="startTimeTem1" value=""/>
+										<input type="hidden" name="endTimeTem1" value=""/>
+										<input type="hidden" name="startTime" value=""/>
+										<input type="hidden" name="endTime" value=""/>
+									</div>
+								</div>
+								<div class="pull-right">
+									<div class="has-feedback clearfix ">
+								  		<label class="control-label sr-only" for="userName">用户名</label>
+								 		<input type="text" class="form-control" name="userName" id="userName" placeholder="请输入用户名">
+						            </div>
+						            <a href="javascript:void(0)" class="btn btn-sm" id="developerSearch">提交</a>
+					            </div>
+							</div>
+						</div>
+					</form>
+					<!-- 间隔 -->
+					<div style="height:10px;background:#f1f2f7;"></div>
+					<!-- 间隔 -->
+					<div class="block_content">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-12">
+									<table class="table" >
+										<thead>
+											<tr>
+												<th>注册时间</th>
+												<th>用户名</th>
+												<th>手机</th>
+												<th>设置</th>
+											</tr>
+										</thead>
+										<tbody id="developerList">
+										
+										</tbody>
+									</table>
+									<!-- 分页开始 -->
+									<div class="bs-component clearfix pull-right" id="page1">
+
+									</div>
+									<!-- 分页结束 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 提现请求 -->
+			<div class="tab-content">
+	        	<div role="tabpanel" class="tab-pane" id="mtbb">
+	        		<form id="withdrawRequestSearchForm" action="ssp/withdrawRequestInfo/page">
+						<div class="search_block clearfix">
+							<div class="form-group  clearfix">
+								<div class="pull-left">
+									<div class="formgroup clearfix ">
+									    <label>修改时间：</label>
+								      	<div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+											<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+											<span></span> <b class="caret"></b>
+										</div>
+										<input type="hidden" name="startTimeTem2" value=""/>
+										<input type="hidden" name="endTimeTem2" value=""/>
+										<input type="hidden" name="startTime" value=""/>
+										<input type="hidden" name="endTime" value=""/>
+									</div>
+								</div>
+								<div class="pull-right">
+									<div class="has-feedback clearfix ">
+								  		<label class="control-label sr-only" for="userName">用户名</label>
+								 		<input type="text" class="form-control" name="userName" id="userName" placeholder="请输入用户名">
+						            </div>
+						            <a href="javascript:void(0)" class="btn btn-sm" id="withdrawRequestSearch">提交</a>
+					            </div>
+							</div>
+						</div>
+					</form>
+					<!-- 间隔 -->
+					<div style="height:10px;background:#f1f2f7;"></div>
+					<!-- 间隔 -->
+					<div class="block_content">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="col-md-12">
+									<table class="table" >
+										<thead>
+											<tr>
+												<th>请求时间</th>
+												<th>用户名</th>
+												<th>手机</th>
+												<th>申请金额</th>
+												<th>资料</th>
+											</tr>
+										</thead>
+										<tbody id="withdrawRequestList">
+										</tbody>
+									</table>
+									<!-- 分页开始 -->
+									<div class="bs-component clearfix pull-right" id="page2">
+									
+									</div>
+									<!-- 分页结束 -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	<!-- 表单内容结束 -->
+	<!-- 右侧结束 -->
+</body>
+<script>
+$(function () {
+	/*组件初始化*/
+	$("[data-toggle='tooltip']").tooltip();
+	$("input[name='switch']").bootstrapSwitch({  
+        onText:"开",  
+        offText:"关",  
+        size:"mini",  
+        onSwitchChange:function(event,state){  
+            if(state==true){  
+                $(this).val("1");  
+            }else{  
+                $(this).val("2");  
+            }  
+        }
+    });
+	//下拉菜单
+    $(".dropdown").selectpicker({});
+    //参考网址 http://blog.csdn.net/zhengxiangwen/article/details/46480687
+
+	/*双日历组件*/
+	var defDateFormat = "YYYY-MM-DD";
+	var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+	var defEndDate = moment().format(defDateFormat);
+	$('#reportrange1 span').html(defStartDate + ' - ' + defEndDate);
+	$('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+	
+	//默认为时间空间赋值
+    $('input[name="startTimeTem1"]').val(getMapDate(7));
+    $('input[name="startTimeTem2"]').val(getMapDate(7));
+    $('input[name="endTimeTem1"]').val(getMapDate(0));
+    $('input[name="endTimeTem2"]').val(getMapDate(0));
+    
+	$('#reportrange1').daterangepicker({
+			startDate: defStartDate
+	    },
+	    function (start, end) {
+	        var choStart = start.format(defDateFormat);
+	        var choEnd = end.format(defDateFormat);
+	        $('#reportrange1 span').html(choStart + ' - ' + choEnd);
+	        $('input[name="startTimeTem1"]').val(choStart);
+	        $('input[name="endTimeTem1"]').val(choEnd);
+	        $('#reportrange1 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+	});
+	
+	$('#reportrange2').daterangepicker({
+			startDate: defStartDate
+	    },
+	    function (start, end) {
+	        var choStart = start.format(defDateFormat);
+	        var choEnd = end.format(defDateFormat);
+	        $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+	        $('input[name="startTimeTem2"]').val(choStart);
+	        $('input[name="endTimeTem2"]').val(choEnd);
+	        $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+	});
+	
+	$("table input[name='checkboxall']").on('click',function(event){
+		$(this).parent().parent().parent().next('tbody').find("input").prop('checked',$(this).prop('checked'));
+		event.stopPropagation();
+	});
+	$('table input[name="checkboxed"]').on('click',function(event){
+		$(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+		event.stopPropagation();
+	});
+	$('#tabbtn').click(function(){
+		$(this).parent().parent().next('.form-group').toggleClass('hidden');
+	});
+	
+	loadDeveloperData(1);
+	
+});
+
+function showDevelopers() {
+	if($('#ggbb').is(":visible")) {
+		return;
+	}
+	$('#ggbb').show();
+	$('#mtbb').hide();
+	
+	loadDeveloperData(1);
+}
+
+function showWithdrawRequests() {
+	if($("#mtbb").is(":visible")) {
+		return;
+	}
+	$('#mtbb').show();
+	$('#ggbb').hide();
+	
+	loadWithdrawRequestData(1);
+}
+
+
+function enterDetails(id) {
+	var url = "sspDeveloper/details?id="+id;
+	page.loadPage(url);
+}
+
+function enterAppManager(id) {
+	var url = "sspAppInfo/listManage";
+	page.loadPage(url);
+}
+
+//起始页
+var CurrentPageNo = 1;
+ 
+/*开发者搜索按钮提交*/
+$("#developerSearch").click(function () {
+	//首先判断当前显示的是否为开发者列表
+	$("#developerSearchForm").find('input[name="startTime"]').val($('input[name="startTimeTem1"]').val());
+	$("#developerSearchForm").find('input[name="endTime"]').val($('input[name="endTimeTem1"]').val());
+
+    page.ajaxSubmit($("#developerSearchForm").eq(0)[0],
+    	function (resultJson,resultMsg,xmlHttpResponse) {
+	        if(resultJson.result.dataArray.length!=0){
+	        	$("#developerList").html("");
+				$("#page1").empty();
+				loadDeveloperPage(resultJson);
+	        }else{
+	        	$("#developerList").html("<tr><td colspan='6' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+	        	$("#page1").empty();
+	        }
+	    },function (xmlHttpRequest,errorMsg,errorObj) {
+
+    });
+});
+
+
+$("#withdrawRequestSearch").click(function () {
+	var startTime = $("#withdrawRequestSearchForm").find('input[name="startTime"]');
+	var endTime = $("#withdrawRequestSearchForm").find('input[name="endTime"]');
+	var userName = $("#withdrawRequestSearchForm").find("input[name='userName']");
+	
+	startTime.val($('input[name="startTimeTem2"]').val());
+	endTime.val($('input[name="endTimeTem2"]').val());
+
+	var jsonData = {
+    		"currentPageNo" : 1,
+			"pageSize" : 10,
+			"predicate" : "AND",
+			"searchExpressionList" : [],
+			"orderExpressionList" : [{
+				"propertyName" : "update_time",
+				"op" : "DESC"
+			}]
+		};
+    if(!isEmpty(startTime.val())) {
+    	jsonData.searchExpressionList.push({
+    		"operation" : "GE",
+			"propertyName" : "update_time",
+			"value" : startTime.val(),
+			"valueType" : "java.util.Date"
+    	});
+    }
+    if(!isEmpty(endTime.val())) {
+    	jsonData.searchExpressionList.push({
+    		"operation" : "LE",
+			"propertyName" : "update_time",
+			"value" : endTime.val()+"23:59:59",
+			"valueType" : "java.util.Date"
+    	});
+    }
+    
+    
+	page.ajax({
+		url : 'ssp/withdrawRequestInfo/page',
+		contentType : 'application/json',
+		data : JSON.stringify(jsonData),
+		success : function(data) {
+			if (data.result.dataArray.length) {
+				$("#withdrawRequestList").html("");
+				$("#page2").empty();
+				loadWithdrawRequestPage(data, userName.val());
+			} else {
+				$("#withdrawRequestList").html("");
+				$("#page2").empty();
+				$("#withdrawRequestList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+			}
+		},
+		error : function(err) {
+
+		}
+	});
+});
+
+//加载数据
+function loadDeveloperData(currentPageNo) {
+	var userName = $("#developerSearchForm").find("input[name=userName]").val();
+	var startTime = $("#developerSearchForm").find('input[name="startTime"]').val();
+    var endTime = $("#developerSearchForm").find('input[name="endTime"]').val();
+    
+    page.ajax({
+		url : 'sspDeveloper/page',
+		data : {
+			currentPageNo : currentPageNo,
+			userName : userName,
+			startTime : startTime,
+			endTime : endTime
+		},
+		success : function(data) {
+			if (data.result.dataArray.length) {
+				$("#developerList").html("");
+				$("#page1").empty();
+				loadDeveloperPage(data);
+			} else {
+				$("#developerList").html("");
+				$("#page1").empty();
+				$("#developerList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+			}
+		},
+		error : function(err) {
+
+		}
+	});
+	
+}
+
+function loadWithdrawRequestData(currentPageNo) {
+	var userName = $("#withdrawRequestSearchForm").find('input[name="userName"]').val();
+	var startTime = $("#withdrawRequestSearchForm").find('input[name="startTime"]').val();
+    var endTime = $("#withdrawRequestSearchForm").find('input[name="endTime"]').val();
+    var jsonData = {
+    		"currentPageNo" : 1,
+			"pageSize" : 10,
+			"predicate" : "AND",
+			"searchExpressionList" : [],
+			"orderExpressionList" : [{
+				"propertyName" : "update_time",
+				"op" : "DESC"
+			}]
+		};
+    if(!isEmpty(userName)) {
+    	jsonData.searchExpressionList.push({
+    		"operation" : "LIKE",
+    		"propertyName" : "username",
+    		"value" : userName,
+    		"valueType" : "java.lang.String"
+		});
+    }
+    
+    if(!isEmpty(startTime)) {
+    	jsonData.searchExpressionList.push({
+    		"operation" : "GE",
+			"propertyName" : "update_time",
+			"value" : startTime,
+			"valueType" : "java.util.Date"
+    	});
+    }
+    if(!isEmpty(endTime)) {
+    	jsonData.searchExpressionList.push({
+    		"operation" : "LE",
+			"propertyName" : "update_time",
+			"value" : endTime,
+			"valueType" : "java.util.Date"
+    	});
+    }
+    
+    page.ajax({
+		url : 'ssp/withdrawRequestInfo/page',
+		contentType:'application/json',
+		data : JSON.stringify(jsonData),
+		success : function(data) {
+			if (data.result.dataArray.length) {
+				$("#withdrawRequestList").html("");
+				$("#page2").empty();
+				loadWithdrawRequestPage(data);
+			} else {
+				$("#withdrawRequestList").html("");
+				$("#page2").empty();
+				$("#withdrawRequestList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+			}
+		},
+		error : function(err) {
+
+		}
+	});
+}
+
+function loadDeveloperPage(data) {
+	var datas = data.result.dataArray;
+	$("#developerList").empty();
+	if(datas.length != 0) {
+		$.each(datas, function(index, developer) {
+			var html = "<tr>";
+			html += "<td>" + getDay(developer.createTime) + "</td>";
+			html += "<td>" + developer.username + "</td>";
+			html += "<td>" + developer.phone + "</td>";
+			html += '<td><a href="javascript:void(0);" onclick="enterAppManager(id);" data-toggle="tooltip" data-placement="top" title="应用"><i class="iconfont icon-application"></i></a>' +
+				' <a href="javascript:void(0);" onclick="enterDetails(' + developer.id + ');" data-toggle="tooltip" data-placement="top" title="详细信息"><i class="iconfont icon-xiangxiziliao"></i></a>' +
+				' <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="操作记录"><i class="iconfont icon-caozuojilu"></i></a></td>';
+			html += "</tr>";
+			$("#developerList").append(html);
+		});
+	} else {
+		$("#developerList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+	}
+
+	var totalPage = data.result.totalPage;
+	var totalCount = data.result.totalCount;
+	var startPage = data.result.currentPageNo;
+	$('#page1').html('');
+	$('#page1').html('<ul id="pageUserListUl1" class="bs-component pull-right"></ul>');
+	page.ajaxPage({
+		pcont : 'pageUserListUl1',// 分页容器，ID
+		totalPages : totalPage, // 总页数
+		count : totalCount, // 总记录数
+		startPage : startPage,
+		onPageClick : function(env, thisPage) {
+			// CurrentPageNo = thisPage;
+			loadDeveloperData(thisPage);
+		}
+	});
+	Echo.init({
+        offset: 0,
+        throttle: 0
+    });
+	$('img').unbind('error').bind('error', function() {
+    	var $this = $(this);
+        var retry= $this.attr("re");
+        retry = isNaN(retry)?1:retry;
+        if(retry > 5){
+        	$(this).unbind('error');
+        	$this.css('background','none');
+        }else {
+        	setTimeout(function(){
+        		$this.attr('src',$this.attr('src'));
+        	},1000);
+        }
+        $this.attr("re",++retry);
+    });
+}
+
+function loadWithdrawRequestPage(data, userName) {
+	var datas = data.result.dataArray;
+	$("#withdrawRequestList").empty();
+	if(datas.length != 0) {
+		$.each(datas, function(index, request) {
+			if(isEmpty(userName) || request.user.username.indexOf(userName) >= 0) {
+				var html = "<tr>";
+				html += "<td>" + getDay(request.createTime) + "</td>";
+				html += "<td>" + request.user.username + "</td>";
+				html += "<td>" + request.user.phone + "</td>";
+				html += "<td>" + request.preTax + "</td>";
+				html += '<td><a href="javascript:void(0);" onclick="enterAppManager(id);" data-toggle="tooltip" data-placement="top" title="应用"><i class="iconfont icon-application"></i></a>' +
+					' <a href="#" data-toggle="tooltip" data-placement="top" title="应用审核" onclick="enterAudit('+ request.id +')"><i class="iconfont icon-shenhe"></i></a>' +
+					' <a href="javascript:void(0);" data-toggle="tooltip" data-placement="top" title="操作记录" onclick="showLog('+ request.id +')"><i class="iconfont icon-caozuojilu"></i></a></td>';
+				html += "</tr>";
+				$("#withdrawRequestList").append(html);
+			}
+		});
+		if($("#withdrawRequestList").children().length == 0) {
+			$("#withdrawRequestList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+		}
+	} else {
+		$("#withdrawRequestList").append("<tr><td style='vertical-align: middle;text-align:center;' colspan='7'>暂未查到数据</td></tr>");
+	}
+
+	var totalPage = data.result.totalPage;
+	var totalCount = data.result.totalCount;
+	var startPage = data.result.currentPageNo;
+	$('#page2').html('');
+	$('#page2').html('<ul id="pageUserListUl2" class="bs-component pull-right"></ul>');
+	page.ajaxPage({
+		pcont : 'pageUserListUl2',// 分页容器，ID
+		totalPages : totalPage, // 总页数
+		count : totalCount, // 总记录数
+		startPage : startPage,
+		onPageClick : function(env, thisPage) {
+			// CurrentPageNo = thisPage;
+			loadWithdrawRequestData(thisPage);
+		}
+	});
+	Echo.init({
+        offset: 0,
+        throttle: 0
+    });
+	$('img').unbind('error').bind('error', function() {
+    	var $this = $(this);
+        var retry= $this.attr("re");
+        retry = isNaN(retry)?1:retry;
+        if(retry > 5){
+        	$(this).unbind('error');
+        	$this.css('background','none');
+        }else {
+        	setTimeout(function(){
+        		$this.attr('src',$this.attr('src'));
+        	},1000);
+        }
+        $this.attr("re",++retry);
+    });
+}
+
+//字符串转化为时间
+function getDay(str) {
+	var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+	return oDate;
+};
+
+//处理默认时间工具
+function addDate(dd, dadd) {
+	var a = new Date(dd)
+	a = a.valueOf()
+	a = a + dadd * 24 * 60 * 60 * 1000
+	a = new Date(a)
+	return a;
+}
+function getMapDate(dayss) {
+	var now = new Date();
+	var NextNow = addDate(now, -dayss);
+	var years = NextNow.getFullYear();
+	var months = NextNow.getMonth() + 1;
+	var days = NextNow.getDate();
+	var beginTime = years + "-" + months + "-" + days;
+	return beginTime;
+}
+
+
+</script>
+</html>

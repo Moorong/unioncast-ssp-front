@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<style type="text/css">
+.echo-lazy{background: url(plugs/echojs/loading.gif) 50% no-repeat;}
+.help-block[data-bv-result='INVALID']{
+	display: inline-block !important;
+}
+
+.has-success .help-block, .has-success .control-label, .has-success .radio,
+	.has-success .checkbox, .has-success .radio-inline, .has-success .checkbox-inline,
+	.has-success.radio label, .has-success.checkbox label, .has-success.radio-inline label,
+	.has-success.checkbox-inline label {
+	color: #333;
+}
+
+.current_loc a {
+	color: #3daded;
+}
+table thead>tr>th:hover {
+  background-color: rgba(0,0,0,.075)!important;
+}
+</style>
+</head>
+<body>
+	<div class="header clearfix">
+		<ul class="logogroup">
+			<li><a href="#">易通SSP媒体服务平台</a></li>
+		</ul>
+		<ul class="user_info clearfix">
+			<li>${Session.SPRING_SECURITY_CONTEXT.authentication.principal.remark!'xxx'}
+				<a href="javascript:void(0);"
+				onclick="javascript:location.href='logout'" class="goout">退出</a>
+			</li>
+		</ul>
+	</div>
+</body>
+</html>

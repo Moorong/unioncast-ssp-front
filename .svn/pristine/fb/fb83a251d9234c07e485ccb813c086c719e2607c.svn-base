@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<!-- 右侧开始 -->
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/user/accountList">账户管理</a> <i> / </i> <span>账户资料</span></h2>
+<!-- 当前位置结束 -->
+<!-- 表单内容开始 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <div class="block_content ">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										账户资料
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <form class="form-horizontal" role="form" action="ssp/user/update">
+                            <div class="formwarp">
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">用户名：</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="hidden" id="id" name="id" value="${(account.id)!}">
+                                        <p class="form-control-static">${(account.loginName)!}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label">角色：</label>
+                                    <div class="col-sm-8 ">
+                                        <div class="pull-left marginr26">
+                                            <!--<label class="control-label">测试</label>-->
+                                            <select class="dropdown" id="role" name="roleList[0].id">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">联系人：</label>
+                                    <div class="col-sm-8 ">
+                                        <p class="form-control-static">${(account.username)!}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">邮箱：</label>
+                                    <div class="col-sm-8 ">
+                                        <p class="form-control-static">${(account.email)!}</p>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">手机：</label>
+                                    <div class="col-sm-8 ">
+                                        <p class="form-control-static">${(account.phone)!}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="savewarp text-center">
+                                <a href="javascript:void(0)" class="btn formbtn green" id="submit">完成</a>
+                                <a href="javascript:void(0)" class="btn formbtn bk999"
+                                   id="cancel">取消</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="roleId" value="${(role.id)!}">
+<!-- 右侧结束 -->
+</body>
+
+<script>
+    var pageInit = {
+        loadRole: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/ssp/role/findBySystemId",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    if (restResponse.result != null) {
+                        $('#role').empty();
+                        /*options.push("<option value='0'>--请选择--</option>")*/
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            if ($("#roleId").val() == row.id) {
+                                options.push("<option value=\"" + row.id + "\" selected>" + row.name + "</option>");
+                            } else {
+                                options.push("<option value=\"" + row.id + "\">" + row.name + "</option>");
+                            }
+                        }
+                        //var selectElement = "<select id=\"parentId\" name=\"parentId\" class=\"form-control\"> " + options.join('') + " </select>"
+                        $("#role").append(options.join(''));
+                        $("#role").selectpicker('refresh');
+
+                    }
+                }, error: function () {
+                    alert('加载角色列表失败！');
+                }
+            });
+        }
+    }
+    $(function () {
+        //下拉菜单
+        $(".dropdown").selectpicker({});
+        pageInit.loadRole();
+    });
+    $("#cancel").click(function () {
+        var url = "ssp/user/accountList";
+        page.loadPage(url);
+    });
+
+    $("#submit").click(function () {
+        var roleId = $("#roleId").val();
+        var selectRole = $("#role").val();
+        if (roleId != selectRole) {
+            $('form').eq(0).submit();
+        }
+    });
+    function returnPage() {
+        var url = "ssp/user/currentAccountInfo";
+        page.choiceMenu('55')
+        page.loadPage(url);
+    }
+    $('form').eq(0).bootstrapValidator({
+    }).on('success.form.bv', function (e) {
+        // 防止表单提交
+        e.preventDefault();
+        // 获取表单
+        var $form = $(e.target);
+        // 获取验证器实例
+        var bv = $form.data('bootstrapValidator');
+        // 使用Ajax异步提交数据
+        //alert("00")
+        page.ajaxSubmit(e.target, function (result) {
+            //alert("创建完毕")
+            console.log(result);
+            var url = "ssp/user/accountList";
+            page.loadPage(url);
+
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,9 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspDictEducationTarget;
+
+public interface SspEducationService {
+
+	SspDictEducationTarget[] findByCode(String[] sspDictEducation);
+
+}

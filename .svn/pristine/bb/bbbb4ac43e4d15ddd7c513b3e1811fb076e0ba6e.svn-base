@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SSP</title>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+<#include "layouts/style.html">
+<script type="text/javascript">
+//公共js变量值存储
+window.globalVar = {
+	imgPrefix:'${SYS_IMG_SERVER_URL!""}'
+};
+</script>
+</head>
+<body>
+	<div class="containered">
+		<#include "layouts/header.html"> <#include "layouts/sidebar.html">
+		<!-- 右侧开始 -->
+		<div class="content"  id="uc_page_content"></div>
+	</div>
+	<div id="loadingDiv" style="display:none;">
+		<div style="position:absolute;left:212px;top:105px;right:0;bottom:0;background:#444;opacity:0.2;filter:alpha(opacity=20);z-index:10000;"></div>
+		<div style="position: absolute;  left: 50%; z-index: 10001;top: 50%; width: 190px;; height: 60px; line-height: 60px; padding-left: 5px; padding-right: 5px;margin-top:-25px;border: 2px solid #fff;; background: #fff;border-radius:5px;">
+			<img src="images/loading.gif" style="width:50px;height50px; margin-right:10px;margin-top:-9px;">加载中，请等待...
+		</div>
+	</div>
+</body>
+<#include "layouts/script.html">
+</html>

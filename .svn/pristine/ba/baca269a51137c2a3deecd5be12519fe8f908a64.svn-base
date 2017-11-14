@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+</head>
+<body>
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="returnPage()">媒体管理</a>
+    <i> / </i> <span>应用管理</span></h2>
+<!-- 当前位置结束 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <!-- 表单名称开始 -->
+        <!-- <div class="block_title white clearfix">
+            <span class="block_title_name pull-left">
+                提现记录
+            </span>
+        </div> -->
+        <!-- 表单名称结束 -->
+        <!-- 表单内容开始 -->
+        <div class="block_content">
+            <div class="container-fluid">
+                <div class="search_block clearfix">
+                    <div class="form-group  clearfix">
+                        <div class="pull-left">
+                            <a href="javascript:void(0)" id="add" class="btn green btn2" data-toggle="modal"
+                               data-target="#myModal"><i class="glyphicon glyphicon-plus"></i>新增移动应用</a>
+                            <a href="javascript:void(0)" class="btn btn_trash" onclick="deleteMany()"><i
+                                    class="glyphicon glyphicon-trash"></i>批量删除</a>
+                        </div>
+                        <div class="pull-right">
+                            <select class="dropdown" id="platform">
+
+                            </select>
+                            <select class="dropdown" id="accessWay">
+
+                            </select>
+                            <select class="dropdown" id="audit">
+
+                            </select>
+                            <div class=" inline_block has-feedback clearfix">
+                                <label class="control-label sr-only">Input with success</label>
+                                <input type="text" class="form-control" id="appName">
+                                <span class="glyphicon glyphicon-search form-control-feedback"></span>
+                            </div>
+                            <a href="javascript:void(0)" id="search" class="btn btn-sm">查询</a>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th><input type="checkbox" name="checkboxed1" onclick="operateCheckBox.checkAll()"></th>
+                                <th>应用标识</th>
+                                <th>名称</th>
+                                <th>接入方式</th>
+                                <th>平台</th>
+                                <th>更新日期</th>
+                                <th>审核状态</th>
+                                <th>操作</th>
+                            </tr>
+                            </thead>
+                            <tbody class="sldataBody">
+                            <tr class="sldataBodyHeader">
+                                <td><input type="checkbox" name="checkboxed2"></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                            <tbody class="sldataBodyTemplate">
+                            <tr class="sldataBodyRow">
+                                <td><input type="checkbox" value="{id}" name="checkboxed"
+                                           onclick="operateCheckBox.check()"></td>
+                                <td>{appId}</td>
+                                <td>{name}</td>
+                                <td>{accessWay}</td>
+                                <td>{platform}</td>
+                                <td>{updateTime}</td>
+                                <td>{audit}</td>
+                                <td>{operate}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!-- 分页开始 -->
+                        <div class="bs-component pull-right" id="pageAppList"></div>
+                        <!-- 分页结束 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 表单内容结束 -->
+    </div>
+</div>
+<!-- 右侧结束 -->
+<input type="hidden" id="currentPag">
+</body>
+
+<script>
+    var currentPage = 1;
+    var pageInit = {
+        init: function () {
+            this.loadPlatform();
+            this.LoadAccessWay();
+            this.loadAudit();
+            this.loadPage();
+        }, loadPlatform: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspDicPlatform/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    $('#platform').empty();
+                    options.push("<option value=''>--所属平台--</option>");
+                    if (restResponse.result != null) {
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            var level = row.level;
+                            if (level != "1000") {
+                                options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                            }
+                        }
+                    }
+                    $("#platform").append(options.join(''));
+                    $('#platform').selectpicker('refresh');
+                }, error: function () {
+                    alert('加载平台信息失败！');
+                }
+            });
+        }, LoadAccessWay: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspDictAccessWay/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    $('#accessWay').empty();
+                    options.push("<option value=''>--接入方式--</option>");
+                    if (restResponse.result != null) {
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                        }
+                    }
+                    $("#accessWay").append(options.join(''));
+                    $('#accessWay').selectpicker('refresh');
+                }, error: function () {
+                    alert('加载接入方式失败！');
+                }
+            });
+        }, loadAudit: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/sspDictAudit/find",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    $('#audit').empty();
+                    options.push("<option value=''>--审核状态--</option>");
+                    if (restResponse.result != null) {
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                        }
+                    }
+                    $("#audit").append(options.join(''));
+                    $('#audit').selectpicker('refresh');
+                }, error: function () {
+                    alert('加载审核信息失败！');
+                }
+            });
+        }, loadPage: function () {
+            if (currentPage == null || currentPage <= 0) {
+                currentPage = 1;
+            }
+            var name = $("#appName").val();
+            var platform = $("#platform").val();
+            var accessWay = $("#accessWay").val();
+            //TODO  暂时不做
+            //var audit = $("#audit").val();
+            /*
+             var data = {};
+             if (name != null && name != "") {
+             data = {
+             'currentPageNo': currentPage,
+             'pageSize': 10,
+             'searchExpressionList[0].value': platform,
+             'searchExpressionList[0].propertyName': 'dict_platform_id',
+             'searchExpressionList[0].operation': 'EQ',
+             'searchExpressionList[1].value': accessWay,
+             'searchExpressionList[1].propertyName': 'dict_access_way_id',
+             'searchExpressionList[1].operation': 'EQ',
+             'searchExpressionList[2].value': name,
+             'searchExpressionList[2].propertyName': 'name',
+             'searchExpressionList[2].operation': 'LIKE',
+             'orderExpressionList[0].op': 'desc',
+             'orderExpressionList[0].propertyName': 'update_time',
+             'orderExpressionList[0].operation': 'AND',
+             'predicate': 'AND'
+             };
+             } else {
+             data = {
+             'currentPageNo': currentPage,
+             'pageSize': 10,
+             'searchExpressionList[0].value': platform,
+             'searchExpressionList[0].propertyName': 'dict_platform_id',
+             'searchExpressionList[0].operation': 'EQ',
+             'searchExpressionList[1].value': accessWay,
+             'searchExpressionList[1].propertyName': 'dict_access_way_id',
+             'searchExpressionList[1].operation': 'EQ',
+             'orderExpressionList[0].op': 'desc',
+             'orderExpressionList[0].propertyName': 'update_time',
+             'orderExpressionList[0].operation': 'AND',
+             'predicate': 'AND'
+             };
+             }
+             */
+            var jsonData = {
+                'currentPageNo': currentPage,
+                'pageSize': 10,
+                'predicate': 'AND',
+                'searchExpressionList': [],
+                'orderExpressionList': [{
+                    'op': 'desc',
+                    'propertyName': 'update_time'
+                }]
+            };
+            if (!isEmpty(platform)) {
+                jsonData.searchExpressionList.push({
+                    'value': platform,
+                    'propertyName': 'dict_platform_id',
+                    'operation': 'EQ'
+                });
+            }
+            if (!isEmpty(accessWay)) {
+                jsonData.searchExpressionList.push({
+                    'value': accessWay,
+                    'propertyName': 'dict_access_way_id',
+                    'operation': 'EQ'
+                });
+            }
+            if (!isEmpty(name)) {
+                jsonData.searchExpressionList.push({
+                    'value': name,
+                    'propertyName': 'name',
+                    'operation': 'LIKE'
+                });
+            }
+            $.ajax({
+                type: "post",
+                asyne: true,
+                cache: false,
+                contentType: 'application/json',
+//					datatype: "json",
+                data: JSON.stringify(jsonData),
+                url: "rest/sspAppInfo/page",
+                success: function (restResponse) {
+                    $(".sldataBody .sldataBodyRow").remove();
+                    var totalPages = 1;
+                    var startPage = 1;
+                    var count = 0;
+                    if ((restResponse.restErrors == null) && (restResponse.result.dataArray.length != 0)) {
+                        totalPages = restResponse.result.totalPage; //总页数
+                        startPage = restResponse.result.currentPageNo; //当前页
+                        count = restResponse.result.totalCount; //总记录数
+                        for (var i = 0; i < restResponse.result.dataArray.length; i++) {
+                            var row = restResponse.result.dataArray[i];
+                            var rowHtml = $(".sldataBodyTemplate").html();
+                            rowHtml = rowHtml.replace(/{name}/g,
+                                (row.name == null) ? '' : row.name);
+                            rowHtml = rowHtml.replace(/{appId}/g,
+                                (row.appId == null) ? '' : row.appId);
+                            rowHtml = rowHtml.replace(/{platform}/g, (row.sspDictPlatform.name == null) ? '' : row.sspDictPlatform.name);
+                            rowHtml = rowHtml.replace(/{audit}/g, (row.sspDictAudit.name == null) ? '' : row.sspDictAudit.name);
+                            rowHtml = rowHtml.replace(/{accessWay}/g, (row.sspDictAccessWay.name == null) ? '' : row.sspDictAccessWay.name);
+                            rowHtml = rowHtml.replace(/{updateTime}/g,
+                                getMyDate(row.updateTime));
+                            rowHtml = rowHtml
+                                .replace(
+                                    /{operate}/g,
+                                    "<a data-toggle='tooltip' data-placement='top' title='修改' href=\"javascript:void(0)\" onclick=\"updateInfo('"
+                                    + row.id
+                                    + "')\"><i class='iconfont icon-xiugai'></i></a>&nbsp;<a data-toggle='tooltip' data-placement='top' title='添加广告位' href=\"javascript:void(0)\" onclick=\"addAdPosition('"
+                                    + row.id
+                                    + "')\"><i class='iconfont icon-tianjia'></i></a>&nbsp;<a data-toggle='tooltip' data-placement='top' title='删除' href=\"javascript:void(0)\" onclick=\"deleteInfo('"
+                                    + row.id
+                                    + "','"
+                                    + startPage
+                                    + "',0)\"><i class='iconfont icon-shanchu'></i></a>");
+
+                            $(".sldataBody").append($(rowHtml));
+                            $("#currentPag").val(startPage);
+                        }
+                    } else {
+                        $(".sldataBody .sldataBodyRow").remove();
+                        $(".sldataBody").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"8\">暂时没有数据</td></tr>");
+                    }
+                    $('#pageAppList').html('');
+                    $('#pageAppList').html('<ul id="pageAppListUl" class="bs-component pull-right"></ul>');
+                    UC
+                        .ajaxPage(
+                            "pageAppListUl",
+                            {
+                                totalPages: totalPages, //总页数
+                                startPage: startPage, //当前页
+                                count: count, //总记录数
+                                visiblePages: 5,
+                                onPageClick: function (event, thisPage) {
+                                    currentPage = thisPage;
+                                    pageInit.loadPage();
+                                }
+                            });
+                },
+                error: function () {
+                    $(".sldataBody .sldataBodyRow").remove();
+                    $(".sldataBody").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"8\">暂时没有数据</td></tr>");
+                }
+
+            });
+        }
+    };
+    var operateCheckBox = {
+        checkAll: function () {
+            var obj = document.getElementsByName('checkboxed1');
+            var cks = document.getElementsByName('checkboxed');
+            var ckslen = cks.length;
+            for (var i = 0; i < ckslen - 1; i++) {
+                cks[i].checked = obj[0].checked;
+            }
+        }, check: function () {
+            var obj = document.getElementsByName('checkboxed1');
+            var cks = document.getElementsByName('checkboxed');
+            var ckslen = cks.length;
+            var state = true;
+            for (var i = 0; i < ckslen - 1; i++) {
+                if (!cks[i].checked) {
+                    state = false;
+                }
+            }
+            obj[0].checked = state;
+        }
+    };
+    $(function () {
+        /!*组件初始化*!/
+        $("[data-toggle='tooltip']").tooltip();
+        $("input[name='switch']").bootstrapSwitch({
+            onText: "开",
+            offText: "关",
+            size: "mini",
+            onSwitchChange: function (event, state) {
+                if (state == true) {
+                    $(this).val("1");
+                } else {
+                    $(this).val("2");
+                }
+            }
+        });
+        //下拉菜单
+        $(".dropdown").selectpicker({});
+
+
+        var defDateFormat = "YYYY-MM-DD";
+        var defStartDate = moment().subtract('days', 60).format(defDateFormat);
+        var defEndDate = moment().format(defDateFormat);
+        /*双日历组件*/
+        $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+        $('#reportrange2').daterangepicker({
+                startDate: defStartDate
+            },
+            function (start, end) {
+                var choStart = start.format(defDateFormat);
+                var choEnd = end.format(defDateFormat);
+                $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+                $('input[name="updateTime"]').val(choStart + ' / ' + choEnd);
+                $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+            });
+        //默认为时间空间赋值
+        $('input[name="updateTime"]').val(getMapDate(60) + "/" + getMapDate(0));
+        pageInit.init();
+    });
+    $("#search").click(function () {
+        pageInit.loadPage();
+    });
+    $("#add").click(function () {
+        var url = "sspAppInfo/add";
+        page.loadPage(url);
+    });
+    function updateInfo(id) {
+        var url = "sspAppInfo/update/" + id;
+        page.loadPage(url);
+    }
+    function deleteMany() {
+        var checked = $("input[name='checkboxed']").is(':checked');
+        if (!checked) {
+            alert("请选择一项应用");
+            return false;
+        }
+        var ids = ""
+        var states = 2;//可操作
+        $("input[name='checkboxed']:checkbox:checked").each(function () {
+            var id = $(this).val();
+            if (findAdSlotByAppId(id)!=2) {
+                states = 1;//不可操作
+            }
+            ids += id + ",";
+        })
+        deleteInfo(ids, $("#currentPag").val(), states);
+    }
+    function deleteInfo(id, currentPageNo, states) {
+        debugger;
+        if (states == 0) {
+            var s = findAdSlotByAppId(id);
+            states = s;
+        }
+        if (states == 1) {
+            alert('该app下有广告位，请先删除广告位！');
+            return;
+        }
+        confirm('确认删除该应用？', "提示", "确定", "取消").ok(function () {
+            $.ajax({
+                type: "post",
+                async: false,
+                cache: false,
+                datatype: "json",
+                data: {
+                    ids: id
+                },
+                url: "rest/sspAppInfo/batchDelete",
+                success: function (restResponse) {
+                    if (restResponse.restErrors == null) {
+                        alert('删除成功！');
+                        currentPage = currentPageNo;
+                        pageInit.loadPage();
+                    } else {
+                        alert('删除失败！');
+                    }
+                },
+                error: function () {
+                    alert('删除失败！');
+                }
+            });
+        })
+    }
+
+    function findAdSlotByAppId(id) {
+
+        var data = {
+            "sspAppInfo.id": id,
+            "deleteState": 1
+        };
+        var result = 2;
+        $.ajax({
+            type: "post",
+            async: false,
+            cache: false,
+            data: data,
+            url: "rest/sspAdPositionInfo/find",
+            success: function (restResponse) {
+                debugger;
+                if (restResponse.result.length > 0) {
+                    result = 1;
+                }
+            },
+            error: function () {
+                alert('验证app下广告位失败！');
+            }
+        });
+        return result;
+    }
+
+    function addAdPosition(id) {
+        var url = "sspAdPositionInfo/add?id=" + id;
+        page.loadPage(url);
+        page.choiceMenu('35')
+    }
+    function returnPage() {
+        var url = "ssp/sspDeveloper/list";
+        page.choiceMenu('51')
+        page.loadPage(url);
+    }
+</script>
+</html>

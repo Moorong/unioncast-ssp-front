@@ -1,0 +1,232 @@
+package com.unioncast.ssp.front.service.ssp.dict.impl;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspCityInfo;
+import com.unioncast.common.ssp.model.SspDictAccessWay;
+import com.unioncast.common.ssp.model.SspDictAdPositionType;
+import com.unioncast.common.ssp.model.SspDictAdType;
+import com.unioncast.common.ssp.model.SspDictAgeTarget;
+import com.unioncast.common.ssp.model.SspDictAudit;
+import com.unioncast.common.ssp.model.SspDictBuyTarget;
+import com.unioncast.common.ssp.model.SspDictCreativeSize;
+import com.unioncast.common.ssp.model.SspDictCrowdSexType;
+import com.unioncast.common.ssp.model.SspDictEducationTarget;
+import com.unioncast.common.ssp.model.SspDictIncomeTarget;
+import com.unioncast.common.ssp.model.SspDictIndustry;
+import com.unioncast.common.ssp.model.SspDictInterestsTarget;
+import com.unioncast.common.ssp.model.SspDictLabel;
+import com.unioncast.common.ssp.model.SspDictMarriageTarget;
+import com.unioncast.common.ssp.model.SspDictMediaType;
+import com.unioncast.common.ssp.model.SspDictMobileBrandType;
+import com.unioncast.common.ssp.model.SspDictPlatform;
+import com.unioncast.common.ssp.model.SspDictSysOperationType;
+import com.unioncast.ssp.front.common.util.RestUtil;
+import com.unioncast.ssp.front.service.ssp.dict.DictService;
+/**
+ * 字典服务类
+ * @author changguobin@unioncast.cn
+ * @date 2017-02-06 15:10:56
+ *
+ */
+@Service
+@SuppressWarnings("unchecked")
+public class DictServiceImpl implements DictService {
+
+	
+	@Override
+	public List<SspDictAccessWay> queryAccessWay(SspDictAccessWay sspDictAccessWay) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictAccessWay/find", sspDictAccessWay,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictAccessWay>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictAdPositionType> queryAdPositionType(SspDictAdPositionType sspDictAdPositionType) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictAdPositionType/find", sspDictAdPositionType,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictAdPositionType>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictAdType> queryAdType(SspDictAdType sspDictAdType) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictAdType/find", sspDictAdType,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictAdType>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
+	public List<SspCityInfo> queryCityInfo(SspCityInfo sspCityInfo) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/cityInfo/find", sspCityInfo,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspCityInfo>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictAgeTarget> queryAgeTarget(SspDictAgeTarget sspDictAgeTarget) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictAgeTarget/find", sspDictAgeTarget,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictAgeTarget>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictAudit> queryAudit(SspDictAudit sspDictAudit) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictAudit/find", sspDictAudit,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictAudit>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictBuyTarget> queryBuyTarget(SspDictBuyTarget sspDictBuyTarget) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictBuyTarget/find", sspDictBuyTarget,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictBuyTarget>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictCreativeSize> queryCreativeSize(SspDictCreativeSize sspDictCreativeSize) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictCreativeSize/find", sspDictCreativeSize,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictCreativeSize>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictEducationTarget> queryEducationTarget(SspDictEducationTarget sspDictEducationTarget) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictEducationTarget/find", sspDictEducationTarget,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictEducationTarget>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictIndustry> queryIndustry(SspDictIndustry sspDictIndustry) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictIndustry/find", sspDictIndustry,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictIndustry>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictInterestsTarget> queryInterestsTarget(SspDictInterestsTarget sspDictInterestsTarget) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictInterestsTarget/find", sspDictInterestsTarget,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictInterestsTarget>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictLabel> queryLabel(SspDictLabel sspDictLabel) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictLabel/find", sspDictLabel,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictLabel>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictMediaType> queryMediaType(SspDictMediaType sspDictMediaType) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictMediaType/find", sspDictMediaType,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictMediaType>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictMobileBrandType> queryMobileBrandType(SspDictMobileBrandType sspDictMobileBrandType) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictMobileBrandType/find", sspDictMobileBrandType,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictMobileBrandType>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictPlatform> queryPlatform(SspDictPlatform sspDictPlatform) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictPlatform/find", sspDictPlatform,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictPlatform>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictSysOperationType> querySysOperationType(SspDictSysOperationType sspDictSysOperationType) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictSysOperationType/find", sspDictSysOperationType,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictSysOperationType>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictCrowdSexType> queryCrowdSexType(SspDictCrowdSexType sspDictCrowdSexType) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictCrowdSex/find", sspDictCrowdSexType,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictCrowdSexType>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictMarriageTarget> queryMarriageTarget(SspDictMarriageTarget sspDictMarriageTarget) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictMarriage/find", sspDictMarriageTarget,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictMarriageTarget>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<SspDictIncomeTarget> queryIncomeTarget(SspDictIncomeTarget sspDictIncomeTarget) {
+		RestResponse restResponse = RestUtil.postForObjectForDB("rest/ssp/dictIncome/find", sspDictIncomeTarget,RestResponse.class);
+		if(restResponse.isSuccess()){
+			return (List<SspDictIncomeTarget>) restResponse.getResult();
+		}else{
+			return null;
+		}
+	}
+	
+
+	
+}

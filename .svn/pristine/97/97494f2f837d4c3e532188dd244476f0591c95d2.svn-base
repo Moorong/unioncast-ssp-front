@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+<h2 class="current_loc">
+	<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理(${(CURRENT_ADVERTISER_INFO.name)!''})</a> <i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspOrder/list">订单管理(${(CURRENT_ORDER_INFO.name)!''})</a>
+	<i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this,'parentPlanId')" urlk="rest/ssp/plan/goPlanListByOrderId">策略管理</a> 
+	<#if parentPlanId?? && CURRENT_PLAN_INFO??>
+		<i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/plan/goPlanListByOrderId">策略管理(${(CURRENT_PLAN_INFO.name)!''})</a>
+	</#if>
+	<i> / </i> <span><#if (editPlan.id)??>编辑<#else>新建</#if>策略</span>
+</h2>
+<div class="page_main">
+	<div class="page_main_white">
+		<form class="form-horizontal" role="form" action="ssp/plan/<#if (editPlan.id)?? >update<#else>add</#if>" method="post">
+
+			<input type="hidden" name="sspPlanTargetCondition.id" value="${(condition.id)!''}">
+			<#if (editPlan.id)??>
+				<input type="hidden" name="id" value="${(editPlan.id)!''}" id="editPlanId"/>
+				<input type="hidden" name="user.id" value="${(editPlan.user.id)!''}"/>
+				<#else>
+					<input type="hidden" name="user.id" value="${(Session.SPRING_SECURITY_CONTEXT.authentication.principal.id)!''}"/>
+			</#if>
+			<input type="hidden" name="sspAdvertiser.id" value="${(editPlan.sspAdvertiser.id)!advertiserId!''}" id="advertiserId" />
+			<input type="hidden" name="sspOrder.id" value="${(editPlan.sspOrder.id)!orderId!''}" id="sspOrderId"/>
+			<input type="hidden" id="parentPlanId" name="parentPlan.id" value="${(editPlan.parentPlan.id)!parentPlanId!''}"/>
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 策略信息 </span>
+							<span class="pull-right" id="planShowSpen" > 
+								<a href="#" class="btn btnlink martr1015 js-switchBtn"><span>展开</span><i class="icon-triangle"></i></a>
+							</span>
+						</div>
+						<div class="col-md-12">
+							<div class="formwarp">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>策略名称</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "
+											   placeholder="" id="planName" name="name" value="${(editPlan.name)!''}">
+										<input type="hidden" value="${(editPlan.name)!''}" id="oldPlanName">
+									</div>
+								</div>
+<!-- 								<div class="form-group"> -->
+<!-- 									<label for="inputEmail3" class="col-sm-4 control-label">策略编号</label> -->
+<!-- 									<div class="pull-left marginr26"> -->
+<!-- 										<label for="inputEmail3" class="control-label">&nbsp;&nbsp;&nbsp;&nbsp;${(editPlan.planIdentifying)!'保存后生成'}</label> -->
+<!-- 									</div> -->
+<!-- 								</div> -->
+								<!-- 								<div class="form-group "> -->
+								<!-- 									<label for="inputEmail3" class="col-sm-4 control-label">策略类型</label> -->
+								<!-- 									<div class="col-sm-8 "> -->
+								<!-- 										<label class="radio-inline"> <input type="radio" -->
+								<!-- 											name="inlineRadioOptions" id="inlineRadio1" value="" -->
+								<!-- 											checked=""> RTB -->
+								<!-- 										</label> <label class="radio-inline"> <input type="radio" -->
+								<!-- 											name="inlineRadioOptions" id="inlineRadio1" value="" -->
+								<!-- 											checked=""> PDB -->
+								<!-- 										</label> <label class="radio-inline"> <input type="radio" -->
+								<!-- 											name="inlineRadioOptions" id="inlineRadio1" value="" -->
+								<!-- 											checked=""> 直投 -->
+								<!-- 										</label>  -->
+								<!-- 									</div> -->
+								<!-- 								</div> -->
+								<div class="form-group " name="js-switchWrap">
+									<label for="inputEmail3" class="col-sm-4 control-label">投放周期</label>
+									<div class="col-sm-8 ">
+										<label class="radio-inline">
+											<input type="radio" name="putTimeState" id="putTimeStates"  checked  value="2"
+											<#if (editPlan.putTimeState)?? && editPlan.putTimeState == 2>checked="checked" </#if>
+											> 不限
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="putTimeState"   value="1"
+											<#if (editPlan.putTimeState)?? && editPlan.putTimeState == 1>checked="checked" </#if>
+											> 限制
+										</label>
+										<div id="reportrange2"
+											 style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+											<i class="glyphicon glyphicon-calendar fa fa-calendar"></i><span></span>
+											<input type="hidden" id="putStartTimeStr" name="putStartTimeStr" value="${(staTime)!}" />
+											<input type="hidden" id="putEndTimeStr" name="putEndTimeStr" value="${(endTime)!}" />
+											<b class="caret"></b>
+										</div>
+									</div>
+								</div>
+								<div class="form-group " name="js-switchWrap">
+									<label for="inputEmail3" class="col-sm-4 control-label">预算控制</label>
+									<div class="col-sm-8 ">
+										<label class="radio-inline">
+											<input type="radio" name="budgetState" value="2" id="budgetStates"  checked
+											<#if (editPlan.budgetState)?? && editPlan.budgetState==2>checked="checked" </#if>
+											> 不限
+										</label>
+										<label class="radio-inline">
+											<input type="radio" onclick="$('#reportrange3').show();" name="budgetState" value="1"
+											<#if (editPlan.budgetState)?? && editPlan.budgetState==1>checked="checked" </#if>
+											> 限制
+										</label>
+										<div id="reportrange3"
+											 style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px;">
+											<input type="text" name="budget" value="${(editPlan.budget)!''}"/>&nbsp;元
+										</div>
+									</div>
+								</div>
+								<div class="form-group "name="js-switchWrap">
+									<label for="inputEmail3" class="col-sm-4 control-label">外部关联ID</label>
+									<div class="col-sm-8 ">
+										<input type="text" class="form-control input-sm "
+											   name="contractId" placeholder="与合同id或财务id进行关联" value="${(editPlan.contractId)!''}">
+									</div>
+								</div>
+								<div class="formwarp">
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label "><i>*</i>频次设置</label>
+										<div class="col-sm-8 ">
+											<div class="pull-left marginr26">
+												<label for="inputEmail3" class="control-label marginr15">投放周期内单人曝光不超过</label>
+												<input type="text"
+													   class="form-control input-sm small114 marginr10"
+													   name="singlePeriodShowTimes" value="${(editPlan.singlePeriodShowTimes)!''}"> 次
+											</div>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"></label>
+										<div class="col-sm-8 ">
+											<div class="pull-left marginr26">
+												<label for="inputEmail3" class="control-label">每人每</label>
+												<select class="dropdown small marginr33"
+														name="showCalculationType">
+													<option value="1" <#if (editPlan.showCalculationType)?? && editPlan.showCalculationType==1>selected="selected" </#if>>天</option>
+													<option value="2"<#if (editPlan.showCalculationType)?? && editPlan.showCalculationType==2>selected="selected" </#if>>小时</option>
+												</select> <label for="inputEmail3" class="control-label">曝光不超过</label>
+												<input type="text"
+													   class="form-control input-sm small marginr10"
+													   name="singleShowTimes"  value="${(editPlan.singleShowTimes)!''}"> 次
+											</div>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3"
+											   class="col-sm-4 control-label sr-only"></label>
+										<div class="col-sm-8 ">
+											<div class="pull-left marginr26">
+												<label for="inputEmail3" class="control-label">每人每</label>
+												<select class="dropdown small marginr33"
+														name="clickCalculationType">
+													<option value="1" <#if (editPlan.clickCalculationType)?? && editPlan.clickCalculationType==1>selected="selected" </#if>>天</option>
+													<option value="2" <#if (editPlan.clickCalculationType)?? && editPlan.clickCalculationType==2>selected="selected" </#if>>小时</option>
+												</select> <label for="inputEmail3" class="control-label">点击不超过</label>
+												<input type="text"
+													   class="form-control input-sm small marginr10"
+													   name="singleClickTimes"   value="${(editPlan.singleClickTimes)!''}"> 次
+											</div>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>每日预算上限</label>
+										<div class="col-sm-8 ">
+											<input type="text"
+												   class="form-control input-sm small302 marginr10"
+												   placeholder="每日预算上限N元" name="dailyBudgetCap" value="${(editPlan.dailyBudgetCap)!''}"> 元
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>每日曝光上限</label>
+										<div class="col-sm-8 ">
+											<input type="text"
+												   class="form-control input-sm small302 marginr10"
+												   placeholder="每日曝光上限N次" name="dailyShowCap" value="${(editPlan.dailyShowCap)!''}"> 次
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label"><i>*</i>每日点击上限</label>
+										<div class="col-sm-8 ">
+											<input type="text"
+												   class="form-control input-sm small302 marginr10"
+												   placeholder="每日点击上限N次" name="dailyClickCap" value="${(editPlan.dailyClickCap)!''}"> 次
+										</div>
+									</div>
+									<div class="form-group " name="js-switchWrap">
+										<label for="inputEmail3" class="col-sm-4 control-label">投放节奏</label>
+										<div class="col-sm-8 ">
+											<label class="radio-inline"> <input type="radio"
+																				name="putRhythm" id="inlineRadio1" value="1" checked="checked" <#if (editPlan.putRhythm)?? && editPlan.putRhythm==1>checked="checked" </#if>> 不限
+											</label> <label class="radio-inline"> <input type="radio"
+																						 name="putRhythm" id="inlineRadio1" value="2" <#if (editPlan.putRhythm)?? && editPlan.putRhythm==2>checked="checked" </#if>> 曝光
+										</label> <label class="radio-inline"> <input type="radio"
+																					 name="putRhythm" id="inlineRadio1" value="3" <#if (editPlan.putRhythm)?? && editPlan.putRhythm==3>checked="checked" </#if>> 预算
+										</label>
+										</div>
+									</div>
+									<div class="form-group " name="js-switchWrap">
+										<label for="inputEmail3" class="col-sm-4 control-label">KPI</label>
+										<div class="col-sm-8 ">
+											<select class="dropdown small225 " name="kpi">
+												<option value="1" <#if (editPlan.kpi)?? && editPlan.kpi==1>selected="selected" </#if>>CPA</option>
+												<option value="2" <#if (editPlan.kpie)?? && editPlan.kpi==2>selected="selected" </#if>>CPC</option>
+												<option value="3" <#if (editPlan.kpi)?? && editPlan.kpi==3>selected="selected" </#if>>CPM</option>
+											</select>
+											<!-- 											<input type="text" class="form-control input-sm small marginr10" placeholder="" name="kpi">元 -->
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-4 control-label "><i>*</i>最高CPM出价</label>
+										<div class="col-sm-8 ">
+											<div class="pull-left marginr26">
+												<input type="text"
+													   class="form-control input-sm small114 marginr10"
+													   name="highestCpm" value="${(editPlan.highestCpm)!''}"> <label for="inputEmail3" class="control-label marginr15">元/千次曝光</label>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- 间隔 -->
+			<div style="height: 10px; background: #f1f2f7;"></div>
+			<!-- 间隔 -->
+			<div class="block_content ">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 关键词描述 </span>
+						</div>
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<div class="formwarp">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">关键词</label>
+									<div class="col-sm-8 ">
+										<textarea class="form-control" rows="3" name="keywords">${(editPlan.keywords)!''}</textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 间隔 -->
+			<div style="height: 10px; background: #f1f2f7;"></div>
+			<!-- 间隔 -->
+			<div class="block_content ">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 备注 </span>
+						</div>
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<div class="formwarp">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label">备注</label>
+									<div class="col-sm-8 ">
+										<textarea class="form-control" rows="3" name="comment">${(editPlan.comment)!''}</textarea>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 间隔 -->
+			<!-- 					<div style="height: 10px; background: #f1f2f7;"></div> -->
+			<!-- 间隔 -->
+			<div class="block_content " style="display: none;">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 策略执行 </span>
+						</div>
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<div class="formwarp">
+								<div class="form-group">
+									<label for="inputEmail3" class="col-sm-2 control-label"><i>*</i>是否为执行策略</label>
+									<div class="col-sm-8 ">
+										<label class="radio-inline"> <input type="radio"
+																			name="planGroupFlag" value="1"
+											<#if ((editPlan.planGroupFlag)?? && editPlan.planGroupFlag==1)||(planGroupFlag??&&planGroupFlag==1)>checked="checked" </#if>>是
+										</label> <label class="radio-inline"> <input type="radio"
+																					 name="planGroupFlag" value="2"
+										<#if ((editPlan.planGroupFlag)?? && editPlan.planGroupFlag==2)||(planGroupFlag??&&planGroupFlag==2)>checked="checked" </#if>>否
+									</label>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<#if ((editPlan.planGroupFlag)?? && editPlan.planGroupFlag==2)||(planGroupFlag??&&planGroupFlag==2) >
+				<!-- 间隔 -->
+				<div style="height: 10px; background: #f1f2f7;"></div>
+				<!-- 间隔 -->
+				<#include "condition.html"/>
+			</#if>
+			<!-- 间隔 -->
+			<div style="height: 10px; background: #f1f2f7;"></div>
+			<!-- 间隔 -->
+			<div class="savewarp text-center">
+				<input type="submit" class="btn formbtn green" value="保存"
+					   id="savebtns" /> <input type="button" id="cancel" class="btn formbtn bk999" value="取消" />
+			</div>
+		</form>
+	</div>
+</div>
+</body>
+<script type="text/javascript">
+	var planGroupFlag = "${planGroupFlag!''}";
+	var isEditPage = !isEmpty("${(editPlan.id)!''}");
+	</script>
+<script type="text/javascript" src="js/ssp/putIn/plan/data.js"></script>
+<script type="text/javascript" src="js/ssp/putIn/plan/edit.js"></script>
+</html>

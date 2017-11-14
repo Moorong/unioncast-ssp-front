@@ -1,0 +1,736 @@
+var currReportTabIndexTemp = 1;
+$(function() {
+	$('.nav-tabs a').click(function(){currReportTabIndexTemp = $('.nav-tabs a').index(this);
+	//alert("currReportTabIndexTemp--"+currReportTabIndexTemp);
+	});
+	/* 组件初始化 */
+	// 下拉菜单
+	$(".dropdown").selectpicker({});
+	var defDateFormat = "YYYY-MM-DD";
+	var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+	var defEndDate = moment().format(defDateFormat);
+	/* 双日历组件 */
+	$('div[id="mtReportrange"] span').html(defStartDate + ' - ' + defEndDate);
+	// 默认为时间空间赋值
+	$('input[name="mtStartTimeTem"]').val(getMapDate(7));
+	$('input[name="mtEndTimeTem"]').val(getMapDate(0));
+
+	$('div[id="mtReportrange"]').daterangepicker(
+			{
+				startDate : defStartDate
+			},
+			function(start, end) {
+				var choStart = start.format(defDateFormat);
+				var choEnd = end.format(defDateFormat);
+				$('div[id="mtReportrange"] span').html(choStart + ' - ' + choEnd);
+				$('input[name="mtStartTimeTem"]').val(choStart);
+				$('input[name="mtEndTimeTem"]').val(choEnd);
+				$('div[id="mtReportrange"] span').html(
+						start.format(defDateFormat) + ' - '
+								+ end.format(defDateFormat));
+			});
+
+	// 初始化加载
+	pullDownUserId();
+	loadMTData(1);
+
+	
+});
+
+$("[data-toggle='tooltip']").tooltip();
+
+$("a[id='mtExportExcel']").click(function() {
+	var $this = $(this);
+	var defDateFormat = "yyyyMMdd";
+	var defDate = new Date().format(defDateFormat);
+	var filename = defDate + $this.attr('ecfn');
+	$this.parent().parent().find('table').table2excel({
+		// exclude CSS class
+		/* exclude: ".noExl", */
+		name : "Worksheet Name",
+		filename : filename
+	// do not include extension
+	});
+	
+})
+
+function mtConfirmMeth() {
+	var index = currReportTabIndexTemp;
+	if ($("div[id='mtCheckboxNoZero'] :checkbox:checked").size() == 0) {
+		alert("请至少选择一项");
+		return;
+	}
+	debugger;
+	hideShowColumns();
+	$("div[id='mtSelectColumn']").css('display', 'none');
+}
+
+function mtCancelMeth() {
+	var index = $('a[id="mtCancel"]').index(event.currentTarget);
+	/*
+	 * if ($("#checkboxNoZero :checkbox:checked").size() == 0) {
+	 * alert("请至少选择一项"); return; }
+	 */
+	hideShowChecked(index);
+	$("div[id='mtSelectColumn']").css('display', 'none');
+}
+
+// 开发者
+function pullDownUserId() {
+	page.ajax({
+		url : 'ssp/user/findAll',
+		cache : false,
+		// data: {startTime: startTime, endTime: endTime, currentPageNo:
+		// currentPageNo},
+		success : function(res) {
+			var data = res.result;
+
+			if (data != null && data.length != 0) {
+				$.each(data, function(index, report) {
+					$("[name=userId]").append(
+							'<option value=' + report.id + '>' + report.username
+									+ '</option>');
+				});
+				$("[name=userId]").selectpicker('refresh');
+			} else {
+				$("[name=userId]").append(
+						'<option value="">暂无开发者</option>');
+				$("[name=userId]").selectpicker('refresh');
+			}
+		},
+		error : function(err) {
+
+		}
+	});
+}
+
+// 应用
+function pullDownAppInfoId() {
+	if ($("[name=userId]").val() != undefined&& $("[name=userId]").val() != null&& $("[name=userId]").val() != '') {
+		var id = $("[name=userId]").val();
+		page.ajax({
+			url : 'sspAppInfo/findByUserId',
+			cache : false,
+			type : "POST",
+			datatype : 'json',
+			data : {
+				id : id
+			},
+			success : function(res) {
+				$("[name=appInfoId]").empty();
+				var data = res.result;
+				if (data != null && data.length != 0) {
+					$("[name=appInfoId]").append('<option value="">全部</option>');
+					$.each(data, function(index, report) {
+						$("[name=appInfoId]").append('<option value=' + report.id + '>'+ report.name + '</option>');
+					});
+					$("[name=appInfoId]").selectpicker('refresh');
+				} else {
+					$("[name=appInfoId]").append('<option value="">暂无应用</option>');
+					$("[name=appInfoId]").selectpicker('refresh');
+				}
+			},
+			error : function(err) {
+			}
+		});
+	}
+	/* $("[name=orderId]").empty(); */
+	$("[name=adPositionInfoId]").empty();
+	/* $("[name=orderId]").append('<option value="">全部</option>'); */
+	$("[name=adPositionInfoId]").append('<option value="">全部</option>');
+	/* $("[name=orderId]").selectpicker('refresh'); */
+	$("[name=adPositionInfoId]").selectpicker('refresh');
+}
+
+// 广告位
+function pullDownAdPositionInfoId() {
+	if ($("[name=appInfoId]").val() != undefined && $("[name=appInfoId]").val() != null && $("[name=appInfoId]").val() != '') {
+		var id = $("[name=appInfoId]").val();
+		page.ajax({
+					url : 'sspAdPositionInfo/findByAppInfoId',
+					cache : false,
+					// async: false,
+					data : {
+						id : id
+					},
+					success : function(res) {
+						$("[name=adPositionInfoId]").empty();
+						var data = res.result;
+						if (data != null && data.length != 0) {
+							$("[name=adPositionInfoId]").append(
+									'<option value="">全部</option>');
+							$.each(data, function(index, report) {
+								$("[name=adPositionInfoId]").append(
+										'<option value=' + report.id + '>'+ report.name + '</option>');
+							});
+							$("[name=adPositionInfoId]").selectpicker('refresh');
+						} else {
+							$("[name=adPositionInfoId]").append(
+									'<option value="">暂无广告位</option>');
+							$("[name=adPositionInfoId]").selectpicker('refresh');
+						}
+					},
+					error : function(err) {
+
+					}
+				});
+	}
+}
+
+/* 搜索按钮提交 */
+$("#searchMTPostion").click(function() {
+	//debugger;
+	
+					$('input[name="mtStartTime"]').val($('input[name="mtStartTimeTem"]').val());
+					$('input[name="mtEndTime"]').val($('input[name="mtEndTimeTem"]').val());
+					page.ajaxSubmit($("#mtReportForm").eq(0)[0], function(
+							resultJson, resultMsg, xmlHttpResponse) {
+
+						if (resultJson.result.dataArray.length != 0) {
+							$("#mtReportList").html("");
+							loadMTPage(resultJson);
+						} else {
+							// alert("没有查询到数据！")
+							// loadData(1);
+							mtnoData();
+						}
+					}, function(xmlHttpRequest, errorMsg, errorObj) {
+
+					});
+});
+
+// 加载数据
+function loadMTData(currentPageNo) {
+	var startTime = $('input[name="mtStartTime"]').val();
+	var endTime = $('input[name="mtEndTime"]').val();
+	var userId = $('select[name="userId"]').val();
+	var appInfoId = $('select[name="appInfoId"]').val();
+	var adPositionInfoId = $('select[name="adPositionInfoId"]').val();
+	page.ajax({
+		url : 'ssp/mtReport/mtPage',
+		data : {
+			startTime : startTime,
+			endTime : endTime,
+			userId : userId,
+			appInfoId : appInfoId,
+			adPositionInfoId : adPositionInfoId,
+			currentPageNo : currentPageNo
+		},
+		success : function(data) {
+
+			if (data.result != null && data.result.dataArray.length != null) {
+				$("#mtReportList").html("");
+				/* $("#mtReportPage").empty(); */
+				loadMTPage(data);
+				/* $("#adTable").tablesorter(); */
+			} else {
+				// alert("没有查询到数据！")
+				mtnoData();
+				return false;
+			}
+		},
+		error : function(err) {
+			mtnoData();
+		}
+	});
+
+}
+function mtnoData() {
+	var index = currReportTabIndexTemp;
+	$("tbody[id='mtReportList']").html("");
+	$("tbody[id='mtReportList']")
+			.append(
+					"<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"19\">暂时没有数据</td></tr>");
+	var totalPage = 1;
+	var totalCount = 0;
+	var startPage = 1;
+	$('div[id="mtReportPage"]').html('');
+	$('div[id="mtReportPage"]').html(
+			'<ul id="mtPage" class="bs-component pull-right"></ul>');
+
+	page.ajaxPage({
+		pcont : 'div[id="mtPage"]',// 分页容器，ID
+		totalPages : totalPage, // 总页数
+		startPage : startPage,
+		count : totalCount, // 总记录数
+		onPageClick : function(env, thisPage) {
+			if ($(":input[id='mtCheckboxNoZero']  :checkbox:checked").size() == 0) {
+				alert("请至少选择一项");
+				return;
+			}
+			// CurrentPageNo = thisPage;
+			// loadData(thisPage);
+		}
+	});
+}
+
+// 加载数据
+function loadMTPage(data) {
+	var datas = data.result.dataArray;
+
+	$.each(datas,
+			function(index, report) {
+				var html = "<tr>";
+				/*
+				 * html += "<td>"+report.sspAdvertiser.name+"</td>"; html += "<td>"+report.sspOrder.name+"</td>";
+				 * html += "<td>"+report.sspPlan.name+"</td>";
+				 */
+
+				var advertiser = (report.userName) == null ? '(空)' : report.userName;
+				var advertiserStr = subStr(advertiser);
+
+				var order = (report.appInfoName) == null ? '(空)' : report.appInfoName;
+				var orderStr = subStr(order);
+
+				var plan = (report.positionName) == null ? '(空)' : report.positionName;
+				var planStr = subStr(plan);
+
+				/*var creative = (report.creativeName) == null ? '(空)'
+						: report.creativeName;
+				var creativeStr = subStr(creative);*/
+
+				var consumption = (report.consumption) == null ? '0'
+						: (report.consumption);
+				var consumptionStr = consumption.toFixed(2);
+
+				var cpm = (report.cpm) == null ? '0' : (report.cpm);
+				var cpmStr = cpm.toFixed(2);
+
+				var clickRatio = (report.clickRatio) == null ? '0'
+						: (report.clickRatio);
+				var clickRatioStr = clickRatio.toFixed(2);
+
+				var cpc = (report.cpc) == null ? '0' : (report.cpc);
+				var cpcStr = cpc.toFixed(2);
+
+				var cpa = (report.cpa) == null ? '0' : (report.cpa);
+				var cpaStr = cpa.toFixed(2);
+
+				html += "<td class='el1111'>" + report.updateTimeStr + "</td>";
+				html += "<td class='el2111' title='" + advertiser + "'>"
+						+ advertiserStr + "</td>";
+				html += "<td class='el3111' title='" + order + "'>" + orderStr
+						+ "</td>";
+				html += "<td class='el4111' title='" + plan + "'>" + planStr
+						+ "</td>";
+				/*html += "<td class='el5111' title='" + creative + "'>"
+						+ creativeStr + "</td>";*/
+				html += "<td class='el5111'>"
+						+ ((report.showTimes) == null ? '0'
+								: (report.showTimes)) + "</td>";
+				html += "<td class='el6111' title='" + consumption + "'>"
+						+ consumptionStr + "</td>";
+				html += "<td class='el7111' title='" + cpm + "'>" + cpmStr
+						+ "</td>";
+				html += "<td class='el8111'>"
+						+ ((report.clickTimes) == null ? '0'
+								: (report.clickTimes)) + "</td>";
+				html += "<td class='el9111' title='" + clickRatio + "'>"
+						+ clickRatioStr + "</td>";
+				html += "<td class='el10111' title='" + cpc + "'>" + cpcStr
+						+ "</td>";
+				html += "<td class='el11111'>"
+						+ ((report.arrival) == null ? '0' : (report.arrival))
+						+ "</td>";
+				html += "<td class='el12111'>"
+						+ ((report.transform) == null ? '0'
+								: (report.transform)) + "</td>";
+				html += "<td class='el13111' title='" + cpa + "'>" + cpaStr
+						+ "</td>";
+				html += "<td class='el14111'>"
+						+ ((report.secondJump) == null ? '0'
+								: (report.secondJump)) + "</td>";
+				html += "<td class='el15111'>"
+						+ ((report.secondJumpRatio) == null ? '0'
+								: (report.secondJumpRatio)) + "</td>";
+				html += "<td class='el16111'>"
+						+ ((report.arrivalRatio) == null ? '0'
+								: (report.arrivalRatio)) + "</td>";
+				html += "<td class='el17111'>"
+						+ ((report.clickTransform) == null ? '0'
+								: (report.clickTransform)) + "</td>";
+				html += "<td class='el18111'>"
+						+ ((report.clickTransformRatio) == null ? '0'
+								: (report.clickTransformRatio)) + "</td>";
+
+				html += "</tr>";
+
+				$("#mtReportList").append(html);
+				/* hideShowColumns() */
+			});
+
+	if (data.result.dataArray.length == 0) {
+		mtnoData();
+	}
+
+	// 表格列排序
+	$("#mtTable").trigger("update");
+	$("#mtTable").tablesorter({
+		headers : {
+			1 : {
+				sorter : false
+			},
+			2 : {
+				sorter : false
+			},
+			3 : {
+				sorter : false
+			},
+			4 : {
+				sorter : false
+			}
+		}
+	/*
+	 * , headers: {2: {sorter: false}}, headers: {3: {sorter: false}}, headers:
+	 * {4: {sorter: false}}
+	 */
+	});
+
+	var totalPage = data.result.totalPage;
+	var totalCount = data.result.totalCount;
+	var startPage = data.result.currentPageNo;
+	$('#mtReportPage').html('');
+	$('#mtReportPage').html(
+			'<ul id="mtPage" class="bs-component pull-right"></ul>');
+
+	page.ajaxPage({
+		pcont : 'mtPage',// 分页容器，ID
+		totalPages : totalPage, // 总页数
+		startPage : startPage,
+		count : totalCount, // 总记录数
+		onPageClick : function(env, thisPage) {
+			if ($("#mtCheckboxNoZero :checkbox:checked").size() == 0) {
+				alert("请至少选择一项");
+				return;
+			}
+			CurrentPageNo = thisPage;
+			loadMTData(thisPage);
+		}
+	});
+	hideShowColumns();
+
+}
+
+/** 日期转换工具 */
+function getMoth(str) {
+	var oDate = new Date(str).format("yyyy-MM-dd");
+	return oDate;
+}
+
+// 处理默认时间工具
+function addDate(dd, dadd) {
+	var a = new Date(dd)
+	a = a.valueOf()
+	a = a + dadd * 24 * 60 * 60 * 1000
+	a = new Date(a)
+	return a;
+}
+
+function subStr(data) {
+	var dataStr = data;
+	if (data.length > 5) {
+		dataStr = data.substring(0, 5) + "...";
+	}
+	return dataStr;
+}
+
+function getMapDate(dayss) {
+	var now = new Date();
+	var NextNow = addDate(now, -dayss);
+	var years = NextNow.getFullYear();
+	var months = NextNow.getMonth() + 1;
+	var days = NextNow.getDate();
+	return years + "-" + months + "-" + days;
+}
+//点击选择标签时出发事件
+$('a[id="mtElement"]').click(function() {
+	var index = $('a[id="mtElement"]').index(this);
+	if ($("div[id='mtCheckboxNoZero'] :checkbox:checked").size() == 0) {
+		alert("请至少选择一项");
+		return;
+	}
+	if ($("div[id='mtSelectColumn']").css("display") == "none") {
+		$("div[id='mtSelectColumn']").css('display', 'block');
+	} else {
+		$("div[id='mtSelectColumn']").css('display', 'none');
+	}
+})
+
+function hideShowColumns() {
+	debugger;
+	var index  = currReportTabIndexTemp;
+	var $theadTr = $('table:eq('+index+') tr:first');
+	if ($(':input[id="upti"]').is(':checked')) {
+		$theadTr.find('th:eq(0)').show();
+		$('.el1111').show();
+
+	} else {
+		$theadTr.find('th:eq(0)').hide();
+		$('.el1111').hide();
+	}
+	if ($(':input[id="user"]').is(':checked')) {
+		$theadTr.find('th:eq(1)').show();
+		$('.el2111').show();
+	} else {
+		$theadTr.find('th:eq(1)').hide();
+		$('.el2111').hide();
+	}
+	if ($(':input[id="appInfo"]').is(':checked')) {
+		$theadTr.find('th:eq(2)').show();
+		$('.el3111').show();
+
+	} else {
+		$theadTr.find('th:eq(2)').hide();
+		$('.el3111').hide();
+	}
+	if ($(':input[id="position"]').is(':checked')) {
+		$theadTr.find('th:eq(3)').show();
+		$('.el4111').show();
+
+	} else {
+		$theadTr.find('th:eq(3)').hide();
+		$('.el4111').hide();
+	}
+//	if ($(':input[id="creative"]').eq(index).is(':checked')) {
+//		$theadTr.find('th:eq(4)').show();
+//		$('.el5111').show();
+//
+//	} else {
+//		$theadTr.find('th:eq(4)').hide();
+//		$('.el5111').hide();
+//	}
+	if ($(':input[id="showTimes"]').is(':checked')) {
+		$theadTr.find('th:eq(4)').show();
+		$('.el5111').show();
+
+	} else {
+		$theadTr.find('th:eq(4)').hide();
+		$('.el5111').hide();
+	}
+	//
+	if ($(':input[id="consumption"]').is(':checked')) {
+		$theadTr.find('th:eq(5)').show();
+		$('.el6111').show();
+
+	} else {
+		$theadTr.find('th:eq(5)').hide();
+		$('.el6111').hide();
+	}
+	if ($(':input[id="cpm"]').is(':checked')) {
+		$theadTr.find('th:eq(6)').show();
+		$('.el7111').show();
+
+	} else {
+		$theadTr.find('th:eq(6)').hide();
+		$('.el7111').hide();
+	}
+	if ($(':input[id="clickTimes"]').is(':checked')) {
+		$theadTr.find('th:eq(7)').show();
+		$('.el8111').show();
+
+	} else {
+		$theadTr.find('th:eq(7)').hide();
+		$('.el8111').hide();
+	}
+	if ($(':input[id="clickRatio"]').is(':checked')) {
+		$theadTr.find('th:eq(8)').show();
+		$('.el9111').show();
+
+	} else {
+		$theadTr.find('th:eq(8)').hide();
+		$('.el9111').hide();
+	}
+	if ($(':input[id="cpc"]').is(':checked')) {
+		$theadTr.find('th:eq(9)').show();
+		$('.el10111').show();
+
+	} else {
+		$theadTr.find('th:eq(9)').hide();
+		$('.el10111').hide();
+	}
+	if ($(':input[id="arrival"]').is(':checked')) {
+		$theadTr.find('th:eq(10)').show();
+		$('.el11111').show();
+
+	} else {
+		$theadTr.find('th:eq(10)').hide();
+		$('.el11111').hide();
+	}
+	if ($(':input[id="transform"]').is(':checked')) {
+		$theadTr.find('th:eq(11)').show();
+		$('.el12111').show();
+
+	} else {
+		$theadTr.find('th:eq(11)').hide();
+		$('.el12111').hide();
+	}
+	if ($(':input[id="cpa"]').is(':checked')) {
+		$theadTr.find('th:eq(12)').show();
+		$('.el13111').show();
+
+	} else {
+		$theadTr.find('th:eq(12)').hide();
+		$('.el13111').hide();
+	}
+	if ($(':input[id="secondJump"]').is(':checked')) {
+		$theadTr.find('th:eq(13)').show();
+		$('.el14111').show();
+
+	} else {
+		$theadTr.find('th:eq(13)').hide();
+		$('.el14111').hide();
+	}
+	if ($(':input[id="secondJumpRatio"]').is(':checked')) {
+		$theadTr.find('th:eq(14)').show();
+		$('.el15111').show();
+
+	} else {
+		$theadTr.find('th:eq(14)').hide();
+		$('.el15111').hide();
+	}
+	if ($(':input[id="arrivalRatio"]').is(':checked')) {
+		$theadTr.find('th:eq(15)').show();
+		$('.el16111').show();
+
+	} else {
+		$theadTr.find('th:eq(15)').hide();
+		$('.el16111').hide();
+	}
+	if ($(':input[id="clickTransform"]').is(':checked')) {
+		$theadTr.find('th:eq(16)').show();
+		$('.el17111').show();
+
+	} else {
+		$theadTr.find('th:eq(16)').hide();
+		$('.el17111').hide();
+	}
+	if ($(':input[id="clickTransformRatio"]').is(':checked')) {
+		$theadTr.find('th:eq(17)').show();
+		$('.el18111').show();
+
+	} else {
+		$theadTr.find('th:eq(17 )').hide();
+		$('.el18111').hide();
+	}
+
+}
+
+function hideShowChecked() {
+	var index = currReportTabIndexTemp;
+	var $theadTr = $('table:eq('+index+') tr:first');
+	
+	if ($theadTr.find('th:eq(0)').is(':hidden')) {
+		$(":input[id='upti']").attr("checked", false);
+	} else {
+		var s = document.getElementById("upti");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(1)').is(':hidden')) {
+		$(":input[id='user']").attr("checked", false);
+	} else {
+		var s = document.getElementById("advertiser");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(2)').is(':hidden')) {
+		$(":input[id='appInfo']").attr("checked", false);
+	} else {
+		var s = document.getElementById("order");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(3)').is(':hidden')) {
+		$(":input[id='position']").attr("checked", false);
+	} else {
+		var s = document.getElementById("plan");
+		s.checked = true;
+	}
+	/*if ($theadTr.find('th:eq(4)').is(':hidden')) {
+		$(":input[id='creative']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("creative");
+		s.checked = true;
+	}*/
+	if ($theadTr.find('th:eq(4)').is(':hidden')) {
+		$(":input[id='showTimes']").attr("checked", false);
+	} else {
+		var s = document.getElementById("showTimes");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(5)').is(':hidden')) {
+		$(":input[id='consumption']").attr("checked", false);
+	} else {
+		var s = document.getElementById("consumption");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(6)').is(':hidden')) {
+		$(":input[id='cpm']").attr("checked", false);
+	} else {
+		var s = document.getElementById("cpm");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(7)').is(':hidden')) {
+		$(":input[id='clickTimes']").attr("checked", false);
+	} else {
+		var s = document.getElementById("clickTimes");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(8)').is(':hidden')) {
+		$(":input[id='clickRatio']").attr("checked", false);
+	} else {
+		var s = document.getElementById("clickRatio");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(9)').is(':hidden')) {
+		$(":input[id='cpc']").attr("checked", false);
+	} else {
+		var s = document.getElementById("cpc");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(10)').is(':hidden')) {
+		$(":input[id='arrival']").attr("checked", false);
+	} else {
+		var s = document.getElementById("arrival");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(11)').is(':hidden')) {
+		$(":input[id='transform']").attr("checked", false);
+	} else {
+		var s = document.getElementById("transform");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(12)').is(':hidden')) {
+		$(":input[id='cpa']").attr("checked", false);
+	} else {
+		var s = document.getElementById("cpa");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(13)').is(':hidden')) {
+		$(":input[id='secondJump']").attr("checked", false);
+	} else {
+		var s = document.getElementById("secondJump");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(14)').is(':hidden')) {
+		$(":input[id='secondJumpRatio']").attr("checked", false);
+	} else {
+		var s = document.getElementById("secondJumpRatio");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(15)').is(':hidden')) {
+		$(":input[id='arrivalRatio']").attr("checked", false);
+	} else {
+		var s = document.getElementById("arrivalRatio");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(16)').is(':hidden')) {
+		$(":input[id='clickTransform']").attr("checked", false);
+	} else {
+		var s = document.getElementById("clickTransform");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(17)').is(':hidden')) {
+		$(":input[id='clickTransformRatio']").attr("checked", false);
+	} else {
+		var s = document.getElementById("clickTransformRatio");
+		s.checked = true;
+	}
+}

@@ -1,0 +1,12 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspDictPlatform;
+
+/**
+ * @auther wangyao
+ * @date 2017-03-30 18:54
+ */
+public interface SspDictPlatformService {
+	RestResponse find(SspDictPlatform sspDictPlatform);
+}

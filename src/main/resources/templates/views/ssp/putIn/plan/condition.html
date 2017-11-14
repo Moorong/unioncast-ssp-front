@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style type="text/css">
+		ul.ztree {
+			margin-top: 10px;
+			border: 1px solid #c9c9c9;
+			/* 	min-height: 300px; */
+			overflow-y: auto;
+			overflow-x: auto;
+		}
+	</style>
+	<script type="text/javascript">
+		var sspOrderPutStartTime = '${sspOrderPutStartTime!""}';
+		var sspOrderPutEndTime = '${sspOrderPutEndTime!""}';
+	</script>
+</head>
+
+<body>
+
+<div class="block_content ">
+	<div class="container-fluid">
+		<div class="row">
+			<!-- 表单名称开始 -->
+			<div class="block_title white clearfix" id="criteriaHead">
+				<span class="block_title_name pull-left"> 广告定向条件 </span>
+			</div>
+			<!-- 表单名称结束 -->
+			<div class="col-md-12" id="criteria" style="display: none;">
+				<#include "timeCondition.html"/>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">广告类型</label>
+						<div class="col-sm-5">
+							<div class="col-sm-6">
+								<ul id="adTypeTree" class="ztree"></ul>
+								<input type="hidden" id="adTypeInput" name="sspPlanTargetCondition.sspDictAdType.id" value="${(condition.sspDictAdTypeId?replace(',',''))!}">
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">投放节奏</label>
+						<div class="col-sm-8">
+							<label class="radio-inline"> <input type="radio" checked value="1" name="sspPlanTargetCondition.putRhythm"<#if (condition.putRhythm)?? && condition.putRhythm==1>checked="checked" </#if>>匀速投放
+								<a href="#" data-toggle="tooltip" data-placement="right"
+								><i class="iconfont icon-tanhao1"></i></a>
+							</label> <label class="radio-inline"> <input type="radio" value="2" name="sspPlanTargetCondition.putRhythm" <#if (condition.putRhythm)?? && condition.putRhythm==2>checked="checked" </#if>>加速投放
+							<a href="#" data-toggle="tooltip" data-placement="right"
+							><i class="iconfont icon-tanhao1"></i></a>
+						</label> <label class="radio-inline"> <input type="radio" value="3" name="sspPlanTargetCondition.putRhythm"<#if (condition.putRhythm)?? && condition.putRhythm==3>checked="checked" </#if>>集中投放
+							<a href="#" data-toggle="tooltip" data-placement="right"
+							><i class="iconfont icon-tanhao1"></i></a>
+						</label> <label class="radio-inline"> <input type="radio" value="4" name="sspPlanTargetCondition.putRhythm"<#if (condition.putRhythm)?? && condition.putRhythm==4>checked="checked" </#if>>效果最好投放
+							<a href="#" data-toggle="tooltip" data-placement="right"
+							><i class="iconfont icon-tanhao1"></i></a>
+						</label> <label class="radio-inline"> <input type="radio" value="5" name="sspPlanTargetCondition.putRhythm" <#if (condition.putRhythm)?? && condition.putRhythm==5>checked="checked" </#if>>低CPC投放
+							<a href="#" data-toggle="tooltip" data-placement="right"
+							><i class="iconfont icon-tanhao1"></i></a>
+						</label>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">地域定向</label>
+						<div class="col-sm-8">
+							<div id="areaTargetStateId">
+								<label class="radio-inline">
+									<input type="radio" id="areaTargetState1" name="areaTargetState" value="1" checked
+									<#if (condition.areaTargetState)?? && condition.areaTargetState==1>checked</#if>>不限
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="areaTargetState" value="2"
+									<#if (condition.areaTargetState)?? && condition.areaTargetState==2>checked</#if>>按地域（省，市）
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="areaTargetState" value="3" id="areaTargetState3"
+									<#if (condition.areaTargetState)?? && condition.areaTargetState==3>checked</#if>>LBS
+								</label>
+								<input type="hidden" name="sspPlanTargetCondition.areaTargetState" id="areaTargetState" value="${(condition.areaTargetState)!''}">
+							</div>
+							<div class="treebox clearfix" id="areaTargetStateRadio" style="display: none; height:300px;width: 200px; overflow:auto;">
+								<div class="treeboxleft pull-left">
+									<ul id="areaTargetStateTree" class="ztree"></ul>
+									<input type="hidden" id="cityInfoArrInput" name="cityInfoArrStr" value="${(condition.cityInfoArrStr)!''}">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">操作系统</label>
+						<div class="col-sm-8">
+							<div id="operationSystemId">
+								<label class="radio-inline"> <input type="radio"
+																	name="operationSystem" value="1" checked
+									<#if (condition.dictSysOperationState)?? && condition.dictSysOperationState==1>checked</#if>
+									>不限
+								</label> <label class="radio-inline"> <input type="radio"
+																			 name="operationSystem" value="2"
+								<#if (condition.dictSysOperationState)?? && condition.dictSysOperationState==2>checked</#if>
+								>设置
+							</label>
+								<input type="hidden" name="sspPlanTargetCondition.dictSysOperationState" id="dictSysOperationTypeArr" value="${(condition.dictSysOperationState)!''}">
+							</div>
+							<div class="treebox clearfix" id="operationSystemRadio" style="display: none;">
+								<div class="treeboxleft pull-left">
+									<ul id="operationSystemTree" class="ztree"></ul>
+									<input type="hidden" id="operationSystemInput" name="systemType" value="${(condition.dictSysOperationTypeArrStr)!''}">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">移动品牌设备定向</label>
+                    <div class="col-sm-8">
+                        <div>
+                            <label class="radio-inline"> <input type="radio">不限
+                            </label> <label class="radio-inline"> <input type="radio">设置
+                            </label>
+                        </div>
+                        <div class="treebox clearfix">
+                            <div class="treeboxleft pull-left">
+                                <div class="treetitle">
+                                    <label>请选择</label>
+                                </div>
+                                <div class="treeboxview">
+                                    &lt;!&ndash; treeleft &ndash;&gt;
+                                </div>
+                            </div>
+                            <div class="treebtn pull-left">
+                                <a href="#" class="btn btnlink">全部选择</a> <a href="#"
+                                    class="btn btnlink">全部清除</a> <a href="#" class="btn btnlink">单个选择</a>
+                                <a href="#" class="btn btnlink">单个删除</a>
+                            </div>
+                            <div class="treeboxright pull-left">
+                                <div class="treetitle ">
+                                    <label>已选择</label> <label class="radio-inline"> <input
+                                        type="radio">选择
+                                    </label> <label class="radio-inline"> <input type="radio">排除
+                                    </label>
+                                </div>
+                                <div class="treecheckshow">
+                                    &lt;!&ndash; treeright &ndash;&gt;
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">网络类型</label>
+						<div class="col-sm-8">
+							<div class="checkboxwarp checkval">
+								<label class="checkbox-inline"> <input type="checkbox"  checked name="networkTypeall"  id="networkcheck" value="1" <#if (condition.networkType)?? && condition.networkType=="1">checked="checked" </#if>>不限
+								</label> <label class="checkbox-inline"> <input type="checkbox"name="networkType" value="2" <#if (condition.networkType)?? && condition.networkType=="2">checked="checked" </#if>>2G
+							</label> <label class="checkbox-inline"> <input type="checkbox"name="networkType" value="3"<#if (condition.networkType)?? && condition.networkType=="3">checked="checked" </#if>>3G
+							</label> <label class="checkbox-inline"> <input type="checkbox"name="networkType"value="4"<#if (condition.networkType)?? && condition.networkType=="4">checked="checked" </#if>>4G
+							</label> <label class="checkbox-inline"> <input type="checkbox"name="networkType" value="5"<#if (condition.networkType)?? && condition.networkType=="5">checked="checked" </#if>>WIFI
+							</label>
+								<input type="hidden" name="sspPlanTargetCondition.networkType" id="networkType" value="${(condition.networkType)!''}" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">设备ID定向</label>
+						<div class="col-sm-8">
+							<div class="checkboxwarp">
+								<label class="radio-inline">
+									<input type="radio" name="deviceType" value="1" checked
+									<#if (condition.deviceTypeState)?? && condition.deviceTypeState == 1>checked="checked" </#if>
+									> 不限
+								</label>
+								<label class="radio-inline">
+									<input type="radio"name="deviceType" value="2"
+									<#if (condition.deviceTypeState)?? &&  condition.deviceTypeState == 2>checked="checked" </#if>> 有
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="deviceType" value="3"
+									<#if (condition.deviceTypeState)?? && condition.deviceTypeState == 3>checked="checked"</#if>> 指定
+								</label>
+							</div>
+						</div>
+						<input type="hidden" name="sspPlanTargetCondition.deviceTypeState" id="deviceTypeStates" value="${(condition.deviceTypeState)!''}">
+					</div>
+				</div>
+				<div class="formwarp" id="deviceTypeId">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label sr-only">设备ID定向</label>
+						<div class="col-sm-8">
+							<textarea class="form-control small338" rows="3" id="device" placeholder="每行输入一个设备ID，回车换行后输入第二个设备ID。" name="sspPlanTargetCondition.deviceTypeIdfa">${(condition.deviceTypeIdfa?trim)!''}</textarea>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">媒体类型</label>
+						<div class="col-sm-8">
+							<div>
+								<label class="radio-inline">
+									<input type="radio" name="mediaTypeRadio"  value="1" checked
+									<#if (condition.mediaState)?? && condition.mediaState==1>checked</#if>
+									>不限
+								</label>
+								<label class="radio-inline">
+									<input type="radio" name="mediaTypeRadio" value="2"
+									<#if (condition.mediaState)?? && condition.mediaState==2>checked</#if>
+									>设置
+								</label>
+								<input type="hidden" name="sspPlanTargetCondition.mediaState" id="mediaSates" value="${(condition.mediaState)!''}">
+							</div>
+							<div class="treebox clearfix" id="mediaTypeConditionCont" style="display: none;">
+								<div class="treeboxleft pull-left">
+									<!-- 										<div class="treetitle"> -->
+									<!-- 											<label>请选择</label> -->
+									<!-- 										</div> -->
+									<!-- 										<div class="treeboxview"> -->
+									<!-- 											treeleft -->
+									<!-- 										</div> -->
+									<ul id="mediaTypeLeftTree" class="ztree"></ul>
+									<input type="hidden" id="mediaTypeInput" name="mediaType" value="${(condition.dictMediaTypeArrStr)!''}">
+								</div>
+								<!-- 									<div class="treebtn pull-left"> -->
+								<!-- 										<a href="#" class="btn btnlink">全部选择</a> <a href="#" -->
+								<!-- 											class="btn btnlink">全部清除</a> <a href="#" class="btn btnlink">单个选择</a> -->
+								<!-- 										<a href="#" class="btn btnlink">单个删除</a> -->
+								<!-- 									</div> -->
+								<!--<div class="treeboxright pull-left">
+                                <ul id="mediaTypeRightTree" class="ztree"></ul>
+                                <input type="hidden" id="mediaTypeInput" name="mediaTypeIds" value="200002">-->
+								<!-- 										<div class="treetitle "> -->
+								<!-- 											<label>已选择</label> <label class="radio-inline"> <input -->
+								<!-- 												type="radio">选择 -->
+								<!-- 											</label> <label class="radio-inline"> <input type="radio">排除 -->
+								<!-- 											</label> -->
+								<!-- 										</div> -->
+								<!-- 										<div class="treecheckshow"> -->
+								<!-- 											treeright -->
+								<!-- 										</div> -->
+								<!--</div>-->
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">媒体ID定向</label>
+						<div class="col-sm-8">
+							<div class="checkboxwarp">
+								<label class="radio-inline">
+									<input type="radio" name="mediaConnition"  value="1" checked
+									<#if (mediastate)?? && mediastate == 0  >checked="checked" </#if>
+									>无
+								</label>
+								<label class="radio-inline">
+									<input type="radio"name="mediaConnition" value="2"
+									<#if (mediastate)?? && mediastate == 1>checked="checked" </#if>
+									>有
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp" id="mediaConditionVal">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label sr-only">媒体ID定向</label>
+						<div class="col-sm-8">
+							<textarea class="form-control small338" rows="3" name="sspPlanTargetCondition.mediaIds" id="mediaVal">${(condition.mediaIds)!''}</textarea>
+						</div>
+					</div>
+				</div>
+				<div class="formwarp">
+					<div class="form-group">
+						<label for="inputEmail3" class="col-sm-4 control-label ">性别</label>
+						<div class="col-sm-8">
+							<div class="checkboxwarp">
+								<label class="radio-inline"> <input type="radio"
+																	   name="sspPlanTargetCondition.sex" value="1" <#if (condition.sex)?? && condition.sex==1>checked="checked" </#if>>男
+								</label> <label class="radio-inline"> <input type="radio"
+																				name="sspPlanTargetCondition.sex" value="2" <#if (condition.sex)?? && condition.sex==2>checked="checked" </#if>>女
+							</label>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">年龄</label>
+                    <div class="col-sm-8">
+                        <div class="checkboxwarp">
+                            <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxall">不限
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">10-19
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">20-29
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">30-39
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">40-49
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">50-59
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">60以上
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">其他
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+				<!--	<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">学历</label>
+                    <div class="col-sm-8">
+                        <div class="checkboxwarp">
+                            <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxall">不限
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">硕士以上
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">本科
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">大专
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">中专
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">高中
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">初中
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">其他
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+				<!--<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">婚姻</label>
+                    <div class="col-sm-8">
+                        <div class="checkboxwarp">
+                            <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxall">不限
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">已婚
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">其他
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+				<!--<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">收入</label>
+                    <div class="col-sm-8">
+                        <div class="checkboxwarp">
+                            <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxall">不限
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">高
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">中
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">低
+                            </label> <label class="checkbox-inline"> <input type="checkbox"
+                                name="checkboxone">其他
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+				<!--<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">兴趣爱好</label>
+                    <div class="col-sm-8">
+                        <div>
+                            <label class="radio-inline"> <input type="radio">不限
+                            </label> <label class="radio-inline"> <input type="radio">设置
+                            </label>
+                        </div>
+                        <div class="treebox clearfix">
+                            <div class="treeboxleft pull-left">
+                                <div class="treetitle">
+                                    <label>请选择</label>
+                                </div>
+                                <div class="treeboxview">
+                                    &lt;!&ndash; treeleft &ndash;&gt;
+                                </div>
+                            </div>
+                            <div class="treebtn pull-left">
+                                <a href="#" class="btn btnlink">全部选择</a> <a href="#"
+                                    class="btn btnlink">全部清除</a> <a href="#" class="btn btnlink">单个选择</a>
+                                <a href="#" class="btn btnlink">单个删除</a>
+                            </div>
+                            <div class="treeboxright pull-left">
+                                <div class="treetitle ">
+                                    <label>已选择</label> <label class="radio-inline"> <input
+                                        type="radio">选择
+                                    </label> <label class="radio-inline"> <input type="radio">排除
+                                    </label>
+                                </div>
+                                <div class="treecheckshow">
+                                    &lt;!&ndash; treeright &ndash;&gt;
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+				<!--<div class="formwarp">
+                <div class="form-group">
+                    <label for="inputEmail3" class="col-sm-4 control-label ">购买倾向</label>
+                    <div class="col-sm-8">
+                        <div>
+                            <label class="radio-inline"> <input type="radio">不限
+                            </label> <label class="radio-inline"> <input type="radio">设置
+                            </label>
+                        </div>
+                        <div class="treebox clearfix">
+                            <div class="treeboxleft pull-left">
+                                <div class="treetitle">
+                                    <label>请选择</label>
+                                </div>
+                                <div class="treeboxview">
+                                    &lt;!&ndash; treeleft &ndash;&gt;
+                                </div>
+                            </div>
+                            <div class="treebtn pull-left">
+                                <a href="#" class="btn btnlink">全部选择</a> <a href="#"
+                                    class="btn btnlink">全部清除</a> <a href="#" class="btn btnlink">单个选择</a>
+                                <a href="#" class="btn btnlink">单个删除</a>
+                            </div>
+                            <div class="treeboxright pull-left">
+                                <div class="treetitle ">
+                                    <label>已选择</label> <label class="radio-inline"> <input
+                                        type="radio">选择
+                                    </label> <label class="radio-inline"> <input type="radio">排除
+                                    </label>
+                                </div>
+                                <div class="treecheckshow">
+                                    &lt;!&ndash; treeright &ndash;&gt;
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>-->
+			</div>
+		</div>
+	</div>
+</div>
+<link rel="stylesheet" type="text/css" href="plugs/ztree/metroStyle/metroStyle.css"/>
+<script type="text/javascript" src="plugs/ztree/jquery.ztree.all.min.js"></script>
+<script type="text/javascript" src="js/ssp/putIn/plan/condition.js"></script>
+<script type="text/javascript">
+    $(document)
+        .ready(
+            function() {
+                //时间定向
+                //zmtf
+                $("#qztf")
+                    .click(
+                        function() {
+                            var thisTale = $("#time_period");
+                            thisTale.find('tbody td')
+                                .addClass('tdclick');
+                            thisTale
+                                .find(
+                                    'input[name=\'checked\']')
+                                .prop('checked', true);
+                        });
+                $('#zydzwtf').click(
+                    function() {
+                        var thisTale = $("#time_period");
+                        thisTale.find('tbody tr').find('td')
+                            .removeClass('tdclick');
+                        thisTale.find('tbody tr').find(
+                            'td:first').find('input').prop(
+                            'checked', false);
+                        thisTale.find('tbody tr:lt(5)').find(
+                            'td').addClass('tdclick');
+                        thisTale.find('tbody tr:lt(5)').find(
+                            'td:first').find('input').prop(
+                            'checked', true);
+                    });
+                $('#zmtf').click(
+                    function() {
+                        var thisTale = $("#time_period");
+                        thisTale.find('tbody tr').find('td')
+                            .removeClass('tdclick');
+                        thisTale.find('tbody tr').find(
+                            'td:first').find('input').prop(
+                            'checked', false);
+                        thisTale.find('tbody tr:gt(4)').find(
+                            'td').addClass('tdclick');
+                        thisTale.find('tbody tr:gt(4)').find(
+                            'td:first').find('input').prop(
+                            'checked', true);
+                    });
+                $('.tabletime').find('tbody tr').find(
+                    'td:first input[name=checked]').click(
+                    function(e) {
+                        var thisChecked = $(this).prop(
+                            'checked');
+                        if(thisChecked) {
+                            $(this).parents('tr').find('td')
+                                .addClass('tdclick');
+                            $(this).parents('td').addClass(
+                                'tdclick');
+                        } else {
+                            $(this).parents('tr').find('td')
+                                .removeClass('tdclick');
+                            $(this).parents('td').removeClass(
+                                'tdclick');
+                        }
+                    });
+                $('.tabletime')
+                    .find('tbody tr')
+                    .find('td:gt(0)')
+                    .click(
+                        function() {
+                            var bkColor = $(this).hasClass(
+                                'tdclick');
+                            if(bkColor) {
+                                $(this).removeClass(
+                                    'tdclick');
+                                $(this).parents('tr').find(
+                                    'td:first')
+                                    .removeClass(
+                                        'tdclick')
+                                    .find('input')
+                                    .prop('checked',
+                                        false);
+                            } else {
+                                $(this).addClass('tdclick');
+                                var tdClickL = $(this)
+                                    .parents('tr')
+                                    .find('td.tdclick').length;;
+                                var tdL = $(this).parents(
+                                    'tr').find('td').length;
+                                if(tdClickL == tdL - 1) {
+                                    $(this)
+                                        .parents('tr')
+                                        .find(
+                                            'td:first')
+                                        .addClass(
+                                            'tdclick')
+                                        .find('input')
+                                        .prop(
+                                            'checked',
+                                            true);
+                                } else {
+                                    $(this)
+                                        .parents('tr')
+                                        .find(
+                                            'td:first')
+                                        .removeClass(
+                                            'tdclick')
+                                        .find('input')
+                                        .prop(
+                                            'checked',
+                                            false);
+                                }
+                            }
+                        });
+
+
+                //清空
+                $("#clear").on("click", function(e) {
+                    var thisTale = $("#time_period");
+                    thisTale.find('tbody tr').find('td').removeClass('tdclick');
+                    thisTale.find('tbody input[name="checked"]').prop('checked', false);
+                    thisTale.find('tbody .checkbox span').removeClass('checked');
+                    e.preventDefault();
+                })
+				/*全选*/
+                $('input[name="networkTypeall"]').click(
+                    function() {
+                        $(this).parents('.checkboxwarp').find(
+                            'input').prop("checked",
+                            $(this).prop("checked"));
+
+                        $("#networkType").val("1");
+                    });
+                $('input[name="networkType"]').click(
+                    function() {
+                        var a = $(this).prop("checked");
+                        if(!a) {
+                            $(this).parents('.checkboxwarp').find('input[name="networkTypeall"]').prop("checked", false);
+                        }
+                        var vals = '';
+                        $("input[name='networkType']:checkbox:checked").each(function() {
+                            vals += $(this).val() + ",";
+                        });
+                        $("#networkType").val('');
+                        $("#networkType").val(vals.substring(0, vals.length - 1));
+                    });
+            });
+
+</script>
+</body>
+
+</html>

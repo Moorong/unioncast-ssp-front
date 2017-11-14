@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);">财务管理</a>
+		<i> / </i> <span>财务信息</span>
+	</h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<div class="block_content ">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 个人信息 </span>
+						</div>
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<form class="form-horizontal" role="form">
+								<div class="formwarp">
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-1 control-label ">财务信息：</label>
+										<div class="col-sm-8 ">
+											<button type="button" class="btn btnlink xiugaibtn padt5"
+												onclick="page.loadPage('ssp/finance/editFinaceInfo?id=${(financeInfo.id)!""}')">修改</button>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-1 control-label ">财务对象：</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static">
+												<#if (financeInfo.financeType)?? && 1==(financeInfo.financeType)!"">个人</#if><#if (financeInfo.financeType)?? && 2==(financeInfo.financeType)!"">企业</#if></p>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-1 control-label ">开户地：</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static">${(financeInfo.sspCityInfo.name)!""}</p>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-1 control-label ">收款银行：</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static">${(financeInfo.recipientBank)!""}</p>
+										</div>
+									</div>
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-1 control-label ">银行账号：</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static">${(financeInfo.bankAccount)!""}</p>
+										</div>
+									</div>
+									<#if (financeInfo.financeType)?? && 1==(financeInfo.financeType)!"">
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-1 control-label ">收款人姓名</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static">${(financeInfo.recipientName)!""}</p>
+											</div>
+										</div>
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-1 control-label ">收款人身份证：</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static">${(financeInfo.recipientIdentityNum)!""}</p>
+											</div>
+										</div>
+									</#if>
+									<#if (financeInfo.financeType)?? && 2==(financeInfo.financeType)!"">
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-1 control-label ">发票类型：</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static">
+													<#if ((financeInfo.invoiceType)?? && 1==(financeInfo.invoiceType)!"")>增值税普通发票</#if>
+													<#if ((financeInfo.invoiceType)?? && 2==(financeInfo.invoiceType)!"")>增值税专用发票</#if>
+													<#if ((financeInfo.invoiceType)?? && 3==(financeInfo.invoiceType)!"")>境外发票</#if>
+												</p>
+											</div>
+										</div>
+										<div class="form-group ">
+											<label for="inputEmail3" class="col-sm-1 control-label ">税号：</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static">${(financeInfo.taxNum)!""}</p>
+											</div>
+										</div>
+									</#if>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 			<div class="savewarp text-center"> -->
+			<!-- 				<a href="#" class="btn formbtn green">完成</a> <a href="#" -->
+			<!-- 					class="btn formbtn bk999">取消</a> -->
+			<!-- 			</div> -->
+		</div>
+	</div>
+</body>
+</html>

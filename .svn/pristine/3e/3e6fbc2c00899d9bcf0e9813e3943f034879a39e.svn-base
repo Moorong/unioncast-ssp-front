@@ -1,0 +1,9 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspDictMobileBrandType;
+
+public interface SspDictMobileBrandTypeService {
+
+	SspDictMobileBrandType[] findByCode(String[] mobileType);
+
+}

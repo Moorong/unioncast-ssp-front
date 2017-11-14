@@ -1,0 +1,388 @@
+var page = {
+    /**
+     * 前端通用查询对象
+     */
+    pc: {},
+    history:{
+    	data:[],
+    	add:function(url,data){
+    		var reg = /rest\/\w*\/\w+(\/\w+)?/;
+    		if(isEmpty(url)&&reg.test(url))return;
+    		var k = url.match(reg)[0];
+    		if(!isEmpty(data)&&!isEmptyObject(data))
+				url=url + (url.indexOf("?")>0?"&":"?") +UC.parseParam(data);
+			if(!/^\s*http:.*/.test(url))
+				url=this.getReqPrefix()+url+(url.indexOf("?")>0?"&":"?")+"_="+new Date().getTime();
+    		this.data[k]=url;
+    	},
+    	clear:function(){
+    		this.data = [];
+    	},
+    	go:function(k,removeAttr){
+    		$('.popover').popover('destroy');
+    		if(isEmpty(k))return;
+    		if(typeof(k)=="object"){
+    			k = $(k).attr('urlk');
+    		}else if(!typeof(k)=="string"){
+    			return;
+    		}
+    		try{
+    			var url = this.data[k];
+    			if(!isEmpty(removeAttr))
+    				url =url.replace(removeAttr,'').replace(/(\?|&)=\w*/,'');
+    			page.loadPage(url);
+    		}catch(e){
+    			console.log(e);
+    		}
+    	}
+    },
+    /**
+     * 前端常用选择器和样式
+     */
+    attr: {
+        id: '#',
+        class: '.',
+        /**
+         * 页面样式
+         */
+        sidebar_class: {
+            ui_nav: 'ui_nav',
+            icon: '',
+            hide: 'hide',
+            on: 'on',
+            ui_nav_sub_wrap: 'ui_nav_sub_wrap'
+        },
+        /**
+         * 页面属性
+         */
+        page_attr: {
+            url_rest_prefix: '/rest/',
+            menu_cont_id: 'sidebar_ul',
+            sec_mid: 'smid',
+            default_page_cont: 'page',
+            uc_page_content_id: 'uc_page_content'
+        },
+        defDateFormat:"YYYY-MM-DD",
+        drDefaultLocal:{
+            format: this.defDateFormat,
+            separator: " - ",
+            applyLabel: "确定",
+            cancelLabel: "取消",
+            fromLabel: "从",
+            toLabel: "至",
+            customRangeLabel: "自定义",
+            weekLabel: "周",
+            daysOfWeek: [
+                "日",
+                "一",
+                "二",
+                "三",
+                "四",
+                "五",
+                "六"
+            ],
+            monthNames: [
+                "一月",
+                "二月",
+                "三月",
+                "四月",
+                "五月",
+                "六月",
+                "七月",
+                "八月",
+                "九月",
+                "十月",
+                "十一月",
+                "十二月"
+            ],
+            firstDay: 7
+        }
+    },
+    /**
+     * 获取项目访问前缀
+     */
+    getReqPrefix: function () {
+        return UC.getRootPath() + this.attr.page_attr.url_rest_prefix;
+    },
+    /**
+     * 选择菜单
+     */
+    choiceMenu: function (sidebarId) {
+        if (UC.isEmpty(sidebarId))return;
+        var cmArr = sidebarId.split('-');
+        var $pa = $(page.attr.id+page.attr.page_attr.menu_cont_id+' '+page.attr.id + cmArr[0]+' a').eq(0);
+        if (cmArr.length > 1){
+             var $thisLi = $pa.parent();
+             $thisLi.parent().children().removeClass(page.attr.sidebar_class.on);
+             $thisLi.addClass(page.attr.sidebar_class.on);
+             var $ca = $(page.attr.id+page.attr.page_attr.menu_cont_id+' '+page.attr.id + cmArr[1]+' a');
+             $ca.eq(0).click();
+        }else{
+        	$pa.click();
+        }
+    },
+    /**
+     * 异步加载分页数据
+     * 当前页有多个分页组件时请指定分页容器options.pcont,默认'page'
+     */
+    ajaxPage: function (options) {
+        var setting = {
+            pcont: UC.isEmpty(options.pcont) ? this.attr.page_attr.default_page_cont : options.pcont,//分页容器，ID
+            totalPages: this.pc.pages, //总页数
+            startPage: this.pc.pno,  //当前页
+            count: this.pc.count, //总记录数
+        };
+        $.extend(true, setting, options);
+        if (!UC.isEmpty(options.onPageClick))
+            setting.onPageClick = options.onPageClick;
+        UC.ajaxPage(setting.pcont, setting);
+    },
+    /**
+     *  Ajax加载页面
+     */
+    loadPage: function (url, data) {
+    	if(UC.isEmpty(url))return;
+		if(!isEmpty(data)&&!isEmptyObject(data))
+				url=url + (url.indexOf("?")>0?"&":"?") +UC.parseParam(data);
+		if(!/^\s*http:.*/.test(url)){
+			url=this.getReqPrefix()+url+(url.indexOf("?")>0?"&":"?")+"_="+new Date().getTime();
+    	}
+        //TODO 校验权限跳转
+		UC.setBusy(true);
+		//清理冗余DOM
+		$('.popover').popover('destroy');
+		$('.daterangepicker').remove();
+        $(page.attr.id + page.attr.page_attr.uc_page_content_id).load(url, function (html, resultText, result) {
+        	UC.setBusy(false);
+        	page.history.add(url);//添加左上导航记录
+            UC.errmsg.query(html);//过滤错误响应
+            $.each($('form'),function(i,f){
+            	var length = $(f).find('input[type="text"]').length;
+            	if(length<=1){
+            		$(f).append($(HT.input).attr('type','text').attr('hidden',''));
+            	}
+            });
+            /**初始化UI组件**/
+//				$.material.init();
+            $("[data-toggle='tooltip']").tooltip();
+            
+            $("input[name='switch']").bootstrapSwitch({
+                onText: "开",
+                offText: "关",
+                size: "mini",
+                onSwitchChange: function (event, state) {
+                    if (state == true) {
+                        $(this).val("1");
+                    } else {
+                        $(this).val("2");
+                    }
+                }
+            });
+            /**初始化默认时间选择框**/
+            var datetimepickersetting = {
+                language: 'zh-CN',
+//				        weekStart: 1,
+//				        todayBtn:  1,
+//						autoclose: 1,
+                todayHighlight: 1
+//						startView: 2,
+//						minView: 2,
+//						forceParse: 0
+            };
+            $('.datetimepicker').datetimepicker(datetimepickersetting);
+            /**初始化默认下拉框**/
+            $('select').selectpicker({
+                language: 'zh_CN'
+//					  multipleSeparator:';',//多选分割，使用多选需在select上加multiple属性
+//			 		  width:'20%',
+//					  size: 10
+            });
+            /**初始化分页组件**/
+            /*UC.ajaxPage("page",{
+             totalPages: 5, //总页数
+             startPage: 1,  //当前页
+             count: 30, //总记录数
+             //					onPageClick: function(event, thisPage){//thisPage选择的页码
+             //					}
+             });*/
+            /** **/
+            $('#tabbtn').click(function () {
+                $(this).parent().parent().next('.form-group').toggleClass('hidden');
+            });
+            
+            $('table').trigger('resetToLoadState');
+            /**初始化列宽调整组件**/
+//            $("table").not(".tablesorter").colResizable({
+//            	resizeMode:'flex',
+//            	flush:true
+//            });
+        });
+    },
+
+    /**
+     * Ajax加载数据
+     * @param options ajax参数
+     */
+    ajax: function (options, nopropress) {
+        if (!nopropress)
+            UC.setBusy();//NProgress.start();
+        if (UC.isEmpty(options) || UC.isEmpty(options.url))return;
+        options.url = this.getReqPrefix() + options.url + (options.url.indexOf("?") > 0 ? "&" : "?") + "_=" + new Date().getTime();
+        var setting = {
+            type: "post"/*,
+             async:true,
+             data:{
+             pno:1,
+             psize:10,
+             query:{},
+             order:{}
+             }*/
+        }
+        $.extend(true, setting, options);
+        setting.success = function (result, sucessMsg, xmlHttpResponse) {
+            if (!nopropress)
+                UC.setBusy(false);//NProgress.done();
+            var resultJson = UC.errmsg.query(result);
+            if (!UC.isEmpty(options.success))
+                options.success(resultJson, sucessMsg, xmlHttpResponse);
+        }
+        setting.error = function (xmlHttpRequest, errMsg, errObj) {
+            if (!nopropress)
+                UC.setBusy(false);//NProgress.done();
+            console.log(xmlHttpRequest);
+            if (!UC.isEmpty(options.error))
+                options.error(xmlHttpRequest, errMsg, errObj);
+        }
+        $.ajax(setting);
+    },
+    /**
+     *  Ajax表单提交数据
+     *  @param form DOM表单对象
+     *  @param options ajax参数
+     */
+    ajaxSubmit: function (form, successFn, errFn) {
+        if (UC.isEmpty(form) || UC.isEmpty(form.action))return;
+        var url = form.action.replace(UC.getRootPath() + "/", "");
+        var dataPara = UC.getFormJson(form);
+        var setting = {
+            url: url,
+            data: dataPara,
+            success: successFn,
+            error: errFn
+        };
+        this.ajax(setting);
+    },
+    /**
+     * 初始化左侧菜单
+     */
+    initSidebar: function (options) {
+        var setting = {
+            ssmi: false,//默认不选中子菜单第一项
+            data: []//菜单数据
+        };
+        $.extend(true, setting, options);
+        var $menu_cont = $(page.attr.class + page.attr.sidebar_class.ui_nav + ' ul');
+
+        function initLi(m) {
+            if (!UC.isEmpty(m.text)) {
+                var url = m.click;
+                var cflag = UC.isEmpty(m.child) || (!UC.isEmpty(m.child) && m.child.length == 0);
+                var $li = $(HT.li).attr('id', m.id);
+                var $a = $(HT.a);
+                if (!UC.isEmpty(m.icon))//添加icon
+                    $a.append($(HT.i).addClass(page.attr.sidebar_class.icon).addClass(m.icon));
+                $a.click(function () {
+                    initClick(this);
+                    if (!UC.isEmpty(url)){
+                    	page.history.clear();
+                    	page.loadPage(url);
+                    }
+                });
+                $li.append($a.append(m.text));
+                if (!cflag) {
+                    // 初始化子菜单
+                    var $sub_ul = $(HT.ul).addClass(page.attr.sidebar_class.ui_nav_sub_wrap);
+                    $.each(m.child, function (j, cm) {
+                        $sub_ul.append(initLi(cm));
+                    });
+                    $li.append($sub_ul);
+                }
+                return $li;
+            }
+        }
+
+        function initClick(o) {
+            var $thisA = $(o);
+            var $thisLi = $thisA.parent();
+            $thisLi.parent().children().removeClass(page.attr.sidebar_class.on);
+            $thisLi.addClass(page.attr.sidebar_class.on);
+            if ($thisLi.find('ul li').length > 0)
+                $thisLi.find('ul:eq(0) li:eq(0) a:eq(0)').click();
+        }
+
+        $.each(setting.data, function (i, m) {
+            if (!UC.isEmpty(m.text)) {
+                var $li = initLi(m);
+                $menu_cont.append($li);
+            }
+        });
+        //默认选择第一项菜单
+        $menu_cont.find('li:eq(0) a:eq(0)').click();
+        //左侧滚动条初始化
+        $menu_cont.parent().parent().mCustomScrollbar({'theme': 'minimal'});
+    }
+};
+$(function () {
+    //初始化左侧菜单
+    /*page.initSidebar({ssmi: false, data: menus});*/
+    var menus = null;
+    $(function () {
+        var menusStr = ""
+        $.ajax({
+            url: "rest/ssp/module/findByLoginUser",
+            type: "POST",
+            dataType: "json",
+            success: function (restResponse) {
+                if (restResponse.result != null) {
+                    //;
+                    menus = eval('[' + restResponse.result + ']');
+                    page.initSidebar({ssmi: false, data: menus});
+                }
+            },
+            error: function () {
+                alert('加载菜单失败！');
+            }
+        });
+    });
+    //右侧滚动条初始化
+    //{'theme':'minimal-dark'}
+//	$(page.attr.id+page.attr.page_attr.uc_page_content_id).parent().mCustomScrollbar();
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

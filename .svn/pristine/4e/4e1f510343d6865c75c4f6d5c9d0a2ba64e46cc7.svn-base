@@ -1,0 +1,32 @@
+<link rel="stylesheet" type="text/css" href="css/base/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="css/base/bootstrap-theme.css">
+<!-- 图标 -->
+<link rel="stylesheet" type="text/css" href="plugs/fontIconPicker-2.0.0/css/fontello.css">
+<link rel="stylesheet" type="text/css" href="css/fonts/fontsize/iconfont.css">
+<!-- 组件 -->
+<!--   <link rel="stylesheet" type="text/css" href="css/base/bootstrap-material-design.css"> -->
+<!-- 日期 -->
+<link rel="stylesheet" type="text/css" href="plugs/bootstrap-datetimepicker/bootstrap-datetimepicker.css">
+<!-- 日期区间 -->
+<link rel="stylesheet" type="text/css" href="plugs/daterangepicker/daterangepicker-bs3.css">
+  <link rel="stylesheet" type="text/css" href="css/base/daterangepicker-bs3.css" />
+  <!--下拉列表 -->
+  <link rel="stylesheet" type="text/css" href="plugs/bootstrap-select/bootstrap-select.min.css">
+<!--   <link rel="stylesheet" type="text/css" href="plugs/select2/select2.min.css"> -->
+<!-- 文件树 -->
+<link rel="stylesheet" type="text/css" href="plugs/treeview/bootstrap-treeview.css">
+<!--loading -->
+<!-- <link rel="stylesheet" type="text/css" href="plugs/nprogress/nprogress.css"> -->
+<!--   滚动条 -->
+<link rel="stylesheet" href="plugs/scrollbar/jquery.mCustomScrollbar.min.css"/>
+<!-- 开关按钮 -->
+<link rel="stylesheet" type="text/css" href="plugs/bootstrap-switch/bootstrap-switch.min.css">
+<!-- 表单验证 -->
+<link rel="stylesheet" type="text/css" href="plugs/bootstrap-validator/bootstrapValidator.min.css">
+<!-- 提示框 -->
+<!-- <link rel="stylesheet" type="text/css" href="plugs/toastr/toastr.min.css"> -->
+<link rel="stylesheet" type="text/css" href="plugs/confirm/jquery-confirm.css">
+<!-- 公共样式 -->
+<link rel="stylesheet" type="text/css" href="css/base/style.css">
+<link rel="stylesheet" type="text/css" href="css/base/custom.css">
+  

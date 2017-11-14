@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+</head>
+<body>
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);">财务管理</a> <i> / </i> <span>结算信息</span>
+	</h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<div class="block_content ">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						<div class="block_title white clearfix">
+							<span class="block_title_name pull-left"> 结算信息 </span>
+						</div>
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+						<#if financeInfo??>
+							<form class="form-horizontal" role="form">
+								<div class="formwarp">
+									<div class="form-group ">
+										<label for="inputEmail3" class="col-sm-1 control-label ">财务信息：</label>
+										<div class="col-sm-8 ">
+											<div class="pull-left marginr26">
+												<label for="inputEmail3" class="control-label marginr15">${balance?string.currency}</label>
+												<input type="hidden" value="${balance?string.currency}" id="balance"/>
+												<#if balance?? && 100 &lt; balance >
+													<a class="btn  btn_trash" onclick="applyWithdrawal()">申请提现</a>
+												<#else>
+													<a class="btn  btn_trash" data-toggle="tooltip"
+													data-placement="bottom" data-html="true"
+													data-original-title="<h6>余额不足</h6>
+														<p>您当前的余额不足100元可提现金额</p>">申请提现</a>
+												</#if>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						<#else>
+						<div class="formwarp">
+							<p class="text-muted pull-left"><i class="iconfont icon-tanhao1"></i>以下信息关系到您的收益，请您准确的填写真实有效的信息，我们将确保您的信息安全</p>
+							<button class="btn btn_trash green pull-left" onclick="page.loadPage('ssp/finance/editFinaceInfo')">创建财务信息</button>
+						</div>
+						</#if>
+						</div>
+						<div class="col-md-12">
+							<div class="col-sm-6">
+								<h4>税率说明</h4>
+								<tbdoy> </tbdoy>
+								<table class="table">
+									<thead>
+										<tr>
+											<td>税前收入</td>
+											<td>税费计算公式</td>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>税前收入 &lt;= 800</td>
+											<td>0</td>
+										</tr>
+										<tr>
+											<td>800&lt;=税前收入&lt;4000</td>
+											<td>(税前收入-800)*20%</td>
+										</tr>
+										<tr>
+											<td>4000&lt;=税前收入&lt;25000</td>
+											<td>税前收入 *(1-20%)*20%</td>
+										</tr>
+										<tr>
+											<td>25000&lt;=税前收入&lt;62500</td>
+											<td>税前收入 *(1-20%)*30%-2000</td>
+										</tr>
+										<tr>
+											<td>62500&lt;=税前收入</td>
+											<td>税前收入 *(1-20%)*40%-7000</td>
+										</tr>
+
+									</tbody>
+								</table>
+								<p class="text-muted margint10">注：此税费计算表依据国家劳务报酬所得税税率说明，适用于个人开发者。
+									对于公司开发者，需开增值税专用发票。</p>
+							</div>
+							<div class="col-sm-6">
+								<h4>提款规则</h4>
+								<p class="text-muted margint10">个人用户：</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>每月只能申请一次提款，时间为第5个工作日产生上月分成信息/发票详情，节假日顺延。
+								</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>不足100元时，将累计至账户余额，直至达到100元，可进行提款操作，系统会生成付款记录。
+								</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>分成支付周期为每月15日-25日，超过每月最后一天未收到分成或退票通知可联系客服排查。
+								</p>
+								<p class="text-muted margint10">企业用户：</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>每月第5个工作日后，按照发票详情开具发票→填写发票信息→邮寄发票→发票审核→确认支付/发票详情，节假日顺延。
+								</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>若分成大于20万元，必须提供增值税专用发票。
+								</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>发票本身信息，需与系统内发票详情内容完全一致，否则无法支付分成。
+								</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>签收发票后3个工作日内完成审核，发票信息无法修改表示通过初步审核，若有问题将通过发票详情进行提示。
+								</p>
+								<p class="text-muted margint10">
+									<i class="iconfont icon-asterisk colorred"></i>当您修改发票类型或税率后，若出现无法填写发票号的情况时，您可先邮寄发票并说明此情况，系统会在次月重新
+									生成支付记录并安排付款。
+								</p>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="search_block clearfix">
+								<div class="form-group  clearfix">
+									<form action="ssp/withdrawRequestInfo/page" method="post" id="searchFM">
+										<div class="pull-left">
+											<div class="formgroup clearfix ">
+												<label>开始月份：</label><select name="startMonth"
+													class="dropdown bs-select-hidden">
+													<option value="">不限</option>
+													<#list 1..12 as idx >
+														<option value="${idx}">${idx}月</option>
+													</#list>
+												</select>
+<!-- 												<div class="btn-group bootstrap-select dropdown"> -->
+<!-- 													<button type="button" -->
+<!-- 														class="btn dropdown-toggle btn-default" -->
+<!-- 														data-toggle="dropdown" title="1月"> -->
+<!-- 														<span class="filter-option pull-left">1月</span>&nbsp;<span -->
+<!-- 															class="caret"></span> -->
+<!-- 													</button> -->
+<!-- 													<div class="dropdown-menu open"> -->
+<!-- 														<ul class="dropdown-menu inner" role="menu"> -->
+<!-- 															<li data-original-index="0" class="selected"><a -->
+<!-- 																tabindex="0" class="" style="" data-tokens="null"><span -->
+<!-- 																	class="text">1月</span><span -->
+<!-- 																	class="glyphicon glyphicon-ok check-mark"></span></a></li> -->
+<!-- 															<li data-original-index="1"><a tabindex="0" class="" -->
+<!-- 																style="" data-tokens="null"><span class="text">2</span><span -->
+<!-- 																	class="glyphicon glyphicon-ok check-mark"></span></a></li> -->
+<!-- 														</ul> -->
+<!-- 													</div> -->
+<!-- 												</div> -->
+											</div>
+											<div class="formgroup clearfix ">
+												<label>结束月份：</label> <select name="endMonth"
+													class="dropdown bs-select-hidden">
+													<option value="">不限</option>
+													<#list 1..12 as idx >
+														<option value="${idx}">${idx}月</option>
+													</#list>
+												</select>
+<!-- 												<div class="btn-group bootstrap-select dropdown"> -->
+<!-- 													<button type="button" -->
+<!-- 														class="btn dropdown-toggle btn-default" -->
+<!-- 														data-toggle="dropdown" title="1月"> -->
+<!-- 														<span class="filter-option pull-left">1月</span>&nbsp;<span -->
+<!-- 															class="caret"></span> -->
+<!-- 													</button> -->
+<!-- 													<div class="dropdown-menu open"> -->
+<!-- 														<ul class="dropdown-menu inner" role="menu"> -->
+<!-- 															<li data-original-index="0" class="selected"><a -->
+<!-- 																tabindex="0" class="" style="" data-tokens="null"><span -->
+<!-- 																	class="text">1月</span><span -->
+<!-- 																	class="glyphicon glyphicon-ok check-mark"></span></a></li> -->
+<!-- 															<li data-original-index="1"><a tabindex="0" class="" -->
+<!-- 																style="" data-tokens="null"><span class="text">2</span><span -->
+<!-- 																	class="glyphicon glyphicon-ok check-mark"></span></a></li> -->
+<!-- 														</ul> -->
+<!-- 													</div> -->
+<!-- 												</div> -->
+											</div>
+											<div class="formgroup clearfix ">
+												<label>付款状态：</label> <select name="state"
+													class="dropdown bs-select-hidden">
+													<option value="">全部</option>
+													<option value="1">待结算</option>
+													<option value="2">已结算</option>
+													<option value="3">结算失败</option>
+												</select>
+<!-- 												<div class="btn-group bootstrap-select dropdown"> -->
+<!-- 													<button type="button" -->
+<!-- 														class="btn dropdown-toggle btn-default" -->
+<!-- 														data-toggle="dropdown" title="全部"> -->
+<!-- 														<span class="filter-option pull-left">全部</span>&nbsp;<span -->
+<!-- 															class="caret"></span> -->
+<!-- 													</button> -->
+<!-- 													<div class="dropdown-menu open"> -->
+<!-- 														<ul class="dropdown-menu inner" role="menu"> -->
+<!-- 															<li data-original-index="0" class="selected"><a -->
+<!-- 																tabindex="0" class="" style="" data-tokens="null"><span -->
+<!-- 																	class="text">全部</span><span -->
+<!-- 																	class="glyphicon glyphicon-ok check-mark"></span></a></li> -->
+<!-- 															<li data-original-index="1"><a tabindex="0" class="" -->
+<!-- 																style="" data-tokens="null"><span class="text">2</span><span -->
+<!-- 																	class="glyphicon glyphicon-ok check-mark"></span></a></li> -->
+<!-- 														</ul> -->
+<!-- 													</div> -->
+<!-- 												</div> -->
+											</div>
+										</div>
+										<input type="hidden" id="currPageNoInput" name="currentPageNo" value="1"/>
+										<input type="hidden" id="currPageSizeInput" name="pageSize" value="5"/>
+										<div class="pull-right">
+											<a href="javascript:void(0)" class="btn btn-sm" onclick="$('#searchFM').submit();">提交</a>
+										</div>
+									</form>
+								</div>
+							</div>
+						</div>
+						<div class="block_content margintb30">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-md-12">
+										<table class="table">
+											<thead>
+												<tr>
+													<th>时间</th>
+													<th>税前收入(元)</th>
+													<th>代扣税</th>
+													<th>实际支付金额（税后/元）</th>
+													<th>支付状态</th>
+												</tr>
+											</thead>
+											<tbody id="dataBody"></tbody>
+										</table>
+										<!-- 分页开始 -->
+										<div class="bs-component clearfix pull-right" id="page"></div>
+										<!-- 分页结束 -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+<!-- 			<div class="savewarp text-center"> -->
+<!-- 				<a href="#" class="btn formbtn green">完成</a> <a href="#" -->
+<!-- 					class="btn formbtn bk999">取消</a> -->
+<!-- 			</div> -->
+		</div>
+	</div>
+	<script type="text/javascript" src="js/ssp/finance/settlementInfo.js"></script>
+</body>
+</html>

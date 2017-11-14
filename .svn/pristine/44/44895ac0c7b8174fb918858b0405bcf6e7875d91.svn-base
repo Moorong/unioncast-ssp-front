@@ -1,0 +1,934 @@
+$(function() {
+	$('.nav-tabs a').click(function(){
+		currReportTabIndex = $('.nav-tabs a').index(this);
+		switch(currReportTabIndex){
+			case 0:
+				showCreativeReport();
+				break;
+			case 1:
+				showMTReport();
+				break;
+			case 2:
+					
+				break;
+		}
+	});
+	/* 组件初始化 */
+	// 下拉菜单
+	$(".dropdown").selectpicker({});
+	var defDateFormat = "YYYY-MM-DD";
+	var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+	var defEndDate = moment().format(defDateFormat);
+	/* 双日历组件 */
+	$('div[id="reportrange2"] span').html(defStartDate + ' - ' + defEndDate);
+
+	// 默认为时间空间赋值
+	$('input[name="startTimeTem"]').val(getMapDate(7));
+	$('input[name="endTimeTem"]').val(getMapDate(0));
+
+	$('div[id="reportrange2"]').daterangepicker(
+			{
+				startDate : defStartDate
+			},
+			function(start, end) {
+				var choStart = start.format(defDateFormat);
+				var choEnd = end.format(defDateFormat);
+				$('div[id="reportrange2"] span').html(choStart + ' - ' + choEnd);
+				$('input[name="startTimeTem"]').val(choStart);
+				$('input[name="endTimeTem"]').val(choEnd);
+				$('div[id="reportrange2"] span').html(
+						start.format(defDateFormat) + ' - '
+								+ end.format(defDateFormat));
+			});
+
+	/*
+	 * $('#element').popover({ //trigger:"focus", //如果设为focus
+	 * 当按钮失去焦点提示层会消失，例如页面空白处单机提示层消失 placement: "left", html: true, content: '<p>至少选择一项</p>' + '<div
+	 * class="clearfix" style="padding:12px 0; border-bottom:1px solid
+	 * #e7e9ef;">' + '<label class="checkbox-inline">' + '<input
+	 * type="checkbox" value="日期" id="upti">日期' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="广告主"
+	 * checked="checked" id="advertiser">广告主' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="订单"
+	 * checked="checked" id="order">订单' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="策略"
+	 * checked="checked" id="plan">策略' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="创意"
+	 * id="creative">创意' + '</label>' + '</div>' + '<div class="clearfix">' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="曝光"
+	 * checked="checked" id="showTimes">曝光' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="消耗"
+	 * checked="checked" id="consumption">消耗' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="CPM"
+	 * checked="checked" id="cpm">CPM' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="点击"
+	 * checked="checked" id="clickTimes">点击' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="点击率"
+	 * checked="checked" id="clickRatio">点击率' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="CPC"
+	 * checked="checked" id="cpc">CPC' + '</label>' + '</div>' + '<div
+	 * class="clearfix">' + '<label class="checkbox-inline">' + '<input
+	 * type="checkbox" value="到达" id="arrival">到达' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="转化"
+	 * checked="checked" id="transform">转化' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="CPA"
+	 * checked="checked" id="cpa">CPA' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="二跳"
+	 * id="secondJump">二跳' + '</label>' + '<label class="checkbox-inline">' + '<input
+	 * type="checkbox" value="二跳率" id="secondJumpRatio">二跳率' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="到达率"
+	 * id="arrivalRatio">到达率' + '</label>' + '</div>' + '<div
+	 * class="clearfix">' + '<label class="checkbox-inline">' + '<input
+	 * type="checkbox" value="点击转化" id="clickTransform">点击转化' + '</label>' + '<label
+	 * class="checkbox-inline">' + '<input type="checkbox" value="点击转化率"
+	 * id="clickTransformRatio">点击转化率' + '</label>' + '</div>' + '<div
+	 * class="text-center" style="margin-top:10px;">' + '<a
+	 * href="javascript:void(0)" id="confirm" onclick="confirmMeth()" class="btn
+	 * btn2 green" style="padding:5px;">确定</a>' + '<a
+	 * href="javascript:void(0)" class="btn btn2" style="padding:5px;">取消</a>' + '</div>'
+	 * }); $(document).on('click', '#tbnok', function (e) { var size =
+	 * $(this).parent().parent().find('input[type="checkbox"]:checked').length;
+	 * $('#element').popover('hide'); });
+	 */
+	/*
+	 * $(".orderId").select2({ language: "zh-CN", placeholder:'请选择',
+	 * allowClear:true });
+	 */
+	
+	showCreativeReport();
+});
+function showCreativeReport(){
+	// 初始化广告报表数据
+	pullDownAdvertiserId();
+	loadData(1);
+}
+
+$("[data-toggle='tooltip']").tooltip();
+
+$("a[id='exportExcel']").click(function() {
+	var $this = $(this);
+	var defDateFormat = "yyyyMMdd";
+	var defDate = new Date().format(defDateFormat);
+	var filename = defDate + $this.attr('ecfn');
+	$this.parent().parent().find('table').table2excel({
+		// exclude CSS class
+		/* exclude: ".noExl", */
+		name : "Worksheet Name",
+		filename : filename
+	// do not include extension
+	});
+	/*
+	 * $("#adTable").tableExport({ type: 'excel', tableName: 'yourTableName',
+	 * escape: 'false' });
+	 */
+	/*
+	 * $("#adTable").table2excel({ /!*exclude: ".noExl",*!/ name: "Excel
+	 * Document Name", filename: "myFileName", exclude_img: true, exclude_links:
+	 * true, exclude_inputs: true });
+	 */
+})
+
+function adConfirmMeth() {
+	var index = currReportTabIndex;
+	if ($("div[id='checkboxNoZero']:eq("+index+") :checkbox:checked").size() == 0) {
+		alert("请至少选择一项");
+		return;
+	}
+	hideShowColumns0();
+	$("div[id='selectColumn']").eq(index).css('display', 'none');
+	flushColResize();
+}
+
+function adCancelMeth() {
+	var index = $('a[id="adCancel"]').index(event.currentTarget);
+	/*
+	 * if ($("#checkboxNoZero :checkbox:checked").size() == 0) {
+	 * alert("请至少选择一项"); return; }
+	 */
+//	hideShowChecked(index);
+	$("div[id='selectColumn']").eq(index).css('display', 'none');
+}
+
+// 广告主
+function pullDownAdvertiserId() {
+	page.ajax({
+		url : 'sspAdvertiser/find',
+		cache : false,
+		// data: {startTime: startTime, endTime: endTime, currentPageNo:
+		// currentPageNo},
+		success : function(res) {
+			var data = res.result;
+
+			if (data != null && data.length != 0) {
+				$.each(data, function(index, report) {
+					$("[name=advertiserId]").append(
+							'<option value=' + report.id + '>' + report.name
+									+ '</option>');
+				});
+				$("[name=advertiserId]").selectpicker('refresh');
+			} else {
+				$("[name=advertiserId]").append(
+						'<option value="">暂无广告主</option>');
+				$("[name=advertiserId]").selectpicker('refresh');
+			}
+		},
+		error : function(err) {
+
+		}
+	});
+}
+
+// 订单
+function pullDownOrderId() {
+
+	if ($("[name=advertiserId]").val() != undefined
+			&& $("[name=advertiserId]").val() != null
+			&& $("[name=advertiserId]").val() != '') {
+		var id = $("[name=advertiserId]").val();
+		$.ajax({
+			url : 'rest/sspOrder/findByAdverId',
+			cache : false,
+			type : 'post',
+			datatype : 'json',
+			data : {
+				id : id
+			},
+			success : function(res) {
+
+				$("[name=orderId]").empty();
+				var data = res.result;
+				if (data != null && data.length != 0) {
+					$("[name=orderId]").append('<option value="">全部</option>');
+					$.each(data, function(index, report) {
+						$("[name=orderId]").append(
+								'<option value=' + report.id + '>'
+										+ report.name + '</option>');
+					});
+					$("[name=orderId]").selectpicker('refresh');
+				} else {
+					$("[name=orderId]")
+							.append('<option value="">暂无订单</option>');
+					$("[name=orderId]").selectpicker('refresh');
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+	/* $("[name=orderId]").empty(); */
+	$("[name=planId]").empty();
+	$("[name=creativeId]").empty();
+	/* $("[name=orderId]").append('<option value="">全部</option>'); */
+	$("[name=planId]").append('<option value="">全部</option>');
+	$("[name=creativeId]").append('<option value="">全部</option>');
+	/* $("[name=orderId]").selectpicker('refresh'); */
+	$("[name=planId]").selectpicker('refresh');
+	$("[name=creativeId]").selectpicker('refresh');
+}
+
+// 策略
+function pullDownPlanId() {
+	if ($("[name=orderId]").val() != undefined
+			&& $("[name=orderId]").val() != null
+			&& $("[name=orderId]").val() != '') {
+		var id = $("[name=orderId]").val();
+		page
+				.ajax({
+					url : 'ssp/plan/findByOrderId',
+					cache : false,
+					// async: false,
+					data : {
+						id : id
+					},
+					success : function(res) {
+						$("[name=planId]").empty();
+						var data = res.result;
+						if (data != null && data.length != 0) {
+							$("[name=planId]").append(
+									'<option value="">全部</option>');
+							$.each(data, function(index, report) {
+								$("[name=planId]").append(
+										'<option value=' + report.id + '>'
+												+ report.name + '</option>');
+							});
+							$("[name=planId]").selectpicker('refresh');
+						} else {
+							$("[name=planId]").append(
+									'<option value="">暂无策略</option>');
+							$("[name=planId]").selectpicker('refresh');
+						}
+					},
+					error : function(err) {
+
+					}
+				});
+	}
+	/* $("[name=planId]").empty(); */
+	$("[name=creativeId]").empty();
+	/* $("[name=planId]").append('<option value="">全部</option>'); */
+	$("[name=creativeId]").append('<option value="">全部</option>');
+	/* $("[name=planId]").selectpicker('refresh'); */
+	$("[name=creativeId]").selectpicker('refresh');
+	/* }) */
+}
+
+// 创意
+/* $("[name=planId]").change(function () { */
+function pullDownCreativeId() {
+
+	if ($("[name=planId]").val() != undefined
+			&& $("[name=planId]").val() != null
+			&& $("[name=planId]").val() != '') {
+		var id = $("[name=advertiserId]").val();
+		page.ajax({
+			url : 'sspOrder/findCreativeByAdverId',
+			cache : false,
+			data : {
+				id : id
+			},
+			success : function(res) {
+
+				$("[name=creativeId]").empty();
+				var data = res.result;
+				if (data != null && data.length != 0) {
+					$("[name=creativeId]").append(
+							'<option value="">全部</option>');
+					$.each(data, function(index, report) {
+
+						$("[name=creativeId]").append(
+								'<option value=' + report.id + '>'
+										+ report.creativeName + '</option>');
+					});
+					$("[name=creativeId]").selectpicker('refresh');
+				} else {
+					$("[name=creativeId]").append(
+							'<option value="">暂无创意</option>');
+					$("[name=creativeId]").selectpicker('refresh');
+				}
+			},
+			error : function(err) {
+
+			}
+		});
+	}
+	/*
+	 * $("[name=creativeId]").empty(); $("[name=creativeId]").append('<option
+	 * value="">全部</option>'); $("[name=creativeId]").selectpicker('refresh');
+	 */
+}
+
+// 广告主
+/*
+ * function pullDownAdvertiserId() {
+ * 
+ * var datas = ""; page.ajax({ url: 'sspAdvertiser/find', cache: false, // data:
+ * {startTime: startTime, endTime: endTime, currentPageNo: currentPageNo},
+ * success: function (res) {
+ * 
+ * /!* $.ajax({ url: 'sspAdvertiser/find', type: 'POST', cache: false,
+ * }).done(function (res) {*!/ // $(popup).find("[name=channel]").empty(); var
+ * data = res.result;
+ * 
+ * datas = "["; if (data != null && data.length != 0) {
+ * 
+ * /!*$(".advertiserId").empty();*!/ $.each(data, function (index, report) {
+ * /!*datas += "{ id: " + report.id + ", text: '" + report.name + "' },";*!/
+ * 
+ * $(".advertiserId").append('<option value=' + report.id + '>' + report.name + '</option>');
+ * }); /!* datas = datas.substring(0, datas.length - 1); datas += "]";
+ * //字符串转成json datas = eval("(" + datas + ")");*!/
+ * /!*$(".advertiserId").val(null).trigger("change");*!/ /!*
+ * $(".advertiserId").select2({ placeholder: '请选择', language: "zh-CN",
+ * allowClear: true, data: datas });*!/
+ * $(".advertiserId").selectpicker('refresh'); } else { /!*
+ * $(".advertiserId").select2({ placeholder: '请选择', language: "zh-CN" });*!/
+ * //$("[name=advertiserId]").append('<option value="">暂无广告主</option>');
+ * ///$("[name=advertiserId]").selectpicker('refresh'); } }, error: function
+ * (err) {
+ *  }
+ * 
+ * });
+ * 
+ * /!* $(".advertiserId").select2({ placeholder: '请选择', language: "zh-CN",
+ * allowClear: true, data: datas });*!/ }
+ * 
+ * 
+ * //订单 /* $("[name=advertiserId]").change(function () {
+ */
+/*
+ * 
+ * function pullDownOrderId() {
+ * 
+ * var datas = ''; if ($("[name=advertiserId]").val() != undefined &&
+ * $("[name=advertiserId]").val() != null && $("[name=advertiserId]").val() !=
+ * '') { var id = $("[name=advertiserId]").val(); page.ajax({ url:
+ * 'sspOrder/findByAdverId', cache: false, data: {id: id}, success: function
+ * (res) { $(".orderId").empty(); var data = res.result; if (data != null &&
+ * data.length != 0) {
+ * 
+ * datas = "["; /!*$(".orderId").append('<option value="">全部</option>');*!/
+ * $.each(data, function (index, report) { datas += "{ id: " + report.id + ",
+ * text: '" + report.name + "' },"; /!* $("[name=orderId]").append('<option
+ * value=' + report.id + '>' + report.name + '</option>'); !/ }); datas =
+ * datas.substring(0, datas.length - 1); datas += "]"; //字符串转成json datas =
+ * eval("(" + datas + ")"); /!* $(".orderId").select2({ language: "zh-CN",
+ * placeholder: '请选择', allowClear: true, data: datas });*!/
+ * /!*$("[name=orderId]").selectpicker('refresh');*!/ } else { /!*
+ * $(".orderId").select2({ language: "zh-CN", placeholder: '请选择' });*!/
+ * /!*$(".orderId").append('<option value="">暂无订单</option>');
+ * $(".orderId").selectpicker('refresh');*!/ } }, error: function (err) {
+ *  } }); }
+ * 
+ * $(".orderId").select2({ language: "zh-CN", placeholder: '请选择', allowClear:
+ * true, data: datas });
+ * 
+ * /!* /!*$("[name=orderId]").empty();*!/ $("[name=planId]").empty();
+ * $("[name=creativeId]").empty(); /!*$("[name=orderId]").append('<option
+ * value="">全部</option>');*!/ $("[name=planId]").append('<option value="">全部</option>');
+ * $("[name=creativeId]").append('<option value="">全部</option>');
+ * /!*$("[name=orderId]").selectpicker('refresh');*!/
+ * $("[name=planId]").selectpicker('refresh');
+ * $("[name=creativeId]").selectpicker('refresh'); /!* })*!/!*!/ }
+ */
+
+/* 搜索按钮提交 */
+$("#searchAD")
+		.click(
+				function() {
+					$('input[name="startTime"]').val(
+							$('input[name="startTimeTem"]').val());
+					$('input[name="endTime"]').val(
+							$('input[name="endTimeTem"]').val());
+
+					page.ajaxSubmit($("#adReportForm").eq(0)[0], function(
+							resultJson, resultMsg, xmlHttpResponse) {
+
+						if (resultJson.result.dataArray.length != 0) {
+							$("#adReportList").html("");
+							loadPage(resultJson);
+						} else {
+							// alert("没有查询到数据！")
+							// loadData(1);
+							noData();
+						}
+					}, function(xmlHttpRequest, errorMsg, errorObj) {
+
+					});
+				});
+
+// 加载数据
+function loadData(currentPageNo) {
+	var startTime = $('input[name="startTime"]').val();
+	var endTime = $('input[name="endTime"]').val();
+	var advertiserId = $('select[name="advertiserId"]').val();
+	var orderId = $('select[name="orderId"]').val();
+	var planId = $('select[name="planId"]').val();
+	var creativeId = $('select[name="creativeId"]').val();
+	page.ajax({
+		url : 'ssp/report/adPage',
+		data : {
+			startTime : startTime,
+			endTime : endTime,
+			advertiserId : advertiserId,
+			orderId : orderId,
+			planId : planId,
+			creativeId : creativeId,
+			currentPageNo : currentPageNo
+		},
+		success : function(data) {
+
+			if (data.result != null && data.result.dataArray.length != null) {
+				$("#adReportList").html("");
+				/* $("#adReportPage").empty(); */
+				loadPage(data);
+				/* $("#adTable").tablesorter(); */
+			} else {
+				// alert("没有查询到数据！")
+				noData();
+				return false;
+			}
+		},
+		error : function(err) {
+			noData();
+		}
+	});
+
+}
+function noData() {
+	var index = currReportTabIndex;
+	$("tbody[id='adReportList']:eq("+index+")").html("");
+	$("tbody[id='adReportList']:eq("+index+")")
+			.append(
+					"<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"19\">暂时没有数据</td></tr>");
+	var totalPage = 1;
+	var totalCount = 0;
+	var startPage = 1;
+	$('div[id="adReportPage"]:eq('+index+')').html('');
+	$('div[id="adReportPage"]:eq('+index+')').html(
+			'<ul id="adPage" class="bs-component pull-right"></ul>');
+
+	page.ajaxPage({
+		pcont : 'div[id="adPage"]:eq('+index+')',// 分页容器，ID
+		totalPages : totalPage, // 总页数
+		startPage : startPage,
+		count : totalCount, // 总记录数
+		onPageClick : function(env, thisPage) {
+			if ($(":input[id='checkboxNoZero']:eq("+index+") :checkbox:checked").size() == 0) {
+				alert("请至少选择一项");
+				return;
+			}
+			// CurrentPageNo = thisPage;
+			// loadData(thisPage);
+		}
+	});
+}
+
+// 加载数据
+function loadPage(data) {
+	var datas = data.result.dataArray;
+
+	$.each(datas,
+			function(index, report) {
+				var html = "<tr>";
+				/*
+				 * html += "<td>"+report.sspAdvertiser.name+"</td>"; html += "<td>"+report.sspOrder.name+"</td>";
+				 * html += "<td>"+report.sspPlan.name+"</td>";
+				 */
+
+				var advertiser = (report.advertiserName) == null ? '(空)'
+						: report.advertiserName;
+				var advertiserStr = subStr(advertiser);
+
+				var order = (report.orderName) == null ? '(空)'
+						: report.orderName;
+				var orderStr = subStr(order);
+
+				var plan = (report.planName) == null ? '(空)' : report.planName;
+				var planStr = subStr(plan);
+
+				var creative = (report.creativeName) == null ? '(空)'
+						: report.creativeName;
+				var creativeStr = subStr(creative);
+
+				var consumption = (report.consumption) == null ? '0'
+						: (report.consumption);
+				var consumptionStr = consumption.toFixed(2);
+
+				var cpm = (report.cpm) == null ? '0' : (report.cpm);
+				var cpmStr = cpm.toFixed(2);
+
+				var clickRatio = (report.clickRatio) == null ? '0'
+						: (report.clickRatio);
+				var clickRatioStr = clickRatio.toFixed(2);
+
+				var cpc = (report.cpc) == null ? '0' : (report.cpc);
+				var cpcStr = cpc.toFixed(2);
+
+				var cpa = (report.cpa) == null ? '0' : (report.cpa);
+				var cpaStr = cpa.toFixed(2);
+
+				html += "<td class='el1'>" + report.updateTimeStr + "</td>";
+				html += "<td class='el2' title='" + advertiser + "'>"
+						+ advertiserStr + "</td>";
+				html += "<td class='el3' title='" + order + "'>" + orderStr
+						+ "</td>";
+				html += "<td class='el4' title='" + plan + "'>" + planStr
+						+ "</td>";
+				html += "<td class='el5' title='" + creative + "'>"
+						+ creativeStr + "</td>";
+				html += "<td class='el6'>"
+						+ ((report.showTimes) == null ? '0'
+								: (report.showTimes)) + "</td>";
+				html += "<td class='el7' title='" + consumption + "'>"
+						+ consumptionStr + "</td>";
+				html += "<td class='el8' title='" + cpm + "'>" + cpmStr
+						+ "</td>";
+				html += "<td class='el9'>"
+						+ ((report.clickTimes) == null ? '0'
+								: (report.clickTimes)) + "</td>";
+				html += "<td class='el10' title='" + clickRatio + "'>"
+						+ clickRatioStr + "</td>";
+				html += "<td class='el11' title='" + cpc + "'>" + cpcStr
+						+ "</td>";
+				html += "<td class='el12'>"
+						+ ((report.arrival) == null ? '0' : (report.arrival))
+						+ "</td>";
+				html += "<td class='el13'>"
+						+ ((report.transform) == null ? '0'
+								: (report.transform)) + "</td>";
+				html += "<td class='el14' title='" + cpa + "'>" + cpaStr
+						+ "</td>";
+				html += "<td class='el15'>"
+						+ ((report.secondJump) == null ? '0'
+								: (report.secondJump)) + "</td>";
+				html += "<td class='el16'>"
+						+ ((report.secondJumpRatio) == null ? '0'
+								: (report.secondJumpRatio)) + "</td>";
+				html += "<td class='el17'>"
+						+ ((report.arrivalRatio) == null ? '0'
+								: (report.arrivalRatio)) + "</td>";
+				html += "<td class='el18'>"
+						+ ((report.clickTransform) == null ? '0'
+								: (report.clickTransform)) + "</td>";
+				html += "<td class='el19'>"
+						+ ((report.clickTransformRatio) == null ? '0'
+								: (report.clickTransformRatio)) + "</td>";
+
+				html += "</tr>";
+
+				$("#adReportList").append(html);
+				/* hideShowColumns0() */
+			});
+	
+	if (data.result.dataArray.length == 0) {
+		noData();
+	}
+
+
+	var totalPage = data.result.totalPage;
+	var totalCount = data.result.totalCount;
+	var startPage = data.result.currentPageNo;
+	$('#adReportPage').html('');
+	$('#adReportPage').html(
+			'<ul id="adPage" class="bs-component pull-right"></ul>');
+
+	page.ajaxPage({
+		pcont : 'adPage',// 分页容器，ID
+		totalPages : totalPage, // 总页数
+		startPage : startPage,
+		count : totalCount, // 总记录数
+		onPageClick : function(env, thisPage) {
+			if ($("#checkboxNoZero :checkbox:checked").size() == 0) {
+				alert("请至少选择一项");
+				return;
+			}
+			CurrentPageNo = thisPage;
+			loadData(thisPage);
+		}
+	});
+	hideShowColumns0();
+	flushColResize();
+}
+
+/** 日期转换工具 */
+function getMoth(str) {
+	var oDate = new Date(str).format("yyyy-MM-dd");
+	return oDate;
+}
+
+// 处理默认时间工具
+function addDate(dd, dadd) {
+	var a = new Date(dd)
+	a = a.valueOf()
+	a = a + dadd * 24 * 60 * 60 * 1000
+	a = new Date(a)
+	return a;
+}
+
+function subStr(data) {
+	var dataStr = data;
+	if (data.length > 5) {
+		dataStr = data.substring(0, 5) + "...";
+	}
+	return dataStr;
+}
+
+function getMapDate(dayss) {
+	var now = new Date();
+	var NextNow = addDate(now, -dayss);
+	var years = NextNow.getFullYear();
+	var months = NextNow.getMonth() + 1;
+	var days = NextNow.getDate();
+	return years + "-" + months + "-" + days;
+}
+
+$('a[id="element"]').click(function() {
+	var index = $('a[id="element"]').index(this);
+	if ($("div[id='checkboxNoZero']:eq("+index+") :checkbox:checked").size() == 0) {
+		alert("请至少选择一项");
+		return;
+	}
+	if ($("div[id='selectColumn']").eq(index).css("display") == "none") {
+		$("div[id='selectColumn']").eq(index).css('display', 'block');
+	} else {
+		$("div[id='selectColumn']").eq(index).css('display', 'none');
+	}
+})
+
+function hideShowColumns0() {
+	var index  = currReportTabIndex;
+	var $theadTr = $('table:eq('+index+') tr:first');
+	if ($(':input[id="upti"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(0)').show();
+		$('.el1').show();
+
+	} else {
+		$theadTr.find('th:eq(0)').hide();
+		$('.el1').hide();
+	}
+	if ($(':input[id="advertiser"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(1)').show();
+		$('.el2').show();
+	} else {
+		$theadTr.find('th:eq(1)').hide();
+		$('.el2').hide();
+	}
+	if ($(':input[id="order"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(2)').show();
+		$('.el3').show();
+
+	} else {
+		$theadTr.find('th:eq(2)').hide();
+		$('.el3').hide();
+	}
+	if ($(':input[id="plan"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(3)').show();
+		$('.el4').show();
+
+	} else {
+		$theadTr.find('th:eq(3)').hide();
+		$('.el4').hide();
+	}
+	if ($(':input[id="creative"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(4)').show();
+		$('.el5').show();
+
+	} else {
+		$theadTr.find('th:eq(4)').hide();
+		$('.el5').hide();
+	}
+	if ($(':input[id="showTimes"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(5)').show();
+		$('.el6').show();
+
+	} else {
+		$theadTr.find('th:eq(5)').hide();
+		$('.el6').hide();
+	}
+	if ($(':input[id="consumption"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(6)').show();
+		$('.el7').show();
+
+	} else {
+		$theadTr.find('th:eq(6)').hide();
+		$('.el7').hide();
+	}
+	if ($(':input[id="cpm"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(7)').show();
+		$('.el8').show();
+
+	} else {
+		$theadTr.find('th:eq(7)').hide();
+		$('.el8').hide();
+	}
+	if ($(':input[id="clickTimes"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(8)').show();
+		$('.el9').show();
+
+	} else {
+		$theadTr.find('th:eq(8)').hide();
+		$('.el9').hide();
+	}
+	if ($(':input[id="clickRatio"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(9)').show();
+		$('.el10').show();
+
+	} else {
+		$theadTr.find('th:eq(9)').hide();
+		$('.el10').hide();
+	}
+	if ($(':input[id="cpc"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(10)').show();
+		$('.el11').show();
+
+	} else {
+		$theadTr.find('th:eq(10)').hide();
+		$('.el11').hide();
+	}
+	if ($(':input[id="arrival"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(11)').show();
+		$('.el12').show();
+
+	} else {
+		$theadTr.find('th:eq(11)').hide();
+		$('.el12').hide();
+	}
+	if ($(':input[id="transform"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(12)').show();
+		$('.el13').show();
+
+	} else {
+		$theadTr.find('th:eq(12)').hide();
+		$('.el13').hide();
+	}
+	if ($(':input[id="cpa"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(13)').show();
+		$('.el14').show();
+
+	} else {
+		$theadTr.find('th:eq(13)').hide();
+		$('.el14').hide();
+	}
+	if ($(':input[id="secondJump"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(14)').show();
+		$('.el15').show();
+
+	} else {
+		$theadTr.find('th:eq(14)').hide();
+		$('.el15').hide();
+	}
+	if ($(':input[id="secondJumpRatio"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(15)').show();
+		$('.el16').show();
+
+	} else {
+		$theadTr.find('th:eq(15)').hide();
+		$('.el16').hide();
+	}
+	if ($(':input[id="arrivalRatio"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(16)').show();
+		$('.el17').show();
+
+	} else {
+		$theadTr.find('th:eq(16)').hide();
+		$('.el17').hide();
+	}
+	if ($(':input[id="clickTransform"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(17)').show();
+		$('.el18').show();
+
+	} else {
+		$theadTr.find('th:eq(17)').hide();
+		$('.el18').hide();
+	}
+	if ($(':input[id="clickTransformRatio"]').eq(index).is(':checked')) {
+		$theadTr.find('th:eq(18)').show();
+		$('.el19').show();
+
+	} else {
+		$theadTr.find('th:eq(18 )').hide();
+		$('.el19').hide();
+	}
+
+}
+
+function hideShowChecked() {
+	var index = currReportTabIndex;
+	var $theadTr = $('table:eq('+index+') tr:first');
+	
+	if ($theadTr.find('th:eq(0)').is(':hidden')) {
+		$(":input[id='upti']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("upti");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(1)').is(':hidden')) {
+		$(":input[id='advertiser']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("advertiser");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(2)').is(':hidden')) {
+		$(":input[id='order']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("order");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(3)').is(':hidden')) {
+		$(":input[id='plan']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("plan");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(4)').is(':hidden')) {
+		$(":input[id='creative']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("creative");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(5)').is(':hidden')) {
+		$(":input[id='showTimes']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("showTimes");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(6)').is(':hidden')) {
+		$(":input[id='consumption']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("consumption");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(7)').is(':hidden')) {
+		$(":input[id='cpm']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("cpm");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(8)').is(':hidden')) {
+		$(":input[id='clickTimes']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("clickTimes");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(9)').is(':hidden')) {
+		$(":input[id='clickRatio']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("clickRatio");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(10)').is(':hidden')) {
+		$(":input[id='cpc']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("cpc");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(11)').is(':hidden')) {
+		$(":input[id='arrival']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("arrival");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(12)').is(':hidden')) {
+		$(":input[id='transform']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("transform");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(13)').is(':hidden')) {
+		$(":input[id='cpa']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("cpa");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(14)').is(':hidden')) {
+		$(":input[id='secondJump']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("secondJump");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(15)').is(':hidden')) {
+		$(":input[id='secondJumpRatio']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("secondJumpRatio");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(16)').is(':hidden')) {
+		$(":input[id='arrivalRatio']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("arrivalRatio");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(17)').is(':hidden')) {
+		$(":input[id='clickTransform']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("clickTransform");
+		s.checked = true;
+	}
+	if ($theadTr.find('th:eq(18)').is(':hidden')) {
+		$(":input[id='clickTransformRatio']").eq(index).attr("checked", false);
+	} else {
+		var s = document.getElementById("clickTransformRatio");
+		s.checked = true;
+	}
+}

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+<body>
+	
+	<!-- 右侧开始 -->
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">媒体管理</a> <i> / </i><a href="#">广告位管理</a> <i> / </i> <span>广告位后台管理</span></h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<div class="search_block clearfix">
+				<div class="form-group  clearfix">
+					<div class="pull-left">
+						<div class="formgroup clearfix ">
+						    <label>广告位类型：</label>
+					      	<select class="dropdown" id="adPositionTypes">
+					      	
+							</select>
+						</div>
+						<div class="formgroup clearfix ">
+						    <label>广告位状态</label>
+					      	<select class="dropdown" id="state">
+						    	<option value="">全部</option>
+						    	<option value="1">开启</option>
+						    	<option value="2">关闭</option>
+							</select>
+						</div>
+						<div class="formgroup clearfix ">
+						    <label>修改时间：</label>
+							<div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+								<i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+								<span></span> <b class="caret"></b>
+								<input type="hidden" name="startTimeTem" value=""/>
+								<input type="hidden" name="endTimeTem" value=""/>
+								<input type="hidden" name="startTime" value=""/>
+								<input type="hidden" name="endTime" value=""/>
+			               </div>
+						</div>
+
+					</div>
+					<div class="pull-right">
+						<div class="has-feedback clearfix ">
+					  		<label class="control-label sr-only" for="inputSuccess2">状态</label>
+					 		<input type="text" class="form-control" id="inputSuccess2" placeholder="请输入广告位名称" name="adPositionName">
+			            </div>
+			            <a href="javascript:void(0)" class="btn btn-sm" id="search">查询</a>
+		            </div>
+				</div>
+			</div>
+			<!-- 间隔 -->
+			<div style="height:10px;background:#f1f2f7;"></div>
+			<!-- 间隔 -->
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table" >
+								<thead>
+									<tr>
+										<th>创建时间<i class="iconfont icon-sort"></i></th>
+										<th>广告位名称</th>
+										<th>所属应用</th>
+										<th>广告位类型</th>
+										<th>广告位状态</th>
+										<th>作弊系数<i class="iconfont icon-sort"></i></th>
+										<th>数据报表</th>
+										<th>操作记录</th>
+									</tr>
+								</thead>
+								<tbody id="adPositionList">
+								
+								</tbody>
+							</table>
+							<!-- 分页开始 -->
+							<div class="bs-component clearfix pull-right" id="page">
+							
+							</div>
+							<!-- 分页结束 -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!-- 表单内容结束 -->
+	<!-- 右侧结束 -->
+</body>
+<script>
+$(function () {
+	/*组件初始化*/
+	loadswitch();
+	//下拉菜单
+     $(".dropdown").selectpicker({});
+    var defDateFormat = "YYYY-MM-DD";
+    var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+    var defEndDate = moment().format(defDateFormat);
+    /*双日历组件*/
+    $('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+
+    //默认为时间空间赋值
+    $('input[name="startTimeTem"]').val(getMapDate(7));
+    $('input[name="endTimeTem"]').val(getMapDate(0));
+
+    $('#reportrange2').daterangepicker({
+            startDate: defStartDate
+        },
+        function (start, end) {
+            var choStart = start.format(defDateFormat);
+            var choEnd = end.format(defDateFormat);
+            $('#reportrange2 span').html(choStart + ' - ' + choEnd);
+            $('input[name="startTimeTem"]').val(choStart);
+            $('input[name="endTimeTem"]').val(choEnd);
+            $('#reportrange2 span').html(start.format(defDateFormat) + ' - ' + end.format(defDateFormat));
+	});
+	
+	loadAdPositionType();
+	
+	//初始化加载
+	loadData(1);
+});
+function loadswitch(){
+	$("[data-toggle='tooltip']").tooltip();
+	$("input[name='switch']").bootstrapSwitch({
+		onText:"开",
+		offText:"关",
+		size:"mini",
+		onSwitchChange:function(event,state){
+			if(state==true){
+				updateState($(this),1);
+				$(this).val("1");
+			}else{
+				updateState($(this),2);
+				$(this).val("2");
+			}
+		}  
+	});
+}
+//更改开关状态
+function updateState(_this,val) {
+	var id = _this.closest('tr').find('input[type="hidden"]').val();
+    var url = "sspAdPositionInfo/updateInfo";
+    page.ajax({
+        url:url,
+        data:{id:id,state:val},
+        type:'post',
+        success:function (data) {
+        },
+        error : function (){
+        	alert("请求失败");
+        }
+    });
+    
+}
+//字符串转化为时间
+function getDay(str) {
+	var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+	return oDate;
+};
+//处理默认时间工具
+function addDate(dd, dadd) {
+	var a = new Date(dd)
+	a = a.valueOf()
+	a = a + dadd * 24 * 60 * 60 * 1000
+	a = new Date(a)
+	return a;
+}
+function getMapDate(dayss) {
+	var now = new Date();
+	var NextNow = addDate(now, -dayss);
+	var years = NextNow.getFullYear();
+	var months = NextNow.getMonth() + 1;
+	var days = NextNow.getDate();
+	var beginTime = years + "-" + months + "-" + days;
+	return beginTime;
+}
+
+function loadAdPositionType() {
+	var options = [];
+    $.ajax({
+        url: "rest/sspDictAdPositionType/find",
+        type: "POST",
+        dataType: "json",
+        success: function (restResponse) {
+            $('#adPositionTypes').empty();
+            options.push("<option value=''>全部</option>");
+            if (restResponse.result != null) {
+                for (var i = 0; i < restResponse.result.length; i++) {
+                    var row = restResponse.result[i];
+                    options.push("<option value=\"" + row.code + "\">" + row.name + "</option>");
+                }
+            }
+            $("#adPositionTypes").append(options.join(''));
+            $('#adPositionTypes').selectpicker('refresh');
+        }, error: function () {
+            alert('加载广告位类型失败！');
+        }
+    });
+}
+//加载数据
+function loadData(currentPageNo){
+//sspDictAdPositionTypeList, state, updateTime, name
+	var name = $("input[name=adPositionName]").val();
+	var adPositionType = $("#adPositionTypes").val();
+	var state = $("#state").val();
+	var startTime = $('input[name="startTime"]').val();
+	var endTime = $('input[name="endTime"]').val();
+	var jsonData = {
+			"currentPageNo" : 1,
+			"pageSize" : 10,
+			"predicate" : "AND",
+			"searchExpressionList" : [],
+			"orderExpressionList" : [{
+				"propertyName" : "update_time",
+				"op" : "DESC"
+			}]
+	};
+	if(!isEmpty(name)) {
+		jsonData.searchExpressionList.push({
+			'value' : name,
+        	'propertyName' : 'name',
+        	'operation' : 'LIKE'
+		});
+	}
+	if(!isEmpty(adPositionType)) {
+		jsonData.searchExpressionList.push({
+			'value' : adPositionType,
+        	'propertyName' : 'dict_ad_position_type_list',
+        	'operation' : 'EQ'
+		});
+	}
+	if(!isEmpty(state)) {
+		jsonData.searchExpressionList.push({
+			'value' : state,
+        	'propertyName' : 'state',
+        	'operation' : 'EQ'
+		});
+	}
+	if(!isEmpty(startTime)) {
+		jsonData.searchExpressionList.push({
+			'value' : startTime,
+        	'propertyName' : 'update_time',
+        	'operation' : 'GE'
+		});
+	}
+	if(!isEmpty(endTime)) {
+    	jsonData.searchExpressionList.push({
+    		"operation" : "LE",
+			"propertyName" : "update_time",
+			"value" : endTime+"23:59:59",
+			"valueType" : "java.util.Date"
+    	});
+    };
+    console.log(jsonData);
+	page.ajax({
+		url : 'sspAdPositionInfo/page',
+		contentType : 'application/json',
+		data : JSON.stringify(jsonData),
+		success : function(data) {
+			console.log(data);
+			if (data.result.dataArray.length > 0) {
+				$("#adPositionList").html("");
+				$("#page").empty();
+				loadPage(data);
+			} else {
+				$("#adPositionList").html("<tr><td colspan='8' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+				$("#page").empty();
+			}
+		},
+		error : function(err) {
+
+		}
+	});
+
+}
+function loadPage(data) {
+	var datas = data.result.dataArray;
+	if(datas.length != 0) {
+		$.each(datas, function(index, adPositionInfo) {
+			var html = "<tr>";
+			html += "<td style='vertical-align: middle;text-align:center;'>" + getDay(adPositionInfo.createTime) + "</td>";
+			html += "<td style='vertical-align: middle;text-align:center;'>" + adPositionInfo.name + "</td>";
+			html += "<td style='vertical-align: middle;text-align:center;'>" + adPositionInfo.sspAppInfo.name + "</td>";
+			html += "<td style='vertical-align: middle;text-align:center;'>" + adPositionInfo.sspDictAdPositionTypeList.name + "</td>";
+			/* 
+			html += "<td style='vertical-align: middle;text-align:center;'>" + adPositionInfo.state + "</td>";
+			 */
+			if (adPositionInfo.state == 1) {
+				html += "<td><input type='checkbox' name='switch' value='1' id='switch"+ adPositionInfo.id +"' checked /></td>";
+			} else if (adPositionInfo.state == 2) {
+				html += "<td><input type='checkbox' name='switch' value='2' id='switch"+ adPositionInfo.id +"' /></td>";
+			} else {
+				html += "<td><input type='checkbox' name='switch' value='0' id='switch"+ adPositionInfo.id +"' /></td>";
+			}
+			
+			html += "<td style='vertical-align: middle;text-align:center;'>" + adPositionInfo.cheatLevel + "</td>";
+			html += "<td><a href='#' data-toggle='tooltip' data-placement='top' title='报表' onclick='showReport()'><i class='iconfont icon-baobiaozhongxin'></i></a></td>";
+			html += "<td style='vertical-align: middle;text-align:center;'><a href='#' data-toggle='tooltip' data-placement='top' title='操作记录'><i class='iconfont icon-caozuojilu'></i></a></td>";
+			html += "<input type='hidden' name='hiddenId' value='" + adPositionInfo.id + "'/>";
+			html += "</tr>";
+			$("#adPositionList").append(html);
+			loadswitch();
+		});
+	} else {
+		$("#adPositionList").html("<tr><td colspan='8' style='vertical-align: middle;text-align:center;'>暂时没有查到数据</td></tr>");
+	}
+
+
+	var totalPage = data.result.totalPage;
+	var totalCount = data.result.totalCount;
+	var startPage = data.result.currentPageNo;
+	$('#page').html('');
+	$('#page').html('<ul id="pageAppListUl" class="bs-component pull-right"></ul>');
+	page.ajaxPage({
+		pcont : 'pageAppListUl',//分页容器，ID
+		totalPages : totalPage, //总页数
+		count : totalCount, //总记录数
+		startPage : startPage,
+		onPageClick : function(env, thisPage) {
+			// CurrentPageNo = thisPage;
+			loadData(thisPage);
+		}
+	});
+}
+
+$("#search").click(function(){
+	$('input[name="startTime"]').val($('input[name="startTimeTem"]').val());
+    $('input[name="endTime"]').val($('input[name="endTimeTem"]').val());
+    loadData(1);
+});
+
+function showReport() {
+	
+}
+
+
+</script>
+</html>

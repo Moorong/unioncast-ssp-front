@@ -1,0 +1,23 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspAppInfo;
+
+public interface SspAppInfoService {
+
+	RestResponse find(SspAppInfo sspAppInfo);
+
+	SspAppInfo[] findT(SspAppInfo sspAppInfo);
+
+	Long save(SspAppInfo sspAppInfo);
+
+	void update(SspAppInfo sspAppInfo);
+
+	RestResponse page(PageCriteria pageCriteria);
+
+	void deleteById(Long id);
+
+	void batchDelete(Long[] ids);
+
+}

@@ -1,0 +1,29 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspPricingGranularity;
+import com.unioncast.ssp.front.common.util.MyHttpEntity;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspPricingGranularityService;
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+
+/**
+ * @auther wangyao
+ * @date 2017-04-24 19:58
+ */
+
+@Service
+public class SspPricingGranularityServiceImpl implements SspPricingGranularityService {
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Override
+    public void save(SspPricingGranularity sspPricingGranularity) throws Exception {
+        HttpEntity<SspPricingGranularity> httpEntity = new MyHttpEntity<SspPricingGranularity>(sspPricingGranularity);
+        RestResponse result = restTemplate.postForObjectForDB("/rest/ssp/pricingGranularity/add", httpEntity, RestResponse.class);
+    }
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+	<style type="text/css">
+		ul.ztree {
+			margin-top: 10px;
+			border: 1px solid #c9c9c9;
+			/* 	min-height: 300px; */
+			overflow-y: auto;
+			overflow-x: auto;
+		}
+	</style>
+	<script type="text/javascript">
+		var sspOrderPutStartTime = '${sspOrderPutStartTime!""}';
+		var sspOrderPutEndTime = '${sspOrderPutEndTime!""}';
+	</script>
+</head>
+
+<body>
+<div class="formwarp">
+	<div class="form-group">
+		<label for="inputEmail3" class="col-sm-4 control-label">时间定向</label>
+		<div class="col-sm-6 ">
+			<div class="formnav">
+				<ul class="nav nav-tabs" style="margin-bottom: 15px;">
+					<li class="<#if ((editPlan.putTimeState)?? && 2==editPlan.putTimeState)>active</#if><#if !(editPlan.putTimeState)??>active</#if>"><a href="#page3_1" data-toggle="tab">不限</a></li>
+					<li id="dateStateFlag1" class="<#if (editPlan.putTimeState)?? && 1==editPlan.putTimeState>active</#if>"><a href="#page3_2" data-toggle="tab">日期</a></li>
+					<li id="dateStateFlag2"><a href="#page3_3" data-toggle="tab">时间</a></li>
+<!-- 					<span style="color: gray;">日期不得超过订单或策略组投放时间范围</span> -->
+				</ul>
+				<div id="myTabContent1" class="tab-content">
+					<div class="tab-pane fade in <#if (editPlan.putTimeState)?? && 2==editPlan.putTimeState>active</#if>" id="page3_1"></div>
+					<div class="tab-pane fade in <#if (editPlan.putTimeState)?? && 1==editPlan.putTimeState>active</#if>" id="page3_2">
+						<div class="form-group">
+							<div id="reportrange2" style="width: 320px; display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; margin-top: 5px;">
+								<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span></span>
+								<input type="hidden" id="putTimeState" name="putTimeState" value="${(editPlan.putTimeState)!2}" />
+								<input type="hidden" id="putStartTimeStr" name="putStartTimeStr" value="${(staTime)!(sspOrderPutStartTime)!}" />
+								<input type="hidden" id="putEndTimeStr" name="putEndTimeStr" value="${(endTime)!(sspOrderPutEndTime)!}" />
+								<b class="caret"></b>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane fade" id="page3_3">
+						<div class="form-group clearfix">
+							<div class="row">
+								<div class="col-md-12">
+									<a href="javascript:;" class="btn" id="qztf">全周投放</a>
+									<a href="javascript:;" class="btn" id="zydzwtf">周一到周五投放</a> 
+									<a href="javascript:;" class="btn" id="zmtf">周末投放</a> 
+									<a href="javascript:;" class="btn " id="clear">清空</a>
+								</div>
+							</div>
+						</div>
+						<table class="table tabletime" id="time_period">
+							<thead>
+								<tr id="timeTargetTHead">
+									<th style="width: 80px;">
+										<div class="out">
+											<b>星期</b> <em>时间</em>
+										</div>
+									</th>
+								</tr>
+							</thead>
+							<tbody id="timeTargetTBody">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$('.nav-tabs li').click(function(){
+		var index = $(this).index();
+		if(0==index)$("#clear").click();
+		$('#putTimeState').val(index>0?1:2);
+	});
+	var $timeTargetTHead = $('#timeTargetTHead');
+	var $timeTargetTBody = $('#timeTargetTBody');
+	var numArr = [ '一', '二', '三', '四', '五', '六', '日' ];
+	var weekArr = [ 'monday', 'tuesda', 'wdnesday', 'thursday', 'friday',
+			'saturday', 'sunday' ];
+
+	for (h = 0; h <= 23; h++)
+		$timeTargetTHead.append($(HT.th).html(h));
+
+	$.each(weekArr, function(wi, wk) {//星期
+		var week = wi + 1;
+		var weekStr = numArr[wi];
+		var $tr = $(HT.tr).attr('name', wk);
+		$tr.append($(HT.td).append(
+				$(HT.label).append(
+						$(HT.input).attr('type', 'checkbox').attr('name',
+								'checked')).append('星期' + weekStr)));
+		for (var h = 0; h <= 23; h++) {//小时
+		// 		 var hour = h==24?0:h;
+			var idstr = String.format('putHours%s%s', week, h == 0 ? 24 : h);
+			var valstr = String.format('%s_%s', week, h == 0 ? 24 : h);
+			// 	 	 var oldvalstr = String.format('%s_%s',week,h);
+			var titlestr = String.format('星期%s %s:00~%s:59', weekStr, h, h);
+			var $td = $(HT.td).attr('id', idstr).attr('value', valstr).attr(
+					'title', titlestr);
+			$tr.append($td);
+		}
+		$timeTargetTBody.append($tr);
+	});
+</script>
+<input id="timeTarget" type="hidden"
+	name="sspPlanTargetCondition.timeTarget"
+	value="${(condition.timeTarget)!''}"></input>
+<div id="datetime" style="display: none;">${(condition.timeTarget)!''}</div>
+</body>
+</html>

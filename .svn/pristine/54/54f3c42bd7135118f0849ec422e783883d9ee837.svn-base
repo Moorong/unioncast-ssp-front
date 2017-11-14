@@ -1,0 +1,26 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.rest.response.ssp.SspEducationArrResponse;
+import com.unioncast.common.ssp.model.SspDictEducationTarget;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspEducationService;
+
+@Component
+public class SspEducationServiceImpl implements SspEducationService {
+
+	@Resource
+	private RestTemplate restTemplate;
+
+	@Override
+	public SspDictEducationTarget[] findByCode(String[] sspDictEducation) {
+		  HttpEntity<String[]> httpEntity = new HttpEntity<String[]>(sspDictEducation);
+		  SspEducationArrResponse sspEducationArrResponse = restTemplate.postForObjectForDB("rest/ssp/dictEducationTarget/batchFindbyCodes", httpEntity, SspEducationArrResponse.class);
+		return sspEducationArrResponse.getResult();
+	}
+
+}

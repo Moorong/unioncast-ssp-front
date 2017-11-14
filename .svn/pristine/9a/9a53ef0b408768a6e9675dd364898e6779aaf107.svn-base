@@ -1,0 +1,65 @@
+#\u6D4B\u8BD5\u5730\u5740
+#lian dev shujuku shi dakai
+#testIp1=192.168.10.111
+#testIp2=192.168.10.112
+#testIp3=192.168.10.113
+#testIp4=192.168.10.114
+#testIp5=192.168.10.115
+#testIp6=192.168.10.116
+#lian prod shujuku shi dakai
+testIp1=123.103.15.158
+testIp2=123.103.15.185
+testIp3=123.103.15.183
+testIp4=123.103.15.138
+testIp5=123.103.15.146
+
+
+#	Server
+#server.servlet-path=/unioncast-ssp-front
+server.contextPath=/unioncast-ssp-front
+server.port=8083
+#server.address=127.0.0.1  
+#lian dev shujuku shi dakai
+#image.download.url=http://192.168.10.111/
+#lian prod shujuku shi dakai
+image.download.url=http://123.103.15.158/
+#rest
+#\u6570\u636E\u8BBF\u95EE\u5C42
+#lian dev shujuku shi dakai
+#rest.restDBServiceUrl=http://localhost:9330/v1/
+#lian prod shujuku shi dakai
+rest.restDBServiceUrl=http://123.103.15.183:9330/unioncast-db-service/
+#rest.restDBServiceUrl=http://192.168.101.121:8080/unioncast-db-service/
+#\u7528\u6237\u7CFB\u7EDF
+#lian dev shujuku shi dakai
+#rest.restUserServiceUrl=http://localhost:8888/UserManager/
+#lian prod shujuku shi dakai
+rest.restUserServiceUrl=http://123.103.15.183:8888/UserManager/
+#lianjie  dev report 
+rest.restReport=http://127.0.0.1:9999/unioncast-ssp-report
+#lianjie  dev report 
+#rest.restReport=http://123.103.15.146:9999/
+#email server
+rest.restEmailHost=smtp.163.com
+rest.restEmailProtocol=smtp
+rest.restEmailPort=25
+rest.restEmailAdress=xxx@163.com
+rest.restEmailPassword=xxx
+#\u7CFB\u7EDF\u540D\u79F0\uFF08\u552F\u4E00\uFF09
+rest.restSystemName=SSPFront
+#	Log
+
+#logging.path=D:\\Users\\juchaochao\\Desktop\\mineLog
+#logging.file=D:\\Users\\juchaochao\\Desktop\\mineLog\\myLog.log
+#logging.level.config=DEBUG
+#logging.level.controller=DEBUG
+
+#elasticsearch
+spring.elasticsearch.port=9300
+
+spring.elasticsearch.host1=${testIp1}
+spring.elasticsearch.host2=${testIp2}
+spring.elasticsearch.host3=${testIp3}
+spring.elasticsearch.host4=${testIp4}
+spring.elasticsearch.host5=${testIp5}
+#spring.elasticsearch.host6=${testIp6}

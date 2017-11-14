@@ -1,0 +1,847 @@
+ package com.unioncast.ssp.front.controller.ssp;
+
+ import com.fasterxml.jackson.core.JsonProcessingException;
+ import com.unioncast.common.restClient.RestResponse;
+ import com.unioncast.common.restClient.RestResponseFactory;
+ import com.unioncast.common.ssp.model.*;
+ import com.unioncast.common.util.CommonUtil;
+ import com.unioncast.common.util.DateFormater;
+ import com.unioncast.common.util.DateUtil;
+ import com.unioncast.common.util.JsonUtil;
+ import com.unioncast.ssp.front.common.util.Const;
+ import com.unioncast.ssp.front.controller.common.BaseController;
+ import com.unioncast.ssp.front.model.vo.SspPlanTargetConditionVO;
+ import com.unioncast.ssp.front.service.ssp.*;
+ import com.unioncast.ssp.front.service.ssp.elasticsearchData.ElasticsearchADReport;
+ import io.swagger.annotations.Api;
+ import io.swagger.annotations.ApiImplicitParam;
+ import io.swagger.annotations.ApiOperation;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.ui.Model;
+ import org.springframework.util.StringUtils;
+ import org.springframework.web.bind.annotation.*;
+
+ import javax.annotation.Resource;
+ import javax.servlet.http.HttpServletRequest;
+ import javax.servlet.http.HttpSession;
+ import java.text.SimpleDateFormat;
+ import java.util.*;
+
+ /**
+ * 广告策略
+ * <p>
+ * </p>
+ * @author dmpchengyunyun
+ * @date 2017年1月10日下午12:00:45
+ */
+@Api("广告策略")
+@Controller
+@RequestMapping("/rest/ssp/plan")
+public class SspPlanController extends BaseController {
+
+	 private static final Logger LOG = LogManager.getLogger(SspPlanController.class);
+
+	 @Resource
+	 private SspPlanService sspPlanService;
+	 @Resource
+	 private SspAdvertiserService sspAdvertiserService;
+	 @Resource
+	 private SspOrderService sspOrderService;
+	 @Resource
+	 private SspCityInfoService sspCityInfoService;
+	 @Resource
+	 private ElasticsearchADReport elasticsearchADReport;
+
+	 //定向服务
+	 @Resource
+	 private SspPlanTargetConditionService planTargetConditionService;
+
+	 //广告类型服务
+	 @Resource
+	 private SspDictAdTypeService sspDictAdTypeService;
+
+
+
+	 @ApiOperation(value = "编辑广告策略页", httpMethod = "GET")
+	 @RequestMapping(value = "edit", method = RequestMethod.GET)
+	 public String edit(Long parentPlanId,String orderId,String advertiserId, Long planId, Integer isPlanGroup, Model model) {
+		 LOG.info("edit sspplan -----------------------策略ID"+planId);
+		 model.addAttribute("orderId", orderId);
+		 model.addAttribute("advertiserId", advertiserId);
+		 model.addAttribute("parentPlanId", parentPlanId);
+		 if (CommonUtil.isNull(planId))
+			 model.addAttribute("planGroupFlag", CommonUtil.isNotNull(isPlanGroup) ? isPlanGroup : 2);//默认为否(非策略组)
+		 if (CommonUtil.isNotNull(orderId)){
+			 try {
+				 RestResponse restResponse = sspOrderService.find(Long.parseLong(orderId));
+				if(restResponse.isSuccess()){
+					List<SspOrder> sspOrderList = restResponse.getResultArr(SspOrder.class);
+					if(!sspOrderList.isEmpty()){
+						SspOrder sspOrder = sspOrderList.get(0);
+						 String staTime = SimpleDateFormats(sspOrder.getPutStartTime());
+						 String endTime = SimpleDateFormats(sspOrder.getPutEndTime());
+						 model.addAttribute("sspOrderPutStartTime", staTime);
+						 model.addAttribute("sspOrderPutEndTime", endTime);
+					}
+					
+				}
+			} catch (Exception e) {
+				LOG.error("新建或编辑策略，查询订单信息异常!",e);
+			}
+		 }
+		 
+		 boolean flag = false;
+		
+		 if (CommonUtil.isNotNull(planId)) {
+			 try {
+				 RestResponse restResponse = sspPlanService.find(planId);
+				 if (restResponse.isSuccess()) {
+					 LinkedHashMap sspplan = (LinkedHashMap) restResponse.getResult();
+					 if(CommonUtil.isNotNull(sspplan)){
+					 if ((Integer) sspplan.get("putTimeState") == 1) {
+
+						 Object pstObj = sspplan.get("putStartTime");
+						 Object pseObj = sspplan.get("putEndTime");
+
+						 if(CommonUtil.isNotNull(pstObj,pseObj)){
+							 Date putStartTime = new Date((Long) pstObj);
+							 Date putEndTime = new Date((Long)pseObj);
+							 String staTime = SimpleDateFormats(putStartTime);
+							 String endTime = SimpleDateFormats(putEndTime);
+							 model.addAttribute("staTime", staTime);
+							 model.addAttribute("endTime", endTime);
+						 }
+					 }
+					 if(CommonUtil.isNotNull(sspplan.get("sspPlanTargetCondition"))){
+						 //策略里面获取定向
+						 LinkedHashMap plan = (LinkedHashMap)sspplan.get("sspPlanTargetCondition");
+						 //根据策略id取定向属性
+						 RestResponse response = planTargetConditionService.find(Long.parseLong(plan.get("id").toString()));
+						 ArrayList<Object> targetCondition = (ArrayList<Object>) response.getResult();
+						 LOG.info("edit planTargetCondition  size  -----------------------"+targetCondition.size());
+						 SspPlanTargetConditionVO planTargetConditionVo = new SspPlanTargetConditionVO();
+						 if(targetCondition !=null && targetCondition.size()!=0){
+						 	//获取定向属性
+							 LinkedHashMap contion = (LinkedHashMap) targetCondition.get(0);
+							 //定向ID
+							 planTargetConditionVo.setId(Long.parseLong(contion.get("id").toString()));
+							 //时间定向
+							 planTargetConditionVo.setTimeTarget(contion.get("timeTarget") == null ? null : contion.get("timeTarget").toString());
+							 //性别
+							 planTargetConditionVo.setSex(contion.get("sex") == null ? null : Long.parseLong(contion.get("sex").toString()));
+							 //网络类型
+							 planTargetConditionVo.setNetworkType(contion.get("networkType") == null ? null : contion.get("networkType").toString());
+							 //投放节奏
+							 planTargetConditionVo.setPutRhythm(Long.parseLong(contion.get("putRhythm").toString()));
+							 //设备id定向控制
+							 planTargetConditionVo.setDeviceTypeState(Long.parseLong(contion.get("deviceTypeState").toString()));
+							//设备ID定向
+							 planTargetConditionVo.setDeviceTypeIdfa(contion.get("deviceTypeIdfa") == null ? null : contion.get("deviceTypeIdfa").toString());
+							 //媒体ID定向
+							 planTargetConditionVo.setMediaIds(contion.get("mediaIds") == null ? null:contion.get("mediaIds").toString());
+							 //地域类型状态
+							 planTargetConditionVo.setAreaTargetState(Long.parseLong(contion.get("areaTargetState").toString()));
+							//操作系统状态
+							 planTargetConditionVo.setDictSysOperationState(Long.parseLong(contion.get("dictSysOperationState").toString()));
+							 //媒体类型状态
+							 planTargetConditionVo.setMediaState(Long.parseLong(contion.get("mediaState").toString()));
+							 //广告类类型-定向子表单独获取
+							 LinkedHashMap sspDictAdType = (LinkedHashMap) contion.get("sspDictAdType");
+							 if(sspDictAdType.get("code") != null){
+								 planTargetConditionVo.setSspDictAdTypeId(Long.parseLong(sspDictAdType.get("code").toString()));
+							 }
+							 //地域类型-定向子表单独获取
+							 ArrayList<Object> cityInfoArr = (ArrayList<Object>)contion.get("cityInfoArr");
+							 if(CommonUtil.isNotNull(cityInfoArr) && cityInfoArr.size()>0){
+								 String  cityarr = "";
+								 for(int i = 0;i<cityInfoArr.size();i++){
+									 LinkedHashMap cityInfo = (LinkedHashMap) cityInfoArr.get(i);
+									 cityarr += cityInfo.get("code").toString()+",";
+								 }
+								 cityarr = cityarr.substring(0,cityarr.length()-1);
+								 planTargetConditionVo.setCityInfoArrStr(cityarr);
+							 }
+							 //操作系统-定向子表单独获取
+							 ArrayList<Object> systems = (ArrayList<Object>)contion.get("dictSysOperationTypeArr");
+							 if(CommonUtil.isNotNull(systems) && systems.size()>0){
+								 String sys = "";
+								 for(int i = 0;i<systems.size();i++){
+									 LinkedHashMap system = (LinkedHashMap) systems.get(i);
+									 sys += system.get("code").toString()+",";
+								 }
+								 sys = sys.substring(0,sys.length()-1);
+								 planTargetConditionVo.setDictSysOperationTypeArrStr(sys);
+							 }
+
+							 //媒体定向-定向子表单独获取
+							 ArrayList<Object> medias = (ArrayList<Object>)contion.get("dictMediaTypeArr");
+							 if(CommonUtil.isNotNull(medias) && medias.size() > 0){
+								 String media = "";
+								 for(int i = 0;i<medias.size();i++){
+									 LinkedHashMap dictmeidia = (LinkedHashMap) medias.get(i);
+									 media += dictmeidia.get("code").toString()+",";
+								 }
+								 media = media.substring(0,media.length()-1);
+								 planTargetConditionVo.setDictMediaTypeArrStr(media);
+							 }
+							 //媒体ID有无控制
+							 int mediastate = 1;
+							 if(CommonUtil.isNull(planTargetConditionVo.getMediaIds()) && planTargetConditionVo.getMediaIds().length() == 0){
+								 mediastate = 0;
+							 }
+							 //设备ID有无控制
+							 int deviceType = 1;
+							 if( CommonUtil.isNull(planTargetConditionVo.getDeviceTypeIdfa()) && planTargetConditionVo.getDeviceTypeIdfa().length() == 0){
+								 deviceType = 0;
+							 }
+							 model.addAttribute("DeviceType",deviceType);
+							 model.addAttribute("mediastate",mediastate);
+							 model.addAttribute("condition",planTargetConditionVo);
+						 }
+					 }
+					 }
+					 model.addAttribute("editPlan", restResponse.getResult());
+					 flag = true;
+				 }
+			 } catch (Exception e) {
+				 LOG.error("获取策略信息失败!");
+			 }
+		 }
+		return "ssp/putIn/plan/edit";
+	}
+
+
+	 @ApiOperation(value = "广告策略列表页", httpMethod = "GET")
+	 @RequestMapping(value = "list", method = RequestMethod.GET)
+	 public String list2() {
+		 return "ssp/putIn/plan/list";
+	 }
+
+	 @ApiOperation(value = "分页查询", httpMethod = "POST")
+	 @RequestMapping(value = "page", method = RequestMethod.POST)
+	 @ResponseBody
+	 public RestResponse list3(String state, String planId, String idOrName, Long orderId, Integer currentPageNo, String pushStartTime, String pushEndTime) {
+		 RestResponse restResponse = new RestResponse();
+		 restResponse.setStatus(RestResponse.OK);
+		 String startTime = null;
+		 String endTime = null;
+		 Integer planState = null;
+		 Long id = null;
+		 String name = null;
+		 Integer currentpage = 1;
+		 int pageSize = 10;
+		 try {
+			 if (!StringUtils.isEmpty(pushStartTime)) {
+				 startTime = pushStartTime;
+			 }
+			 if (!StringUtils.isEmpty(pushEndTime)) {
+				 endTime = pushEndTime;
+			 }
+			 if (!StringUtils.isEmpty(state)) {
+				 planState = Integer.valueOf(state);
+			 }
+			 if (!StringUtils.isEmpty(planId)) {
+				 id = Long.parseLong(planId);
+
+			 }
+			 if (!StringUtils.isEmpty(idOrName)) {
+				 name = idOrName;
+			 }
+			 if (!StringUtils.isEmpty(currentPageNo)) {
+				 currentpage = Integer.valueOf(currentPageNo);
+			 }
+			 RestResponse result = sspPlanService.page(orderId, startTime, endTime, planState, id, name, currentpage, pageSize);
+			 System.out.println(result);
+			 return result;
+		 } catch (Exception e) {
+			 e.printStackTrace();
+			 LOG.error("分页查询广告策略出错");
+			 return RestResponseFactory.exception(e);
+		 }
+
+	 }
+
+	@ApiOperation(value = "订单页面请求跳转", httpMethod = "GET")
+	@RequestMapping(value = "goPlanListByOrderId", method = RequestMethod.GET)
+	public String goPlanListByOrderId(Long orderId,String advertiserId,String parentPlanId, Model model,HttpSession session) {
+		model.addAttribute("advertiserId", advertiserId);
+		model.addAttribute("orderId", orderId);
+		model.addAttribute("parentPlanId", parentPlanId);
+		if(CommonUtil.isNotNull(orderId)){
+			try {
+				RestResponse restResponse = sspOrderService.find(orderId);
+				if(CommonUtil.isNotNull(restResponse)&&restResponse.isSuccess()){
+					List<SspOrder> listOrder = restResponse.getResultArr(SspOrder.class);
+					session.setAttribute(Const.CURRENT_ORDER_INFO,listOrder.get(0));
+	        	}
+			} catch (Exception e) {
+				LOG.error("查询订单信息异常!",e);
+			}
+        }
+		if(CommonUtil.isNotNull(parentPlanId)){
+			try {
+				RestResponse restResponse = sspPlanService.find(Long.parseLong(parentPlanId));
+				if(CommonUtil.isNotNull(restResponse)&&restResponse.isSuccess()){
+					SspPlan sspPlan = restResponse.getResultT(SspPlan.class);
+					session.setAttribute(Const.CURRENT_PLAN_INFO,sspPlan);
+	        	}
+			} catch (Exception e) {
+				LOG.error("查询父策略信息异常!",e);
+			}
+		}
+		return "ssp/putIn/plan/list";
+	 }
+
+
+	@ApiOperation(value = "查询广告策略信息", httpMethod = "POST", response = RestResponse.class)
+	@ResponseBody
+	@RequestMapping(value = "/findById", method = RequestMethod.POST)
+	public RestResponse findById(Long id) {
+		LOG.info("find sspPlan id:{}", id);
+		try {
+			return sspPlanService.find(id);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	 @ApiOperation(value = "查询所有广告策略信息", httpMethod = "POST", response = RestResponse.class)
+	 @ResponseBody
+	 @RequestMapping(value = "/findAll", method = RequestMethod.POST)
+	 public RestResponse findAll() {
+		 LOG.info("find all sspPlan");
+
+		try {
+			return sspPlanService.find();
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	 @ApiOperation(value = "增加广告策略", httpMethod = "POST", response = RestResponse.class)
+	 @ApiImplicitParam(name = "sspPlan", required = true, dataType = "SspPlan", paramType = "body")
+	 @ResponseBody
+	 @RequestMapping(value = "/add", method = RequestMethod.POST)
+	 public RestResponse add(SspPlan sspPlan, HttpServletRequest request,
+							 @RequestParam(value="putStartTimeStr", required = false) String putStartTimeStr, @RequestParam(value="putEndTimeStr", required = false) String putEndTimeStr,
+							 String[] cityInfoArrStr,String[] systemType,String[] mediaType,Long planGroupFlag) {
+		 LOG.info("add sspPlan:{}-----------------------------------增加策略开始");
+		 try {
+			 //时间定向
+			 if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getTimeTarget())) {
+				 String pushTime = sspPlan.getSspPlanTargetCondition().getTimeTarget().toString();
+				 sspPlan.getSspPlanTargetCondition().setTimeTarget(getHandlePushTime(pushTime));
+			 }
+		 	//地域定向
+			 if( CommonUtil.isNotNull(cityInfoArrStr) && cityInfoArrStr.length > 0){
+				 SspCityInfo[] sspCityInfos = sspCityInfoService.findByCode(cityInfoArrStr);
+				 sspPlan.getSspPlanTargetCondition().setCityInfoArr(sspCityInfos);
+			 }else{
+				 sspPlan.getSspPlanTargetCondition().setAreaTargetState(1L);
+			 }
+			 //操作系统
+			 if(CommonUtil.isNotNull(systemType) && systemType.length > 0){
+				 SspDictSysOperationType[] dictSysOperationType =new SspDictSysOperationType[systemType.length];
+				 for(int b = 0;b < systemType.length;b++){
+					 SspDictSysOperationType sspDictSysOperation = new SspDictSysOperationType();
+					 sspDictSysOperation.setId(Long.parseLong(systemType[b].toString()));
+					 dictSysOperationType[b] = sspDictSysOperation;
+				 }
+				 sspPlan.getSspPlanTargetCondition().setDictSysOperationTypeArr(dictSysOperationType);
+			 }else{
+				 sspPlan.getSspPlanTargetCondition().setDictSysOperationState(1L);
+			 }
+			 //媒体定向
+			 if(CommonUtil.isNotNull(mediaType) && mediaType.length > 0){
+				 SspDictMediaType[] dictMediaTypeArr = new SspDictMediaType[mediaType.length];
+				 for(int c = 0;c < mediaType.length;c++){
+					 SspDictMediaType dictMediaType = new SspDictMediaType();
+					 dictMediaType.setId(Long.parseLong(mediaType[c].toString()));
+					 dictMediaTypeArr[c] = dictMediaType;
+				 }
+				 sspPlan.getSspPlanTargetCondition().setDictMediaTypeArr(dictMediaTypeArr);
+			 }else{
+				 sspPlan.getSspPlanTargetCondition().setMediaState(1L);
+			 }
+			 //广告位
+			 if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition())) {
+				 if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getSspDictAdType())) {
+					 SspDictAdType dictAdType = new SspDictAdType();
+					 if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getSspDictAdType().getId())) {
+					 	String dictAdTypeid = sspPlan.getSspPlanTargetCondition().getSspDictAdType().getId().toString();
+						 dictAdType.setId(Long.parseLong(dictAdTypeid));
+						 sspPlan.getSspPlanTargetCondition().setSspDictAdType(dictAdType);
+					 }else{
+					 	//默认广告位类型为0
+						 dictAdType.setId(0L);
+						 sspPlan.getSspPlanTargetCondition().setSspDictAdType(dictAdType);
+					 }
+				 }
+			 }
+			 //网络类型
+			 if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getNetworkType())) {
+				 sspPlan.getSspPlanTargetCondition().setNetworkType(sspPlan.getSspPlanTargetCondition().getNetworkType());
+			 }else{
+				 sspPlan.getSspPlanTargetCondition().setNetworkType("1");
+			 }
+			 //创建时间
+			 sspPlan.getSspPlanTargetCondition().setCreateTime(new Date());
+			 //删除状态
+			 sspPlan.getSspPlanTargetCondition().setDeleteState(1L);
+			 //1是策略组，2策略（有定向更新）
+			 if(planGroupFlag == 2){
+				 RestResponse response = planTargetConditionService.save(sspPlan.getSspPlanTargetCondition());
+				 //保存完定向和策略添加关系
+				 if (CommonUtil.isNotNull(response.getResult())) {
+					 Object id = response.getResult();
+					 LOG.info("add sucess planTargetCondition id is -------------------------"+id);
+					 sspPlan.getSspPlanTargetCondition().setId(Long.parseLong(id.toString()));
+				 }
+			 }else if(planGroupFlag == 1){
+				 sspPlan.setSspPlanTargetCondition(null);
+			 }
+			 sspPlan.setState(1);
+			 sspPlan.setDeleteState(1);
+			 sspPlan.setCreateTime(new Date());
+			 sspPlan.setUpdateTime(new Date());
+			 if (CommonUtil.isNotNull(sspPlan)) {
+				 //如果投放周期为1限制
+				 if (sspPlan.getPutTimeState() != null && sspPlan.getPutTimeState() == 1) {
+					 sspPlan.setPutStartTime(DateFormater.parse(putStartTimeStr, "yyy-MM-dd"));
+					 sspPlan.setPutEndTime(DateFormater.parse(putEndTimeStr, "yyy-MM-dd"));
+				 }
+			 }
+			 sspPlan.setPlanIdentifying(UUID.randomUUID().toString().replace("-", ""));
+			 sspPlanService.save(sspPlan);
+			 return RestResponseFactory.ok();
+		 } catch (Exception e) {
+			 LOG.error("新增广告策略出错");
+			 return RestResponseFactory.exception(e);
+		 }
+	 }
+
+	@ApiOperation(value = "检查策略名称", httpMethod = "POST")
+	@ApiImplicitParam(name = "name", required = true, dataType = "String", paramType = "String")
+	@ResponseBody
+	@RequestMapping(value = "/validatorName", method = RequestMethod.POST)
+	public String validatorName(String name,Long advertiserId) {
+		LOG.info("validatorName name:{}", name);
+		try {
+			boolean flag = sspPlanService.validataSspPlanName(name,advertiserId);
+			if (!flag) {
+				return "false";
+			}
+		} catch (Exception e) {
+			LOG.error("检查策略名称出错");
+		}
+		return "true";
+	}
+
+	@ApiOperation(value = "更新广告策略", httpMethod = "POST")
+	@ApiImplicitParam(name = "sspPlan", required = true, dataType = "SspPlan", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/update", method = RequestMethod.POST)
+	public RestResponse update(SspPlan sspPlan,HttpServletRequest request,
+							   @RequestParam("putStartTimeStr") String putStartTimeStr,@RequestParam("putEndTimeStr") String putEndTimeStr,
+							   String[] cityInfoArrStr,String[] systemType,String[] mediaType,Long planGroupFlag)  {
+		LOG.info("update sspPlan Id:--------------------"+sspPlan.getId());
+		try {
+			//时间定向
+			if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getTimeTarget())) {
+				String pushTime = sspPlan.getSspPlanTargetCondition().getTimeTarget().toString();
+				sspPlan.getSspPlanTargetCondition().setTimeTarget(getHandlePushTime(pushTime));
+			}
+				//地域定向
+				SspCityInfo[] sspCityInfos = sspCityInfoService.findByCode(cityInfoArrStr);
+				sspPlan.getSspPlanTargetCondition().setCityInfoArr(sspCityInfos);
+				//操作系统
+			if(CommonUtil.isNotNull(systemType) && systemType.length > 0) {
+				SspDictSysOperationType[] dictSysOperationType = new SspDictSysOperationType[systemType.length];
+				for (int b = 0; b < systemType.length; b++) {
+					SspDictSysOperationType sspDictSysOperation = new SspDictSysOperationType();
+					sspDictSysOperation.setId(Long.parseLong(systemType[b].toString()));
+					dictSysOperationType[b] = sspDictSysOperation;
+				}
+				sspPlan.getSspPlanTargetCondition().setDictSysOperationTypeArr(dictSysOperationType);
+			}else{
+				//修改不输入默认为1不限制
+				sspPlan.getSspPlanTargetCondition().setDictSysOperationState(1L);
+			}
+				//媒体定向
+			if(CommonUtil.isNotNull(mediaType) && mediaType.length > 0) {
+				SspDictMediaType[] dictMediaTypeArr = new SspDictMediaType[mediaType.length];
+				for (int c = 0; c < mediaType.length; c++) {
+					SspDictMediaType dictMediaType = new SspDictMediaType();
+					dictMediaType.setId(Long.parseLong(mediaType[c].toString()));
+					dictMediaTypeArr[c] = dictMediaType;
+				}
+				sspPlan.getSspPlanTargetCondition().setDictMediaTypeArr(dictMediaTypeArr);
+			}else {
+				//修改不输入默认为1不限制
+				sspPlan.getSspPlanTargetCondition().setMediaState(1L);
+			}
+			//广告位
+			if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition())) {
+				if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getSspDictAdType())) {
+					SspDictAdType dictAdType = new SspDictAdType();
+					if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getSspDictAdType().getId())) {
+						String dictAdTypeid= sspPlan.getSspPlanTargetCondition().getSspDictAdType().getId().toString();
+						dictAdType.setId(Long.parseLong(dictAdTypeid));
+						sspPlan.getSspPlanTargetCondition().setSspDictAdType(dictAdType);
+					}
+				}
+			}
+			//网络类型
+			if (CommonUtil.isNotNull(sspPlan.getSspPlanTargetCondition().getNetworkType())) {
+				sspPlan.getSspPlanTargetCondition().setNetworkType(sspPlan.getSspPlanTargetCondition().getNetworkType());
+			}else{
+				//如果没输入默认为1不限
+				sspPlan.getSspPlanTargetCondition().setNetworkType("1");
+			}
+			sspPlan.getSspPlanTargetCondition().setUpdateTime(new Date());
+			sspPlan.getSspPlanTargetCondition().setId(sspPlan.getSspPlanTargetCondition().getId());
+			//更新定向
+			//1是策略组，2策略（有定向更新）
+			if(planGroupFlag == 2) {
+				LOG.info("update SspPlanTargetCondition:--------------------"+sspPlan.getSspPlanTargetCondition().getId());
+				RestResponse restResponse = planTargetConditionService.update(sspPlan.getSspPlanTargetCondition());
+				boolean flag = restResponse.isSuccess();
+				if(flag){
+					flag = 1 < restResponse.getResultT(Integer.class);
+				}
+				if(!flag)
+					LOG.info("策略更新定向信息失败:planId=--------------------"+sspPlan.getId());
+			}
+				if(CommonUtil.isNotNull(sspPlan)){
+					//如果投放周期为1限制
+					if(sspPlan.getPutTimeState() == 1){
+						sspPlan.setPutStartTime(DateUtil.parseWithYYYYMMDDHHMMSS(String.format("%s 00:00:00",putStartTimeStr)));
+						sspPlan.setPutEndTime(DateUtil.parseWithYYYYMMDDHHMMSS(String.format("%s 23:59:59",putEndTimeStr)));
+					}
+				}
+			sspPlan.setUpdateTime(new Date());
+			sspPlanService.update(sspPlan);
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("更新广告策略出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+
+	@ApiOperation(value = "删除一个广告策略", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "id", required = true, dataType = "long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public RestResponse delete(SspPlan sspPlan) {
+		LOG.info("delete sspPlan id:{}", sspPlan);
+		try {
+			//sspPlanService.deleteById(id);
+			sspPlan.setDeleteState(2);
+			sspPlan.setUpdateTime(new Date());
+			sspPlanService.update(sspPlan);
+
+			//删除es对应的报表
+			elasticsearchADReport.esADRepordDelete("planId",sspPlan.getId());
+
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("删除广告策略出错");
+			return RestResponseFactory.exception(e);
+		}
+
+	}
+
+	@ApiOperation(value = "批量删除广告策略", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "ids", required = true, dataType = "List<Long>", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
+	public RestResponse batchDelete(@RequestBody Long[] ids) {
+		LOG.info("batchDelete sspPlan ids:{}", (Object[]) ids);
+		try {
+			sspPlanService.batchDelete(ids);
+			for(Long id :ids){
+				if(CommonUtil.isNotNull(id)){
+					//删除es对应的报表
+					elasticsearchADReport.esADRepordDelete("planId",id);
+				}}
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("删除广告策略出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+
+	@ApiOperation(value = "根据策略id查询策略修改日志", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "planId", required = true, dataType = "Long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/findLogsByPlanId", method = RequestMethod.POST)
+	public RestResponse findLogsByPlanId(Long planId) {
+		LOG.info("findLogByPlanId planId:{}", planId);
+		try {
+			return sspPlanService.findLogsByPlanId(planId);
+		} catch (Exception e) {
+			LOG.error("根据策略id查询策略修改日志出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "根据策略id查询相关创意--分页", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "planId", required = true, dataType = "Long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/findCreativesByPlanId", method = RequestMethod.POST)
+	public RestResponse findCreativesByPlanId(Long planId) {
+		LOG.info("findCreativesByPlanId planId:{}", planId);
+		try {
+			return sspPlanService.findCreativesByPlanId(planId);
+		} catch (Exception e) {
+			LOG.error("根据策略id查询相关创意出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "根据广告主id查询相关创意--所有", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "advertiserId", required = true, dataType = "Long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/findByAdvertiserId", method = RequestMethod.POST)
+	public RestResponse findByAdvertiserId(Long advertiserId) {
+		LOG.info("findByAdvertiserId advertiserId:{}", advertiserId);
+		try {
+			if(CommonUtil.isNull(advertiserId))return RestResponseFactory.exception();
+			return sspPlanService.findByAdvertiserId(advertiserId);
+		} catch (Exception e) {
+			LOG.error("根据广告主id查询相关创意--所有出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+	@ApiOperation(value = "根据策略id查询相关创意--所有", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "planId", required = true, dataType = "Long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/findAllCreativesByPlanId", method = RequestMethod.POST)
+	public RestResponse findAllCreativesByPlanId(Long planId) {
+		LOG.info("findAllCreativesByPlanId planId:{}", planId);
+		try {
+			return sspPlanService.findAllCreativesByPlanId(planId);
+		} catch (Exception e) {
+			LOG.error("根据策略id查询相关创意--所有出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+	@ApiOperation(value = "将策略-创意关联数据添加进去", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "relation", required = true, dataType = "SspPlanCreativeRelation", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/addPlanCreativeRelations", method = RequestMethod.POST)
+	public RestResponse addPlanCreativeRelations(SspPlanCreativeRelation[] relations) {
+		LOG.info("addPlanCreativeRelations relations:{}", relations);
+		try {
+			return sspPlanService.addPlanCreativeRelations(relations);
+		} catch (Exception e) {
+			LOG.error("将策略-创意关联数据添加进去出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+	@ApiOperation(value = "将策略-创意关联数据添加进去", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "relation1", required = true, dataType = "SspPlanCreativeRelation", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/addPlanCreativeRelations1", method = RequestMethod.POST)
+	public RestResponse addPlanCreativeRelations(String creativeIds ,Long planId ,String groupName) {
+		LOG.info("addPlanCreativeRelations planId:{} ,creativeIds:{} , groupName:{} ", planId , creativeIds , groupName);
+		if(!StringUtils.isEmpty(creativeIds) && planId != null) {
+			Map<String , String> map = new HashMap<String , String>();
+			map.put("creativeIds", creativeIds);
+			map.put("planId", planId+"");
+			map.put("groupName", groupName);
+			try {
+				return sspPlanService.addPlanCreativeRelationsMap(map);
+			} catch (Exception e) {
+				LOG.error("将策略-创意关联数据添加进去出错");
+				return RestResponseFactory.exception(e);
+			}
+		}
+		return null;
+	}
+	@ApiOperation(value = "根据订单id查询相关策略", httpMethod = "POST", response = RestResponse.class)
+	@ResponseBody
+	@RequestMapping(value = "/findByOrderId", method = RequestMethod.POST)
+	public RestResponse findByOrderId(Long id) {
+		LOG.info("findByOrderId id:{}", id);
+		try {
+			return sspPlanService.findByOrderId(id);
+		} catch (Exception e) {
+			LOG.error("根据订单id查询相关策略出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "修改策略的状态", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "state", required = true, dataType = "Integer", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/changeState", method = RequestMethod.POST)
+	// public String changeState(Integer planState,Long id) throws Exception {
+	public RestResponse changeState(SspPlan planParam,
+			HttpServletRequest request) throws Exception {
+
+		LOG.info("changestate planState:{}", planParam);
+		try {
+			if (planParam != null && planParam.getPutTimeState() != null) {
+				if (planParam.getPutTimeState() == 1) {
+					String putStartTimeStr = request
+							.getParameter("putStartTimeStr");
+					String putEndTimeStr = request
+							.getParameter("putEndTimeStr");
+					Date putStartTime = new SimpleDateFormat("yyyy-MM-dd")
+							.parse(putStartTimeStr);
+					Date putEndTime = new SimpleDateFormat("yyyy-MM-dd")
+							.parse(putEndTimeStr);
+					planParam.setPutStartTime(putStartTime);
+					planParam.setPutEndTime(putEndTime);
+				}
+			}
+			planParam.setUpdateTime(new Date());
+			sspPlanService.update(planParam);
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("更新策略出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "根据策略id查询子策略", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "id", required = true, dataType = "Long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/searchPlanChildren", method = RequestMethod.POST)
+	// String state,String planId,String idOrName,Long orderId,Integer
+	// currentPageNo,String pushStartTime,String pushEndTime
+	public RestResponse searchPlanChildren(SspPlan planParam, Integer pageNum,
+			HttpServletRequest request,HttpSession session) throws Exception {
+
+		LOG.info("searchPlanChildren planid:{} currentPage:{}",
+				planParam.getId(), pageNum);
+		try {
+			if (planParam != null && planParam.getId() != null) {
+				// 根据id查找子策略
+				RestResponse result = sspPlanService.searchPlanChildren(
+						planParam, pageNum);
+				if(CommonUtil.isNotNull(planParam.getId())){
+					try {
+						RestResponse restResponse = sspPlanService.find(planParam.getId());
+						if(CommonUtil.isNotNull(restResponse)&&restResponse.isSuccess()){
+							SspPlan sspPlan = restResponse.getResultT(SspPlan.class);
+							session.setAttribute(Const.CURRENT_PLAN_INFO, sspPlan);
+			        	}
+					} catch (Exception e) {
+						LOG.error("查询订单信息异常!",e);
+					}
+		        }
+				return result;
+
+			}
+			return null;
+		} catch (Exception e) {
+			LOG.error("查询子策略策略出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	// 没有子策略了 此时开始跳转到该策略的创意列表页 将策略id和广告主id带过去
+	@ApiOperation(value = "子策略页面请求跳转", httpMethod = "GET")
+	@RequestMapping(value = "/getCreativeListByPlanId", method = RequestMethod.GET)
+	public String getCreativeListByPlanId(Long planId, Long advertiserId,
+			Model model,HttpSession session) {
+		model.addAttribute("planId", planId);
+		model.addAttribute("advertiserId", advertiserId);
+		if(CommonUtil.isNotNull(planId)){
+			try {
+				RestResponse restResponse = sspPlanService.find(planId);
+				if(CommonUtil.isNotNull(restResponse)&&restResponse.isSuccess()){
+					SspPlan sspPlan = restResponse.getResultT(SspPlan.class);
+					session.setAttribute(Const.CURRENT_PLAN_INFO, sspPlan);
+	        	}
+			} catch (Exception e) {
+				LOG.error("查询订单信息异常!",e);
+			}
+        }
+		return "ssp/putIn/creative/planCreativeList";
+	}
+
+	 /**
+	  * 处理时间定向结果
+	  * @return
+	  */
+	 public  String getHandlePushTime(String allowPushTime) throws JsonProcessingException {
+		 Map<String, String> map1 = new HashMap<String, String>();
+		 if (allowPushTime != null) {
+			 Map<String, List<String>> map = new HashMap<String, List<String>>();
+			 String[] arr = allowPushTime.split(",");
+			 for (String putHour : arr) {
+				 if (putHour.equals("undefined")) {
+					 continue;
+				 }
+				 String[] day_hours = putHour.split("_");
+				 List<String> list = map.get(day_hours[0]);
+				 if (list == null) {
+					 list = new ArrayList<String>();
+					 map.put(day_hours[0], list);
+				 }
+				 list.add(day_hours[1]);
+			 }
+			 for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+				 StringBuffer sb = new StringBuffer();
+				 for (String data : entry.getValue()) {
+					 sb.append(data).append(",");
+				 }
+				 String time = sb.toString();
+				 if (time != null) {
+					 if (time.endsWith(",")) {
+						 time = time.substring(0, time.length() - 1);
+					 }
+					 map1.put(entry.getKey(), time);
+				 }
+			 }
+		 }
+		 return JsonUtil.object2JsonString(map1);
+	 }
+
+		@ApiOperation(value = "条件分页查询", httpMethod = "POST", response = RestResponse.class)
+		@ApiImplicitParam(name = "searchPlanCreativeRelationPage", value = "分页查询条件", required = true, dataType = "PageCriteria", paramType = "body")
+		@ResponseBody
+		@RequestMapping(value = "/searchPlanCreativeRelationPage", method = RequestMethod.POST)
+		public RestResponse searchPlanCreativeRelationPage(HttpServletRequest request,
+				@RequestParam(value = "pageSize", required = false, defaultValue = "10") String pageSize,
+				@RequestParam(value = "currentPageNo", required = false, defaultValue = "1") String currentPageNo,
+				@RequestParam(value = "planId", required = false) String planId,
+				@RequestParam(value = "creativeName", required = false) String creativeName,
+				@RequestParam(value = "advertiserId", required = false) String advertiserId,
+				@RequestParam(value = "state", required = false) String state,
+				@RequestParam(value = "creativeType", required = false) String creativeType,
+				@RequestParam(value = "creativeLabel", required = false) String creativeLabel) {
+			try {
+
+					RestResponse response = sspPlanService.searchPlanCreativeRelationPage( planId, currentPageNo, pageSize, creativeName, advertiserId,
+							state, creativeType, creativeLabel);
+					return response;
+
+			} catch (Exception e) {
+				LOG.error("获取创意分页出错");
+				return RestResponseFactory.exception(e);
+			}
+}
+
+	 /**
+	  * 时间日期转换
+	  * @param dateTime
+	  * @return
+	  */
+	 public String SimpleDateFormats(Date dateTime){
+		 String dateTime0 = null;
+		 if(!StringUtils.isEmpty(dateTime)){
+			 dateTime0 = new SimpleDateFormat("yyyy-MM-dd").format(dateTime);
+		 }
+		 return  dateTime0;
+	 }
+}

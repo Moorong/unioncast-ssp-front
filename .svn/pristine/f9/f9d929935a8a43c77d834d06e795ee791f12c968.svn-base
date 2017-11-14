@@ -1,0 +1,27 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.rest.response.ssp.SspMobileBrandArrResponse;
+import com.unioncast.common.rest.response.ssp.SspSexTypeArrResponse;
+import com.unioncast.common.ssp.model.SspDictCrowdSexType;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspCrowdSexService;
+
+@Component
+public class SspCrowdSexServiceImpl implements SspCrowdSexService {
+
+	@Resource
+	private RestTemplate restTemplate;
+
+	@Override
+	public SspDictCrowdSexType[] findByCode(String[] sexType) {
+		  HttpEntity<String[]> httpEntity = new HttpEntity<String[]>(sexType);
+		  SspSexTypeArrResponse response = restTemplate.postForObjectForDB("rest/ssp/dictCrowdSex/batchFindbyCodes", httpEntity, SspSexTypeArrResponse.class);
+		return response.getResult();
+	}
+
+}

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+<!-- 右侧开始 -->
+<!-- 当前位置开始 -->
+<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">账户资料</a> <i> / </i> <span>修改手机号</span></h2>
+<!-- 当前位置结束 -->
+<!-- 表单内容开始 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <div class="block_content ">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix">
+									<span class="block_title_name pull-left">
+										修改手机号
+									</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="col-md-12">
+                        <form class="form-horizontal" role="form">
+                            <div class="formwarp">
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">手机号：</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  " placeholder="">
+                                        <em>需验证手机号是否存在</em>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <label class="col-sm-4 control-label ">验证码：</label>
+                                    <div class="col-sm-8 ">
+                                        <input type="text" class="form-control input-sm  small114" placeholder="">
+                                        <a href="#" class="btn btn2 ">获取验证码</a>
+                                        <em><span style="color:#3daded;">60</span>秒后重新获取</em>
+                                    </div>
+                                </div>
+                                <div class="savewarp text-center">
+                                    <a href="javascript:void(0)" class="btn formbtn green" id="submit">完成</a>
+                                    <a href="javascript:void(0)" class="btn formbtn bk999"
+                                       id="cancel">取消</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 右侧结束 -->
+</body>
+<script>
+    $(function () {
+    });
+    $("#cancel").click(function () {
+        var url = "ssp/user/currentAccountInfo";
+        page.loadPage(url);
+    });
+</script>
+</html>

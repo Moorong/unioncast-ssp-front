@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<!-- 右侧开始 -->
+	<!-- <div class="content"> -->
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc">
+		<i class="iconfont icon-zhuye"></i><a href="javascript:void(0);" onclick="page.choiceMenu('46');">投放管理</a> <i> / </i><a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspAdvertiser/getPages">广告主管理(${(CURRENT_ADVERTISER_INFO.name)!''})</a> <i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/sspOrder/list">订单管理(${(CURRENT_ORDER_INFO.name)!''})</a>
+		<i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this,'parentPlanId')" urlk="rest/ssp/plan/goPlanListByOrderId">策略管理</a> 
+	<#if parentPlanId?? && CURRENT_PLAN_INFO??>
+		<i> / </i> <a href="javascript:void(0);" onclick="page.history.go(this)" urlk="rest/ssp/plan/goPlanListByOrderId">策略管理(${(CURRENT_PLAN_INFO.name)!''})</a>
+	</#if>
+		<i> / </i> <span>策略列表</span>
+	</h2>
+	<!-- 当前位置结束 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<!-- 表单内容开始 -->
+			<form id="sspPlanForm" action="ssp/plan/page">
+				<div class="search_block clearfix">
+					<div class="form-group  clearfix">
+						<div class="pull-left">
+							<a href="javascript:void(0)" class="btn  btn2 green"
+								data-toggle="modal" data-target="#myModal" id="addBut"><i
+								class="glyphicon glyphicon-plus"></i>新增策略</a> 
+							<#if !parentPlanId??>
+								<a href="javascript:void(0)" class="btn  btn2 green" data-toggle="modal" data-target="#myModal" id="addGroupBut"><i class="glyphicon glyphicon-plus"></i>新增策略组</a>
+							</#if>
+							<!-- <a href="javascript:void(0)" class="btn btn_trash"><i class="glyphicon glyphicon-trash"></i>批量删除</a> -->
+							<!-- <a href="javascript:void(0)" class="btn btn_trash" id="tabbtn">筛选</a> -->
+						</div>
+						<!--隐藏带过来的订单id-->
+						<input type="hidden" value="${(orderId)!}" name="orderId"
+							id="orderId" />
+						<input type="hidden" value="${(advertiserId)!''}" name="advertiserId"
+							id="advertiserId" />
+						<input type="hidden" 	id="parentPlanId" value="${(parentPlanId)!''}" name="planId"/>
+							
+						<!-- 	<input type="hidden" value="${(advertiserId)!}" name="advertiserId" id="advertiserId"/> -->
+						<div class="pull-right">
+							<div class="formgroup clearfix ">
+								<label>投放状态</label> <select class="dropdown" id="sspPlanState"
+									name="state">
+									<option value="" selected>全部</option>
+									<option value="1">开</option>
+									<option value="2">关</option>
+								</select>
+							</div>
+							<div class="formgroup clearfix ">
+								<label>修改时间：</label>
+								<div id="reportrange2"
+									style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+									<i class="glyphicon glyphicon-calendar fa fa-calendar"></i> <span
+										id="time" name="time"></span> <b class="caret"></b> <input
+										type="hidden" name="pushStartTime" value="" /> <input
+										type="hidden" name="pushEndTime" value="" />
+								</div>
+							</div>
+							<div class="has-feedback clearfix ">
+								<label class="control-label sr-only" for="inputSuccess2">状态</label>
+								<input type="text" class="form-control" id="idOrName"
+									name="idOrName" placeholder="请输入策略名称">
+							</div>
+							<a href="javascript:void(0)" class="btn btn-sm" id="sspSearch">查询</a>
+						</div>
+					</div>
+				</div>
+			</form>
+			<!-- 间隔 -->
+			<div style="height: 10px; background: #f1f2f7;"></div>
+			<!-- 间隔 -->
+			<div class="block_content">
+				<div class="container-fluid">
+
+					<div class="row">
+						<div class="col-md-12">
+							<table class="table">
+								<thead>
+									<tr>
+										<th>投放状态</th>
+										<th>策略&策略组</th>
+										<!-- <th>计划ID<a href="#" class="atooltip" data-toggle="tooltip" data-html="true" data-placement="bottom" title="<img src='images/img1.jpg'>"><i class="iconfont icon-tanhao1"></i></a></th> -->
+										<#if !parentPlanId??>
+											<th>是否为策略组</th>
+										</#if>
+										<th>策略ID</th>
+										<#if !parentPlanId??>
+											<th>策略数量</th>
+										</#if>
+										<th>投放时间</th>
+										<th>进度条</th>
+										<th>修改时间</th>
+										<th>操作</th>
+									</tr>
+								</thead>
+								<tbody id="sspPlanList">
+
+								</tbody>
+							</table>
+							<!-- 分页开始 -->
+							<div class="bs-component clearfix pull-right" id="page"></div>
+							<!-- 分页结束 -->
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 表单内容结束 -->
+		</div>
+	</div>
+	</div>
+	<!-- 右侧结束 -->
+	<!-- </div> -->
+</body>
+<!-- 双日历 -->
+<script type="text/javascript" src="js/base/moment.js"></script>
+<script type="text/javascript" src="js/base/daterangepicker.js"></script>
+<script>
+	$(function() {
+		/*组件初始化*/
+		$("[data-toggle='tooltip']").tooltip();
+		loadSwith();
+
+		//下拉菜单
+		$(".dropdown").selectpicker({});
+		/*双日历组件*/
+		var defDateFormat = "YYYY-MM-DD";
+		var defStartDate = moment().subtract('days', 7).format(defDateFormat);
+		var defEndDate = moment().format(defDateFormat);
+		/*双日历组件*/
+		$('#reportrange2 span').html(defStartDate + ' - ' + defEndDate);
+		$('#reportrange2').daterangepicker(
+				{
+					startDate : defStartDate
+				},
+				function(start, end) {
+					var choStart = start.format(defDateFormat);
+					var choEnd = end.format(defDateFormat);
+					$('input[name="pushStartTime"]').val(choStart);
+					$('input[name="pushEndTime"]').val(choEnd);
+					$('#reportrange2 span').html(
+							start.format(defDateFormat) + ' - '
+									+ end.format(defDateFormat));
+				}).on('apply.daterangepicker',function(ev,picker){
+					$('input[name="pushStartTime"]').val(picker.startDate.format('YYYY-MM-DD'));
+					$('input[name="pushEndTime"]').val(picker.endDate.format('YYYY-MM-DD'));
+					$('#reportrange2 span').html(
+							picker.startDate.format('YYYY-MM-DD') + ' - '
+									+ picker.endDate.format('YYYY-MM-DD'));
+				}).on('cancel.daterangepicker',function(ev, picker) {
+					$('input[name="pushStartTime"]').val('');
+					$('input[name="pushEndTime"]').val('');
+					$('#reportrange2 span').html('不限');
+				});
+		//默认为时间空间赋值
+		$('input[name="pushStartTime"]').val(getMapDate(7));
+		$('input[name="pushEndTime"]').val(getMapDate(0));
+
+	});
+	//渲染开关组件
+	function loadSwith(parentId) {
+	//console.log("parentId--"+parentId);
+		//if(isEmpty(parentId))return;
+		$("input[name='switch']").bootstrapSwitch({
+			onText : "开",
+			offText : "关",
+			size : "mini",
+			onSwitchChange : function(event, state) {
+				if (state == true) {
+					changeState($(this), 1 , parentId);
+					$(this).val("1");
+				} else {
+					changeState($(this), 2 , parentId);
+					$(this).val("2");
+				}
+			}
+		});
+	}
+
+	//初次加载数据
+	$(function() {
+
+		loadData();
+
+	});
+	//起始页为1
+	var currentPageNo = 1;
+
+	function loadData(currentPageNo) {
+		var parentId = $('#parentPlanId').val();
+		var orderId = $("#orderId").val();
+		console.log("orderId--" + orderId);
+		//var pageSize = 10;
+		// var pushStartTime =  $('input[name="pushStartTime"]').val();
+		//var pushEndTime = $('input[name="pushEndTime"]').val();
+		page.ajax({
+			url : 'ssp/plan/page',
+			//data: {currentPageNo: currentPageNo,pushStartTime:pushStartTime,pushEndTime:pushEndTime},
+			data : {
+				currentPageNo : currentPageNo,
+				orderId : orderId,
+				planId:isEmpty(parentId)?'':parentId
+			},
+			type : 'post',
+			datatype : 'json',
+			success : function(data) {
+				$("#sspPlanList").html("");
+				if (data.result != null) {
+					loadPage(data);
+				} else {
+				 $("#sspPlanList").empty();
+				 $("#page").empty();
+			     $("#sspPlanList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+				 return false;
+				}
+
+			},
+			error : function(err) {
+			}
+		});
+	}
+
+	//搜索框检索
+	$("#sspSearch").click(function() {
+				page.ajaxSubmit($("#sspPlanForm").eq(0)[0], function(
+						resultJson, resultMsg, xmlHttpResponse) {
+					$("#sspPlanList").html("");
+					if (resultJson.result != null) {
+						loadSearchPage(resultJson);
+					} else {
+					 $("#sspPlanList").empty();
+				     $("#page").empty();
+			         $("#sspPlanList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+				     return false;
+						
+					}
+				}, function(xmlHttpRequest, errorMsg, errorObj) {
+
+				});
+			});
+			
+
+	//加载页面表单
+	function loadSearchPage(data) {
+		var datas = data.result.dataArray;
+		//要先将之前的数据清空一下
+		if(datas==null||datas.length==0){
+		 $("#sspPlanList").empty();
+				 $("#page").empty();
+			     $("#sspPlanList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+				return false;
+		}else{
+		$("#sspPlanList").empty();
+		$.each(datas,function(index, plan) {
+							var html = "<tr>";
+							html += "<td style='display: none' class='planId'>"
+									+ plan.id + "</td>";
+							if (plan.state == 1) {
+								html += "<td><input type='checkbox' id='switch-"+plan.id+"' name='switch' value= '1' checked /></td>";
+							} else {
+								html += "<td><input type='checkbox' name='switch' value='2' id='switch-"+plan.id+"' /></td>";
+							}
+							if(plan.name.length>10){
+							var newname = plan.name.substring(0,10);
+							html += "<td title='"+plan.name+"' style='vertical-align: middle;text-align:center;'>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='searchPlanChildren("
+									+ plan.id
+								if(plan.sspAdvertiser)
+										html+= ","+plan.sspAdvertiser.id+","+plan.planGroupFlag ;
+								html+= ");'>"+newname+"..."+"</a>" + "</td>";
+							}else{
+							html += "<td title='"+plan.name+"' style='vertical-align: middle;text-align:center;'>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='searchPlanChildren("
+									+ plan.id
+								if(plan.sspAdvertiser)
+									html+= ","+plan.sspAdvertiser.id+","+plan.planGroupFlag ;
+								html+= ");'>"+plan.name+"</a>" + "</td>";
+							}
+							if(plan.planGroupFlag==2){
+							//不是策略组
+							html += "<td style='vertical-align: middle;text-align:center;'>否</td>";
+							}else if(plan.planGroupFlag==1){
+							html += "<td style='vertical-align: middle;text-align:center;'>是</td>";
+							}else{
+							html += "<td style='vertical-align: middle;text-align:center;'>未设置</td>";
+							}
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ plan.planIdentifying + "</td>";
+
+							/*  html += "<td style='vertical-align: middle;text-align:center;'>" + '2' + "</td>"; */
+// 							html += "<td style='vertical-align: middle;text-align:center;'>"
+// 									+ plan.childStateCount
+// 									+ "/"
+// 									+ plan.childrenNum + "</td>";
+								if(plan.putStartTime==null||plan.putEndTime==null){
+									html += "<td>不限</td>";
+									}else if(plan.putTimeState==2||plan.putTimeState==null){
+									html += "<td>不限</td>";
+									}else{
+							html += "<td>" + getMoth(plan.putStartTime) + " - "
+									+ getMoth(plan.putEndTime) + "</td>";
+									}
+							if (plan.budget != null && plan.budget != 0) {
+							if((plan.budget - plan.consumptionAmount) / plan.budget>=0.999){
+							var num = 0.99 * 100;
+							html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+							}else{
+							
+								//显示%比=（预算-消费金额）/预算
+								var num = ((plan.budget - plan.consumptionAmount) / plan.budget) * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+								}
+							} else {
+								//没有预算 怎么办
+								if(plan.sspOrder.budget !=null && plan.sspOrder.budget !=0){
+								if((plan.sspOrder.budget - plan.consumptionAmount) / plan.sspOrder.budget>=0.999){
+								var num = 0.99 * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+								}else{
+								//策略所属的计划有预算
+								var num = ((plan.sspOrder.budget - plan.consumptionAmount) / plan.sspOrder.budget) * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+										}
+								}else{
+								//计划也没有预算
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ 0
+										+ "%'>"
+										+ 0
+										+ "</div></div></td>";
+								}
+							}
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ getDay(plan.updateTime) + "</td>";
+							html += "<td><a href='#' data-toggle='tooltip' data-placement='top' onclick='updatePlan("
+									+ plan.id
+									+ ");' title='修改'><i class='iconfont icon-xiugai'></i></a>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='deletePlan("
+									+ plan.id
+									+ "," + (plan.parentPlan?plan.parentPlan.id:'')
+									+ ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";
+							html += "</tr>";
+							$("#sspPlanList").append(html);
+							//渲染开关
+							loadSwith();
+						});
+		//渲染分页插件   
+		var totalPage = data.result.totalPage;
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page')
+				.html(
+						'<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',//分页容器，ID
+			totalPages : totalPage, //总页数
+			count : totalCount, //总记录数
+			startPage : startPage,
+			//每页显示记录数  没有搜索条件
+			onPageClick : function(env, thisPage) {
+				//CurrentPageNo = thisPage;
+				loadSearchData(thisPage);
+			}
+		});
+		}
+	}
+		//点击搜索按钮后的加载
+function loadSearchData(currentPageNo) {
+		var orderId = $("#orderId").val();
+		console.log("orderId--" + orderId);
+		var sspPlanState = $("#sspPlanState").val();
+		var pushStartTime =  $('input[name="pushStartTime"]').val();
+		var pushEndTime = $('input[name="pushEndTime"]').val();
+		var name = $("#idOrName").val();
+			var parentPlanId = $("#parentPlanId").val();
+		//var pageSize = 10;
+		// var pushStartTime =  $('input[name="pushStartTime"]').val();
+		//var pushEndTime = $('input[name="pushEndTime"]').val();
+		page.ajax({
+			url : 'ssp/plan/page',
+			//data: {currentPageNo: currentPageNo,pushStartTime:pushStartTime,pushEndTime:pushEndTime},
+			data : {
+				currentPageNo : currentPageNo,
+				orderId : orderId,
+				state:sspPlanState,
+				planId:parentPlanId,
+				idOrName:name,
+				pushStartTime:pushStartTime,
+				pushEndTime:pushEndTime
+			},
+			type : 'post',
+			datatype : 'json',
+			success : function(data) {
+				$("#sspPlanList").html("");
+				if (data.result != null) {
+					loadSearchPage(data);
+				} else {
+					 $("#sspPlanList").empty();
+				 $("#page").empty();
+			     $("#sspPlanList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+				return false;
+				}
+
+			},
+			error : function(err) {
+			}
+		});
+	}
+	
+	//加载页面表单
+	function loadPage(data) {
+		var parentId = $('#parentPlanId').val();
+		var datas = data.result.dataArray;
+		//要先将之前的数据清空一下
+		$("#sspPlanList").empty();
+		$.each(datas,function(index, plan) {
+							var html = "<tr>";
+							html += "<td style='display: none' class='planId'>"
+									+ plan.id + "</td>";
+							if (plan.state == 1) {
+								html += "<td><input type='checkbox' id='switch-"+plan.id+"' name='switch' value= '1' checked /></td>";
+							} else {
+								html += "<td><input type='checkbox' name='switch' value='2' id='switch-"+plan.id+"' /></td>";
+							}
+							if(plan.name.length>10){
+							var newname = plan.name.substring(0,10);
+							html += "<td title='"+plan.name+"' style='vertical-align: middle;text-align:center;'>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='searchPlanChildren("
+									+ plan.id
+								if(plan.sspAdvertiser)
+										html+= ","+plan.sspAdvertiser.id+","+plan.planGroupFlag ;
+								html+= ");'>"+newname+"..."+"</a>" + "</td>";
+							}else{
+							html += "<td title='"+plan.name+"' style='vertical-align: middle;text-align:center;'>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='searchPlanChildren("
+									+ plan.id
+									if(plan.sspAdvertiser)
+											html+= ","+plan.sspAdvertiser.id+","+plan.planGroupFlag ;
+									html+= ");'>"+plan.name+"</a>" + "</td>";
+							}
+							if(isEmpty(parentId)){
+								if(plan.planGroupFlag==2){
+									//不是策略组
+									html += "<td style='vertical-align: middle;text-align:center;'>否</td>";
+									}else if(plan.planGroupFlag==1){
+									html += "<td style='vertical-align: middle;text-align:center;'>是</td>";
+									}else{
+									html += "<td style='vertical-align: middle;text-align:center;'>未设置</td>";
+									}
+							}
+							
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ plan.planIdentifying + "</td>";
+
+							/*  html += "<td style='vertical-align: middle;text-align:center;'>" + '2' + "</td>"; */
+							if(isEmpty(parentId)){
+								html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ plan.childStateCount
+									+ "/"
+									+ plan.childrenNum + "</td>";
+							}
+							if(plan.putStartTime==null||plan.putEndTime==null){
+									html += "<td>不限</td>";
+									}else if(plan.putTimeState==2||plan.putTimeState==null){
+									html += "<td>不限</td>";
+									}else{
+							html += "<td>" + getMoth(plan.putStartTime) + " - "
+									+ getMoth(plan.putEndTime) + "</td>";
+									}
+							if (plan.budget != null && plan.budget != 0) {
+								//显示%比=（预算-消费金额）/预算
+								if((plan.budget - plan.consumptionAmount) / plan.budget>=0.999){
+								
+								var num = 0.99 * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+								}else{
+								var num = ((plan.budget - plan.consumptionAmount) / plan.budget) * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+										}
+							} else {
+								//没有预算 怎么办
+								if(plan.sspOrder.budget !=null && plan.sspOrder.budget !=0){
+								//策略所属的计划有预算
+								if((plan.sspOrder.budget - plan.consumptionAmount) / plan.sspOrder.budget>=0.999){
+								var num = 0.99 * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+								}else{
+								var num =((plan.sspOrder.budget - plan.consumptionAmount) / plan.sspOrder.budget)*100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+									}
+									}else{
+									
+								//计划也没有预算
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ 0
+										+ "%'>"
+										+ 0
+										+ "</div></div></td>";
+								}
+							}
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ getDay(plan.updateTime) + "</td>";
+							html += "<td><a href='#' data-toggle='tooltip' data-placement='top' onclick='updatePlan("
+									+ plan.id
+									+ ");' title='修改'><i class='iconfont icon-xiugai'></i></a>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='deletePlan("
+									+ plan.id
+									if(plan.parentPlan)
+										html+= ","+plan.parentPlan.id;
+									html+= ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";
+							html += "</tr>";
+							$("#sspPlanList").append(html);
+							//渲染开关
+							loadSwith();
+						});
+		//渲染分页插件   
+		var totalPage = data.result.totalPage;
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page').html('<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',//分页容器，ID
+			totalPages : totalPage, //总页数
+			count : totalCount, //总记录数
+			startPage : startPage,
+			//每页显示记录数  没有搜索条件
+			onPageClick : function(env, thisPage) {
+				//CurrentPageNo = thisPage;
+				loadData(thisPage);
+			}
+		});
+	}
+
+	//修改
+	function updatePlan(id) {
+		var putAllowedState= $("#switch-"+id).val();
+		var advertiserId = $("#advertiserId").val();
+		if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行修改操作！");
+			return;
+		} else {
+		page.loadPage("ssp/plan/edit", {
+			advertiserId:advertiserId,
+			orderId : $("#orderId").val(),
+			planId : id
+		});
+	}
+	}
+	//删除
+	function deletePlan(id, parentId) {
+		var putAllowedState= $("#switch-"+id).val();
+		if (putAllowedState == 1) {
+			alert("请将状态关闭后，再进行删除操作！");
+			return;
+		} else {
+			var url = "ssp/plan/delete";
+			$.confirm({
+				title : '删除',
+				content : '是否删除该策略？',
+				buttons : {
+					okay : {
+						text : '确定',
+						btnClass : 'btn green',
+						action : function() {
+							page.ajax({
+								url : url,
+								data : {
+									id : id
+								},
+								type : 'post',
+								success : function(data) {
+
+									if (data.status == 200) {
+										alert("删除成功").ok(function(){
+											if(parentId == 'undefined' || parentId == null ||parentId==0) {
+												
+												loadData();
+											} else {
+												loadchildData(1 , parentId);
+											}
+										});
+										//;
+									}
+								}
+							});
+						}
+					},
+					no : {
+						text : '取消',
+						btnClass : 'btn '
+					}
+				}
+			});
+
+			
+		}
+	}
+	//新增计划
+	$("#addBut").click(function() {
+		var parentPlanId = $('#parentPlanId').val();
+		var advertiserId = $("#advertiserId").val();
+		page.loadPage("ssp/plan/edit", {
+			advertiserId:advertiserId,
+			orderId : $("#orderId").val(),
+			parentPlanId:parentPlanId
+		});
+	});
+	//新增计划组
+	$("#addGroupBut").click(function() {
+		var advertiserId = $("#advertiserId").val();
+		page.loadPage("ssp/plan/edit", {
+			advertiserId:advertiserId,
+			orderId : $("#orderId").val(),
+			isPlanGroup : 1
+		});
+	});
+
+	//状态开关转换
+	function changeState(_this, val , parentId) {
+		var id = _this.closest('tr').find('.planId').text();
+		page.ajax({
+			url : "ssp/plan/changeState",
+			type : "post",
+			data : {
+				id : id,
+				state : val
+			},
+			success : function(data) {
+				if (data.status == 200) {
+					if(parentId == 'undefined' || parentId == null) {
+					
+					} else {
+					
+					}
+				}
+			},
+			error : function() {
+				alert("修改状态失败！");
+			}
+		})
+
+	}
+
+	//根据计划id查询所有子计划 
+	function searchPlanChildren(id, advertiserId,planGroupFlag) {
+		console.log("该计划id是----" + id);
+		console.log("广告主id是---" + advertiserId);
+		if(planGroupFlag==2){
+		//不是策略组
+		//没有子计划  加载创建新计划页面
+		var url = "ssp/plan/getCreativeListByPlanId?planId=" + id
+			+ "&advertiserId=" + (isEmpty(advertiserId)?'':advertiserId);
+		page.loadPage(url);
+		}else if(planGroupFlag==1){
+			//记录左上导航 by changuobin
+			page.loadPage('ssp/plan/goPlanListByOrderId',{
+				advertiserId : $("#advertiserId").val(),
+				orderId : $("#orderId").val(),
+				parentPlanId:id
+			});
+			return;
+			
+			
+		//下方已注释 by changguobin
+		//是策略组
+// 		var url = "ssp/plan/searchPlanChildren";
+// 		page.ajax({
+// 			url : url,
+// 			type : "post",
+// 			data : {
+// 				id : id
+// 			},
+// 			success : function(result) {
+// 				if (result != null && result.result.dataArray.length > 0) {
+// 					loadChildPage(result, id);
+// 					$("#addGroupBut").hide();
+// 				} else {
+// 				$("#addGroupBut").hide();//没查到数据也要隐藏17.03.03
+// 				 $("#sspPlanList").empty();
+// 				 $("#page").empty();
+// 			     $("#sspPlanList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+// 				return false;
+// 				}
+
+// 			}
+// 		})
+		
+		}
+	}
+
+	//加载子计划页面
+	function loadChildPage(data, id) {
+	//;
+		//记录父策略ID
+		$('#parentPlanId').val(id);
+		var datas = data.result.dataArray;
+		//要先将之前的数据清空一下
+		$("#sspPlanList").empty();
+		$.each(datas,function(index, plan) {
+							//;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+							var html = "<tr>";
+							html += "<td style='display: none' class='planId'>"
+									+ plan.id + "</td>";
+							if (plan.state == 1) {
+								html += "<td><input type='checkbox' name='switch' value='1' id='switch-"+plan.id+"' checked /></td>";
+							} else {
+								html += "<td><input type='checkbox' name='switch' value='2' id='switch-"+plan.id+"' /></td>";
+							}
+							if(plan.name.length>10){
+							var newname = plan.name.substring(0,10);
+							html += "<td title='"+plan.name+"' style='vertical-align: middle;text-align:center;'>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='searchPlanChildren("
+									+ plan.id
+								if(plan.sspAdvertiser)
+									html+= ","+plan.sspAdvertiser.id+","+plan.planGroupFlag ;
+								html+=	 ");'>"+newname+"..."+"</a>" + "</td>";
+							}else{
+							html += "<td title='"+plan.name+"' style='vertical-align: middle;text-align:center;'>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='searchPlanChildren("
+									+ plan.id
+								if(plan.sspAdvertiser)
+									html+= ","+plan.sspAdvertiser.id+","+plan.planGroupFlag ;
+								html+=  ");'>"+plan.name+"</a>" + "</td>";
+							}
+							if(plan.planGroupFlag==2){
+							//不是策略组
+							html += "<td style='vertical-align: middle;text-align:center;'>否</td>";
+							}else if(plan.planGroupFlag==1){
+							html += "<td style='vertical-align: middle;text-align:center;'>是</td>";
+							}else{
+							html += "<td style='vertical-align: middle;text-align:center;'>未设置</td>";
+							}
+							/*  html += "<td style='vertical-align: middle;text-align:center;'>" + '2' + "</td>"; */
+// 							html += "<td style='vertical-align: middle;text-align:center;'>"
+// 									+ plan.childStateCount
+// 									+ "/"
+// 									+ plan.childrenNum + "</td>";
+							if(plan.putStartTime==null||plan.putEndTime==null){
+									html += "<td>不限</td>";
+									}else if(plan.putTimeState==2||plan.putTimeState==null){
+									html += "<td>不限</td>";
+									}else{
+							html += "<td>" + getMoth(plan.putStartTime) + " - "
+									+ getMoth(plan.putEndTime) + "</td>";
+									}
+							if (plan.budget != null && plan.budget != 0) {
+								//显示%比=（预算-消费金额）/预算
+								var num = ((plan.budget - plan.consumptionAmount) / plan.budget) * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+							} else {
+							if(plan.parentPlan.budget !=null && plan.parentPlan.budget!=0){
+								//计划组中有预算   从计划组中扣除
+								var num = ((plan.parentPlan.budget - plan.consumptionAmount) / plan.parentPlan.budget) * 100;
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ num
+										+ "%'>"
+										+ num
+										+ "</div></div></td>";
+								}else{
+								//计划组中没有预算
+								html += "<td><div class='progress'><div class='progress-bar progress-bar-warning progress-bar-striped' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width: "
+										+ 0
+										+ "%'>"
+										+ 0
+										+ "</div></div></td>";
+								}
+							}
+							html += "<td style='vertical-align: middle;text-align:center;'>"
+									+ getDay(plan.updateTime) + "</td>";
+							html += "<td><a href='#' data-toggle='tooltip' data-placement='top' onclick='updatePlan("
+									+ plan.id
+									+ ");' title='修改'><i class='iconfont icon-xiugai'></i></a>"
+									+ "<a href='#' data-toggle='tooltip' data-placement='top' onclick='deletePlan("
+									+ plan.id
+									if(plan.parentPlan)
+										html+= ","+plan.parentPlan.id;
+									html+= ");' title='删除'><i class='iconfont icon-shanchu'></i></a></td>";
+							html += "</tr>";
+							$("#sspPlanList").append(html);
+							//渲染开关
+							loadSwith((plan.parentPlan?plan.parentPlan.id:''));
+						});
+		//渲染分页插件   
+		var totalPage = data.result.totalPage;
+		var totalCount = data.result.totalCount;
+		var startPage = data.result.currentPageNo;
+		$('#page')
+				.html(
+						'<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+		page.ajaxPage({
+			pcont : 'pageUserListUl',//分页容器，ID
+			totalPages : totalPage, //总页数
+			count : totalCount, //总记录数
+			startPage : startPage,
+			//每页显示记录数  没有搜索条件
+			onPageClick : function(env, thisPage) {
+				//CurrentPageNo = thisPage;
+				//加载子计划数据
+				loadchildData(thisPage, id);
+			}
+		});
+	}
+
+	//查询子计划数据
+	function loadchildData(pageNum, id) {
+		//;
+		console.log("pageNum--" + pageNum);
+		page.ajax({
+			url : 'ssp/plan/searchPlanChildren',
+			data : {
+				pageNum : pageNum,
+				id : id
+			},
+			type : 'post',
+			datatype : 'json',
+			success : function(data) {
+				$("#sspPlanList").html("");
+				if (data.result != null) {
+					loadChildPage(data, id);
+				} else {
+				 $("#sspPlanList").empty();
+				 $("#page").empty();
+			     $("#sspPlanList").append("<tr class=\"sldataBodyRow\"><td style=\"text-align: center\" colspan=\"11\">暂时没有数据</td></tr>");
+				return false;
+				}
+
+			},
+			error : function(err) {
+			}
+		});
+	}
+
+	//跳转到策略列表
+	function goToCreativeList(id, advertiserId) {
+		console.log("有广告主id吗--" + advertiserId);
+		var url = "ssp/plan/getCreativeListByPlanId?planId=" + id
+				+ "&advertiserId=" + advertiserId;
+		//var url="ssp/plan/getCreativeListByPlanId?planId="+id;
+		page.loadPage(url)
+	}
+
+	/**日期转换工具*/
+	function getMoth(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd");
+		return oDate;
+	};
+	function getDay(str) {
+		var oDate = new Date(str).format("yyyy-MM-dd hh:mm:ss");
+		return oDate;
+	};
+	//处理默认时间工具
+	function addDate(dd, dadd) {
+		var a = new Date(dd)
+		a = a.valueOf()
+		a = a + dadd * 24 * 60 * 60 * 1000
+		a = new Date(a)
+		return a;
+	}
+	function getMapDate(dayss) {
+		var now = new Date();
+		var NextNow = addDate(now, -dayss);
+		var years = NextNow.getFullYear();
+		var months = NextNow.getMonth() + 1;
+		var days = NextNow.getDate();
+		var beginTime = years + "-" + months + "-" + days;
+		return beginTime;
+	}
+</script>
+</html>

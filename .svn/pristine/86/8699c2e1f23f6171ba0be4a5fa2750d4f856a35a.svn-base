@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<#assign path=request.contextPath/>
+<base href="${path}/">
+<html>
+<head>
+    <title>SSP</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="css/base/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/base/bootstrap-theme.css">
+    <!-- 图标 -->
+    <link rel="stylesheet" type="text/css" href="css/fonts/fontsize/iconfont.css">
+    <!-- 公共样式 -->
+    <link rel="stylesheet" type="text/css" href="css/base/style.css">
+    <link rel="stylesheet" type="text/css" href="css/base/custom.css">
+</head>
+<body>
+<div class="containered">
+    <div class="header clearfix">
+        <ul class="logogroup">
+            <li><a href="#">广告投放媒体管理系统</a></li>
+        </ul>
+        <!-- <ul class="user_info clearfix">
+            <li><span>zhuc</span><a href="javascript:;" class="goout">退出</a></li>
+        </ul> -->
+    </div>
+    <div class="denglubox bknone">
+        <div class="block_content passwoedwarp">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- 表单名称开始 -->
+                    <div class="block_title white clearfix ">
+							<span class="block_title_name pull-left">
+								找回密码
+							</span>
+                    </div>
+                    <!-- 表单名称结束 -->
+                    <div class="zhmabox">
+                        <div class="zoumadeng">
+                            <span class='gradient one '><em>1</em>确认账号</span>
+                            <span class='gradient two on'><em>2</em>安全认证</span>
+                            <span class='gradient tree'><em>3</em>重置密码</span>
+                        </div>
+                        <div class="imgeamibox text-center">
+                            <div class=" imgeami"><img src="images/email.png"></div>
+                            <p>我们已向您的邮箱 <span id="email">${(email)!}</span>发送了一封激活邮件一封密码找回邮件，请您注意 接收邮件</p>
+                            <a id="gotoLogin" href="javascript:void(0)" target="_blank"
+                               class="btn btn2 green wczcbtn">去邮箱接收邮件</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="js/base/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="js/base/bootstrap.min.js"></script>
+<script type="text/javascript" src="js/base/jquery-form.js"></script>
+<script>
+    $(function () {
+
+        $('#emailoption').click(function () {
+            if ($(this).is(":checked")) {
+                $('#email').removeClass('hidden');
+                $('#iphone').addClass('hidden');
+            }
+        });
+        $('#iphoneoption').click(function () {
+            if ($(this).is(":checked")) {
+                $('#iphone').removeClass('hidden');
+                $('#email').addClass('hidden');
+            }
+        });
+    });
+    $("#gotoLogin").click(function () {
+        ;
+        //跳转到指定的邮箱登录页面
+        var uurl = $("span#email").text();
+        uurl = gotoEmail(uurl);
+        if (uurl != "") {
+            $("#gotoLogin").attr("href", "http://" + uurl);
+            $("#gotoLogin").click();
+        } else {
+            alert("抱歉!未找到对应的邮箱登录地址，请自己登录邮箱查看邮件！");
+        }
+        //window.location.href = "register/resetPassword";
+    });
+
+    //功能：根据用户输入的Email跳转到相应的电子邮箱首页
+    function gotoEmail($mail) {
+        $t = $mail.split('@')[1];
+        $t = $t.toLowerCase();
+        if ($t == '163.com') {
+            return 'mail.163.com';
+        } else if ($t == 'vip.163.com') {
+            return 'vip.163.com';
+        } else if ($t == '126.com') {
+            return 'mail.126.com';
+        } else if ($t == 'qq.com' || $t == 'vip.qq.com' || $t == 'foxmail.com') {
+            return 'mail.qq.com';
+        } else if ($t == 'gmail.com') {
+            return 'mail.google.com';
+        } else if ($t == 'sohu.com') {
+            return 'mail.sohu.com';
+        } else if ($t == 'tom.com') {
+            return 'mail.tom.com';
+        } else if ($t == 'vip.sina.com') {
+            return 'vip.sina.com';
+        } else if ($t == 'sina.com.cn' || $t == 'sina.com') {
+            return 'mail.sina.com.cn';
+        } else if ($t == 'tom.com') {
+            return 'mail.tom.com';
+        } else if ($t == 'yahoo.com.cn' || $t == 'yahoo.cn') {
+            return 'mail.cn.yahoo.com';
+        } else if ($t == 'tom.com') {
+            return 'mail.tom.com';
+        } else if ($t == 'yeah.net') {
+            return 'www.yeah.net';
+        } else if ($t == '21cn.com') {
+            return 'mail.21cn.com';
+        } else if ($t == 'hotmail.com') {
+            return 'www.hotmail.com';
+        } else if ($t == 'sogou.com') {
+            return 'mail.sogou.com';
+        } else if ($t == '188.com') {
+            return 'www.188.com';
+        } else if ($t == '139.com') {
+            return 'mail.10086.cn';
+        } else if ($t == '189.cn') {
+            return 'webmail15.189.cn/webmail';
+        } else if ($t == 'wo.com.cn') {
+            return 'mail.wo.com.cn/smsmail';
+        } else if ($t == '139.com') {
+            return 'mail.10086.cn';
+        } else {
+            return '';
+        }
+    }
+    ;
+
+</script>
+</html>

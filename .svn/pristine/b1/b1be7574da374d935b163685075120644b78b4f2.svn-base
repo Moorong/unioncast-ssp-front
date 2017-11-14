@@ -1,0 +1,451 @@
+package com.unioncast.ssp.front.model.vo;
+
+import com.unioncast.common.annotation.MyColumn;
+import com.unioncast.common.ssp.model.SspDictCrowdSexType;
+import com.unioncast.common.ssp.model.SspDictMarriageTarget;
+
+import java.io.Serializable;
+import java.util.Date;
+
+/**
+ * 广告定向条件 ssp_plan_target_condition
+ * <p>
+ * </p>
+ *
+ * @author dmpchengyunyun
+ * @date 2017年1月9日上午10:37:38
+ */
+public class SspPlanTargetConditionVO implements Serializable {
+
+	private static final long serialVersionUID = 8047341100855145498L;
+
+	private Long id;
+
+	// 时间定向
+	private String timeTarget;
+
+	// 广告类型
+	private Long sspDictAdTypeId;
+
+	// 投放节奏，1-均匀投放，2-加速投放，3-集中投放，4-效果最有投放，5-低CPC投放
+	private Long putRhythm;
+
+	// 地域定向,1-不限定,2-按地域（省、市）,3-LBS
+	private Long areaTargetState;
+	private String cityInfoArrStr;
+
+	// 经度-纬度-半径
+	private String lbsInfo;
+	// 操作系统定向状态1不限，2限制
+	private Long dictSysOperationState;
+	// 操作系统定向
+	private String dictSysOperationTypeArrStr;
+	// 移动设备品牌定向状态1不限，2限制
+	private Long dictMobileBrandState;
+	// 移动设备品牌定向
+	private String dictMobileBrandTypeArrStr;
+
+	// 网络类型，1-全选，2-2G，3-3G，4-4G，5-WIFI，逗号区分
+	private String networkType;
+
+	// 设备ID定向控制状态
+	private Long deviceTypeState;
+
+	// 设备ID定向类型
+	private String deviceTypeIdfa;
+
+	// 设备ID定向类型
+	private String deviceTypeMac;
+
+	// 设备ID定向类型
+	private String deviceTypeImei;
+
+	// 媒体类型定向状态1不限，2限制
+	private Long mediaState;
+
+	// 媒体类型定向
+	private String dictMediaTypeArrStr;
+
+	// 媒体ID定向，逗号区分
+	private String mediaIds;
+
+	// 性别定向状态 1不限 2 限制
+	private Long sexState;
+	// 性别，1-男，2-女
+	private String dictCrowdSexTypeArrStr;
+
+	// 年龄定向状态
+	private Long dictAgeState;
+	// 年龄定向
+	private String ageTargetArrStr;
+
+	// 学历定向
+	private Long dictEducationState;
+	// 学历
+	private String educationTargetArrStr;
+	// 婚姻定向
+	private Long dictMarriageState;
+	// 婚姻，1-已婚，2-未婚，，逗号区分
+	private String sspDictMarriageTargetArrStr;
+
+	// 收入定向状态
+	private Long dictIncomeState;
+	// 收入，1-高，2-中，3-低，，逗号区分
+	private String incomeArrStr;
+
+	// 兴趣爱好定向
+	private Long dictInterestsState;
+	// 兴趣爱好，
+	private String interestsTargetArrStr;
+
+	// 购买倾向状态1，不限，2限制
+	private Long dictBuyState;
+	// 购买倾向
+	private String buyTargetArrStr;
+	private Date createTime;
+	private Date updateTime;
+
+	// 删除状态，1-未删除，2-已删除
+	private Long deleteState;
+
+	public SspPlanTargetConditionVO() {
+		super();
+	}
+
+	public SspPlanTargetConditionVO(Long id, String timeTarget, Long sspDictAdTypeId, Long putRhythm,
+			Long areaTargetState, String cityInfoArrStr, String lbsInfo, Long dictSysOperationState,
+			String dictSysOperationTypeArrStr, Long dictMobileBrandState, String dictMobileBrandTypeArrStr,
+			String networkType, Long deviceTypeState, String deviceTypeIdfa, String deviceTypeMac,
+			String deviceTypeImei, Long mediaState, String dictMediaTypeArrStr, String mediaIds, Long sexState,
+			String dictCrowdSexTypeArrStr, Long dictAgeState, String ageTargetArrStr, Long dictEducationState,
+			String educationTargetArrStr, Long dictMarriageState, String sspDictMarriageTargetArrStr,
+			Long dictIncomeState, String incomeArrStr, Long dictInterestsState, String interestsTargetArrStr,
+			Long dictBuyState, String buyTargetArrStr, Date createTime, Date updateTime, Long deleteState) {
+		super();
+		this.id = id;
+		this.timeTarget = timeTarget;
+		this.sspDictAdTypeId = sspDictAdTypeId;
+		this.putRhythm = putRhythm;
+		this.areaTargetState = areaTargetState;
+		this.cityInfoArrStr = cityInfoArrStr;
+		this.lbsInfo = lbsInfo;
+		this.dictSysOperationState = dictSysOperationState;
+		this.dictSysOperationTypeArrStr = dictSysOperationTypeArrStr;
+		this.dictMobileBrandState = dictMobileBrandState;
+		this.dictMobileBrandTypeArrStr = dictMobileBrandTypeArrStr;
+		this.networkType = networkType;
+		this.deviceTypeState = deviceTypeState;
+		this.deviceTypeIdfa = deviceTypeIdfa;
+		this.deviceTypeMac = deviceTypeMac;
+		this.deviceTypeImei = deviceTypeImei;
+		this.mediaState = mediaState;
+		this.dictMediaTypeArrStr = dictMediaTypeArrStr;
+		this.mediaIds = mediaIds;
+		this.sexState = sexState;
+		this.dictCrowdSexTypeArrStr = dictCrowdSexTypeArrStr;
+		this.dictAgeState = dictAgeState;
+		this.ageTargetArrStr = ageTargetArrStr;
+		this.dictEducationState = dictEducationState;
+		this.educationTargetArrStr = educationTargetArrStr;
+		this.dictMarriageState = dictMarriageState;
+		this.sspDictMarriageTargetArrStr = sspDictMarriageTargetArrStr;
+		this.dictIncomeState = dictIncomeState;
+		this.incomeArrStr = incomeArrStr;
+		this.dictInterestsState = dictInterestsState;
+		this.interestsTargetArrStr = interestsTargetArrStr;
+		this.dictBuyState = dictBuyState;
+		this.buyTargetArrStr = buyTargetArrStr;
+		this.createTime = createTime;
+		this.updateTime = updateTime;
+		this.deleteState = deleteState;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public String getTimeTarget() {
+		return timeTarget;
+	}
+
+	public void setTimeTarget(String timeTarget) {
+		this.timeTarget = timeTarget == null ? null : timeTarget.trim();
+	}
+
+	public Long getPutRhythm() {
+		return putRhythm;
+	}
+
+	public void setPutRhythm(Long putRhythm) {
+		this.putRhythm = putRhythm;
+	}
+
+	public Long getAreaTargetState() {
+		return areaTargetState;
+	}
+
+	public void setAreaTargetState(Long areaTargetState) {
+		this.areaTargetState = areaTargetState;
+	}
+
+	public String getLbsInfo() {
+		return lbsInfo;
+	}
+
+	public void setLbsInfo(String lbsInfo) {
+		this.lbsInfo = lbsInfo == null ? null : lbsInfo.trim();
+	}
+
+	public String getNetworkType() {
+		return networkType;
+	}
+
+	public void setNetworkType(String networkType) {
+		this.networkType = networkType == null ? null : networkType.trim();
+	}
+
+	public String getDeviceTypeIdfa() {
+		return deviceTypeIdfa;
+	}
+
+	public void setDeviceTypeIdfa(String deviceTypeIdfa) {
+		this.deviceTypeIdfa = deviceTypeIdfa == null ? null : deviceTypeIdfa.trim();
+	}
+
+	public String getDeviceTypeMac() {
+		return deviceTypeMac;
+	}
+
+	public void setDeviceTypeMac(String deviceTypeMac) {
+		this.deviceTypeMac = deviceTypeMac == null ? null : deviceTypeMac.trim();
+	}
+
+	public String getDeviceTypeImei() {
+		return deviceTypeImei;
+	}
+
+	public void setDeviceTypeImei(String deviceTypeImei) {
+		this.deviceTypeImei = deviceTypeImei == null ? null : deviceTypeImei.trim();
+	}
+
+	public String getMediaIds() {
+		return mediaIds;
+	}
+
+	public void setMediaIds(String mediaIds) {
+		this.mediaIds = mediaIds == null ? null : mediaIds.trim();
+	}
+
+	public Long getDictAgeState() {
+		return dictAgeState;
+	}
+
+	public void setDictAgeState(Long dictAgeState) {
+		this.dictAgeState = dictAgeState;
+	}
+
+	public Long getDictEducationState() {
+		return dictEducationState;
+	}
+
+	public void setDictEducationState(Long dictEducationState) {
+		this.dictEducationState = dictEducationState;
+	}
+
+	public Long getDictMarriageState() {
+		return dictMarriageState;
+	}
+
+	public void setDictMarriageState(Long dictMarriageState) {
+		this.dictMarriageState = dictMarriageState;
+	}
+
+	public String getSspDictMarriageTargetArrStr() {
+		return sspDictMarriageTargetArrStr;
+	}
+
+	public void setSspDictMarriageTargetArrStr(String sspDictMarriageTargetArrStr) {
+		this.sspDictMarriageTargetArrStr = sspDictMarriageTargetArrStr;
+	}
+
+	public Long getDictIncomeState() {
+		return dictIncomeState;
+	}
+
+	public void setDictIncomeState(Long dictIncomeState) {
+		this.dictIncomeState = dictIncomeState;
+	}
+
+	public String getIncomeArrStr() {
+		return incomeArrStr;
+	}
+
+	public void setIncomeArrStr(String incomeArrStr) {
+		this.incomeArrStr = incomeArrStr;
+	}
+
+	public Long getDictInterestsState() {
+		return dictInterestsState;
+	}
+
+	public void setDictInterestsState(Long dictInterestsState) {
+		this.dictInterestsState = dictInterestsState;
+	}
+
+	public Long getDictBuyState() {
+		return dictBuyState;
+	}
+
+	public void setDictBuyState(Long dictBuyState) {
+		this.dictBuyState = dictBuyState;
+	}
+
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+
+	public Date getUpdateTime() {
+		return updateTime;
+	}
+
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
+	}
+
+	public Long getDeleteState() {
+		return deleteState;
+	}
+
+	public void setDeleteState(Long deleteState) {
+		this.deleteState = deleteState;
+	}
+
+	public Long getSspDictAdTypeId() {
+		return sspDictAdTypeId;
+	}
+
+	public void setSspDictAdTypeId(Long sspDictAdTypeId) {
+		this.sspDictAdTypeId = sspDictAdTypeId;
+	}
+
+	public String getCityInfoArrStr() {
+		return cityInfoArrStr;
+	}
+
+	public void setCityInfoArrStr(String cityInfoArrStr) {
+		this.cityInfoArrStr = cityInfoArrStr;
+	}
+
+	public String getDictSysOperationTypeArrStr() {
+		return dictSysOperationTypeArrStr;
+	}
+
+	public void setDictSysOperationTypeArrStr(String dictSysOperationTypeArrStr) {
+		this.dictSysOperationTypeArrStr = dictSysOperationTypeArrStr;
+	}
+
+	public String getDictMobileBrandTypeArrStr() {
+		return dictMobileBrandTypeArrStr;
+	}
+
+	public void setDictMobileBrandTypeArrStr(String dictMobileBrandTypeArrStr) {
+		this.dictMobileBrandTypeArrStr = dictMobileBrandTypeArrStr;
+	}
+
+	public String getDictMediaTypeArrStr() {
+		return dictMediaTypeArrStr;
+	}
+
+	public void setDictMediaTypeArrStr(String dictMediaTypeArrStr) {
+		this.dictMediaTypeArrStr = dictMediaTypeArrStr;
+	}
+
+	public String getAgeTargetArrStr() {
+		return ageTargetArrStr;
+	}
+
+	public void setAgeTargetArrStr(String ageTargetArrStr) {
+		this.ageTargetArrStr = ageTargetArrStr;
+	}
+
+	public String getEducationTargetArrStr() {
+		return educationTargetArrStr;
+	}
+
+	public void setEducationTargetArrStr(String educationTargetArrStr) {
+		this.educationTargetArrStr = educationTargetArrStr;
+	}
+
+	public String getInterestsTargetArrStr() {
+		return interestsTargetArrStr;
+	}
+
+	public void setInterestsTargetArrStr(String interestsTargetArrStr) {
+		this.interestsTargetArrStr = interestsTargetArrStr;
+	}
+
+	public String getBuyTargetArrStr() {
+		return buyTargetArrStr;
+	}
+
+	public void setBuyTargetArrStr(String buyTargetArrStr) {
+		this.buyTargetArrStr = buyTargetArrStr;
+	}
+
+	public Long getDictSysOperationState() {
+		return dictSysOperationState;
+	}
+
+	public void setDictSysOperationState(Long dictSysOperationState) {
+		this.dictSysOperationState = dictSysOperationState;
+	}
+
+	public Long getMediaState() {
+		return mediaState;
+	}
+
+	public void setMediaState(Long mediaState) {
+		this.mediaState = mediaState;
+	}
+
+	public Long getDeviceTypeState() {
+		return deviceTypeState;
+	}
+
+	public void setDeviceTypeState(Long deviceTypeState) {
+		this.deviceTypeState = deviceTypeState;
+	}
+
+	public Long getDictMobileBrandState() {
+		return dictMobileBrandState;
+	}
+
+	public void setDictMobileBrandState(Long dictMobileBrandState) {
+		this.dictMobileBrandState = dictMobileBrandState;
+	}
+
+	public Long getSexState() {
+		return sexState;
+	}
+
+	public void setSexState(Long sexState) {
+		this.sexState = sexState;
+	}
+
+	public String getDictCrowdSexTypeArrStr() {
+		return dictCrowdSexTypeArrStr;
+	}
+
+	public void setDictCrowdSexTypeArrStr(String dictCrowdSexTypeArrStr) {
+		this.dictCrowdSexTypeArrStr = dictCrowdSexTypeArrStr;
+	}
+
+}

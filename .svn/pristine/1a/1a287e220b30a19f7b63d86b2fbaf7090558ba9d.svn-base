@@ -1,0 +1,43 @@
+package com.unioncast.ssp.front.controller.ssp;
+
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.restClient.RestResponseFactory;
+import com.unioncast.common.ssp.model.SspDictAccessWay;
+import com.unioncast.ssp.front.service.ssp.SspDictAccessWayService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+/**
+ * @auther wangyao
+ * @date 2017-03-31 13:48
+ */
+@Api("接入方式")
+@Controller
+@RequestMapping("/rest/sspDictAccessWay")
+public class SspDictAccessWayController {
+    private final Logger LOG = LogManager.getLogger(SspDictAccessWayController.class);
+
+    @Autowired
+    private SspDictAccessWayService sspDictAccessWayService;
+    @ApiOperation(value = "查询所有接入方式", httpMethod = "POST", response = RestResponse.class)
+    @ResponseBody
+    @RequestMapping(value = "/find", method = RequestMethod.POST)
+    public RestResponse find(SspDictAccessWay sspDictAccessWay) {
+        LOG.info("find sspDictAccessWay:{}", sspDictAccessWay);
+        RestResponse restResponse = new RestResponse();
+        restResponse.setStatus(RestResponse.OK);
+        try {
+            return sspDictAccessWayService.find(sspDictAccessWay);
+        } catch (Exception e) {
+            LOG.error("查询接入方式出错");
+            return RestResponseFactory.exception(e);
+        }
+    }
+}

@@ -1,0 +1,27 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.rest.response.ssp.SspIncomeArrResponse;
+import com.unioncast.common.ssp.model.SspDictIncomeTarget;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspIncomeService;
+
+@Component
+public class SspIncomeServiceImpl implements SspIncomeService{
+
+	@Resource
+	private RestTemplate restTemplate;
+	
+	@Override
+	public SspDictIncomeTarget[] findByCode(String[] dictIncome) {
+		HttpEntity<String[]> httpEntity = new HttpEntity<String[]>(dictIncome);
+		SspIncomeArrResponse sspIncomeArrResponse = restTemplate.postForObjectForDB("rest/ssp/dictIncome/batchFindbyCodes", httpEntity, SspIncomeArrResponse.class);
+		return sspIncomeArrResponse.getResult();
+	}
+	
+
+}

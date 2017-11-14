@@ -1,0 +1,425 @@
+package com.unioncast.ssp.front.controller.ssp;
+
+import java.util.*;
+
+import javax.annotation.Resource;
+
+import com.unioncast.ssp.front.service.ssp.SspModuleService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.core.env.Environment;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.restClient.RestResponseFactory;
+import com.unioncast.common.user.model.Module;
+import com.unioncast.common.user.model.Role;
+import com.unioncast.ssp.front.common.util.ModuleInfoComparator;
+import com.unioncast.ssp.front.common.util.SystemSession;
+import com.unioncast.ssp.front.controller.common.BaseController;
+import com.unioncast.ssp.front.model.SecurityUser;
+import com.unioncast.ssp.front.service.ssp.SspSystemService;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+
+/**
+ * @auther wangyao
+ * @date 2017-01-12 11:54
+ */
+@Api("模块")
+@Controller
+@RequestMapping("/rest/ssp/module")
+public class SspModuleController extends BaseController {
+
+	private static final Logger LOG = LogManager.getLogger(SspModuleController.class);
+
+	@Resource
+	private SspModuleService sspModuleService;
+	@Resource
+	private SspSystemService sspSystemService;
+
+	@Resource
+	private Environment env;
+
+	/**
+	 * 模块列表映射
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 15:01
+	 */
+	@RequestMapping(value = { "/moduleList" }, method = RequestMethod.GET)
+	public String moduleList(ModelMap model) {
+		//内存中取系统信息
+		String systemId = String.valueOf(SystemSession.CURRENT_SYSTEM_IMFO.getId());
+		model.addAttribute("systemId", systemId);
+		return "ssp/system/moduleInfo";
+	}
+
+	/**
+	 * 新增模块映射
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 15:05
+	 */
+	@RequestMapping(value = { "/add" })
+	public String saveModule() {
+		return "ssp/system/addModule";
+	}
+
+	/**
+	 * 修改模块映射
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 15:07
+	 */
+	@RequestMapping(value = { "/update" })
+	public String update(@RequestParam Long id, ModelMap map) {
+		LOG.info("moduleId:{}", id);
+
+		try {
+			Module[] module = sspModuleService.findById(id);
+			// Module[] moduleAll = moduleSystemService.findAll();
+			map.addAttribute("module", module[0]);
+			LOG.info("module--findbyId:{}", Arrays.toString(module));
+			// map.addAttribute("moduleAll", moduleAll);
+		} catch (Exception e) {
+			LOG.error("加载修改模块页面出错",e.getMessage());
+		}
+
+		// 测试数据
+		/*
+		 * Module module = new Module(); module.setCreateTime(new Date());
+		 * module.setDescription("测试"); module.setElementUrl("ssss");
+		 * module.setLevel(1); module.setName("ceshi"); module.setId(1l);
+		 * module.setRemark("ss"); module.setSort(3);
+		 */
+
+		return "ssp/system/editModule";
+	}
+
+	/**
+	 * 新增模块
+	 *
+	 * @param module
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 19:20
+	 */
+	@RequestMapping(value = "/addModule", method = RequestMethod.POST)
+	public @ResponseBody RestResponse add(Module module) {
+		LOG.info("moduleInfo:{}", module);
+		try {
+			module.setCreateTime(new Date());
+			module.setUpdateTime(new Date());
+			module.setState(0);
+			module.setSystemId(SystemSession.CURRENT_SYSTEM_IMFO.getId());
+			return sspModuleService.save(module);
+		} catch (Exception e) {
+			LOG.error("添加模块出错",e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 修改模块
+	 *
+	 * @param module
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/14 13:56
+	 */
+	@RequestMapping(value = "/updateModule", method = RequestMethod.POST)
+	public @ResponseBody RestResponse updateModule(Module module) {
+		LOG.info("moduleInfo:{}", module);
+		try {
+			module.setUpdateTime(new Date());
+			module.setState(0);
+			return sspModuleService.update(module);
+		} catch (Exception e) {
+			LOG.error("修改模块出错",e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 删除模块信息（单个或多个）
+	 *
+	 * @param moduleIds
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 15:28
+	 */
+	@RequestMapping(value = "/deleteModules", method = RequestMethod.POST)
+	public @ResponseBody RestResponse delete(@RequestParam String moduleIds) {
+		LOG.info("moduleIds:{}", moduleIds);
+		String[] moduleIdArray = moduleIds.split(",");
+		Long longArray[] = new Long[moduleIdArray.length];
+		for (int i = 0; i < longArray.length; i++) {
+			longArray[i] = Long.valueOf(moduleIdArray[i]);
+		}
+		try {
+			sspModuleService.deleteByModuleIds(longArray);
+			for (Long moduleId : longArray) {
+				sspModuleService.deleteById(moduleId);
+			}
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("删除模块出错",e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 根据系统类型获取所有模块
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/1/12 14:35
+	 */
+	@ApiOperation(value = "根据系统类型获取所有模块", httpMethod = "POST", response = RestResponse.class)
+	@RequestMapping(value = "/findModuleBySystemId", method = RequestMethod.POST)
+	public @ResponseBody RestResponse findModuleBySystemId() {
+		try {
+			Long systemId = SystemSession.CURRENT_SYSTEM_IMFO.getId();
+			Module[] modules = sspModuleService.findModuleBySystemId(systemId);
+			LOG.info("modules:{}", Arrays.toString(modules));
+			return RestResponseFactory.ok(modules);
+		} catch (Exception e) {
+			LOG.error("获取模块列表出错",e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 根据系统id和name获取模块
+	 *
+	 * @param name
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 18:56
+	 */
+	@ApiOperation(value = "根据系统id和name获取模块", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParams({ @ApiImplicitParam(name = "name", required = true, dataType = "String", paramType = "body"),
+			@ApiImplicitParam(name = "systemId", required = true, dataType = "Long", paramType = "body") })
+	@RequestMapping(value = "/findByNameAndSystem/{name}", method = RequestMethod.POST)
+	public @ResponseBody RestResponse findByNameAndSystem(@PathVariable String name) {
+		LOG.info("name:{}", name);
+		try {
+			Module[] module = sspModuleService.findByNameAndSystem(name, SystemSession.CURRENT_SYSTEM_IMFO.getId());
+			LOG.info("Module", Arrays.toString(module));
+			return RestResponseFactory.ok(module);
+		} catch (Exception e) {
+			LOG.error("根据systemId和name查找模块出错", e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 根据角色获取模块
+	 *
+	 * @param roleId
+	 * @return
+	 * @author wangyao
+	 * @date 2017/1/13 17:03
+	 */
+	@ApiOperation(value = "根据角色获取模块", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "roleId", required = true, dataType = "Long", paramType = "body")
+	@RequestMapping(value = "/findByRoleId/{roleId}", method = RequestMethod.POST)
+	public @ResponseBody RestResponse findByRoleId(@PathVariable Long roleId) {
+		LOG.info("findByRoleId--roleId:{}", roleId);
+		try {
+			Long systemId = SystemSession.CURRENT_SYSTEM_IMFO.getId();
+			Module[] allModule = sspModuleService.findModuleBySystemId(systemId);
+			Module[] findByRoleId = sspModuleService.findByRoleId(roleId);
+			for (int i = 0; i < allModule.length; i++) {
+				for (int j = 0; j < findByRoleId.length; j++) {
+					if ((allModule[i].getId()).equals(findByRoleId[j].getId())) {
+						allModule[i].setRemark("checked");
+					}
+				}
+			}
+			return RestResponseFactory.ok(allModule);
+		} catch (Exception e) {
+			LOG.error("根据用户ID获取角色列表出错",e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 分页查找模块
+	 *
+	 * @param pageCriteria
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/13 15:02
+	 */
+	@RequestMapping(value = "/page", method = RequestMethod.POST)
+	public @ResponseBody RestResponse pageAll(PageCriteria pageCriteria) {
+		LOG.info("pageCriteria:{}", pageCriteria);
+		try {
+			return sspModuleService.pageAll(pageCriteria);
+		} catch (Exception e) {
+			LOG.error("获取模块数据出错", e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 根据当前用户信息获取菜单
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/2/14 14:27
+	 */
+	@RequestMapping(value = "/findByLoginUser", method = RequestMethod.POST)
+	public @ResponseBody RestResponse findByLoginUser() {
+		try {
+			SecurityUser userDetails = (SecurityUser) SecurityContextHolder.getContext().getAuthentication()
+					.getPrincipal();
+			// TODO 获取用户的角色列表（取第一个角色）；
+			List<Role> roleList = userDetails.getRoleList();
+			Module[] modules = null;
+			if (roleList.size() > 0) {
+				Long id = roleList.get(0).getId();
+				modules = sspModuleService.findByRoleId(id);
+			}
+			StringBuilder menuSb = new StringBuilder();
+			List<Module> topMenuModuleList = getTopMenuModule(modules);
+			List<Module> otherMenuModuleList = getOtherMenuModule(modules);
+			formatMenuModule(topMenuModuleList, otherMenuModuleList, menuSb);
+			// return menuSb.toString();
+			LOG.info("modules:{}", Arrays.toString(modules));
+			String menuStr = menuSb.substring(0, menuSb.length() - 1);
+			LOG.info("menuSb:{}", menuStr);
+			return RestResponseFactory.ok(menuStr);
+		} catch (Exception e) {
+			LOG.error("获取模块列表出错",e.getMessage());
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	/**
+	 * 获取顶级菜单集合
+	 *
+	 * @param modules
+	 * @return
+	 * @author wangyao
+	 * @date 2017/1/22 10:29
+	 */
+	private List<Module> getTopMenuModule(Module[] modules) {
+		List<Module> topMenuModuleList = new ArrayList<Module>();
+		if (modules != null) {
+			for (Module module : modules) {
+				if ("0".equals(String.valueOf(module.getParentId()))) {
+					topMenuModuleList.add(module);
+				}
+			}
+		}
+		// 对顶级菜单进行排序(按照OrderNum升序排列)
+		if (topMenuModuleList.size() > 0) {
+			Collections.sort(topMenuModuleList, new ModuleInfoComparator());
+			return topMenuModuleList;
+		}
+		return null;
+	}
+
+	/**
+	 * 获取非顶级菜单集合
+	 *
+	 * @param modules
+	 * @return
+	 * @author wangyao
+	 * @date 2017/1/22 10:28
+	 */
+	private List<Module> getOtherMenuModule(Module[] modules) {
+		List<Module> otherMenuModuleList = new ArrayList<Module>();
+		if (modules != null) {
+			for (Module module : modules) {
+				if (!"0".equals(String.valueOf(module.getParentId()))) {
+					otherMenuModuleList.add(module);
+				}
+			}
+		}
+		// 对非顶级菜单进行排序
+		if (otherMenuModuleList.size() > 0) {
+			Collections.sort(otherMenuModuleList, new ModuleInfoComparator());
+			return otherMenuModuleList;
+		}
+		return null;
+	}
+
+	/**
+	 * 获取某个菜单的子菜单
+	 *
+	 * @param moduleInfoList
+	 * @param parentModuleId
+	 * @return
+	 * @author wangyao
+	 * @date 2017/1/22 10:28
+	 */
+	private List<Module> getSubModules(List<Module> moduleInfoList, String parentModuleId) {
+		List<Module> subModules = new ArrayList<Module>();
+		if (moduleInfoList != null) {
+			for (Module module : moduleInfoList) {
+				if (parentModuleId.equals(String.valueOf(module.getParentId()))) {
+					subModules.add(module);
+				}
+			}
+		}
+		// 对直属子级菜单进行排序
+		if (subModules.size() > 0) {
+			Collections.sort(subModules, new ModuleInfoComparator());
+			return subModules;
+		}
+		return null;
+	}
+
+	/**
+	 * 递归格式化菜单
+	 *
+	 * @param topMenuModuleList
+	 * @param otherMenuModuleList
+	 * @param menuSb
+	 * @author wangyao
+	 * @date 2017/1/22 10:28
+	 */
+	private void formatMenuModule(List<Module> topMenuModuleList, List<Module> otherMenuModuleList,
+			StringBuilder menuSb) {
+		if (topMenuModuleList != null) {
+			for (Module topModuleInfo : topMenuModuleList) {
+				List<Module> subModules = getSubModules(otherMenuModuleList, String.valueOf(topModuleInfo.getId()));
+				if (subModules != null) {
+					menuSb.append("{id:'" + topModuleInfo.getId() + "',icon:'" + topModuleInfo.getIcon() + "',click:'"
+							+ topModuleInfo.getElementUrl() + "',text:'" + topModuleInfo.getName() + "',child:[");
+					formatMenuModule(subModules, otherMenuModuleList, menuSb);
+					menuSb.append("]},");
+				} else {
+					menuSb.append("{id:'" + topModuleInfo.getId() + "',icon:'" + topModuleInfo.getIcon() + "',click:'"
+							+ topModuleInfo.getElementUrl() + "',text:'" + topModuleInfo.getName() + "',child:[]},");
+				}
+			}
+		}
+	}
+	@RequestMapping(value = { "/findParentName" }, method = RequestMethod.POST)
+	public@ResponseBody RestResponse findParentName(Long moduleId) {
+		RestResponse response = new RestResponse();
+		response.setStatus(0);
+		System.out.println("moduleId--"+moduleId);
+		Module[]  list = sspModuleService.findById(moduleId);
+		if(null != list&& list.length>0){
+			response.setResult(list[0]);
+		}
+		return response;
+	}
+
+}

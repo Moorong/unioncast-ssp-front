@@ -1,0 +1,52 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspWithdrawRequestInfo;
+import com.unioncast.ssp.front.service.common.GeneralService;
+
+public interface SspWithdrawRequestInfoService extends GeneralService<SspWithdrawRequestInfo>{
+	/**
+	 * 查询
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-04-01 14:18:40
+	 *
+	 * @param sspWithdrawRequestInfo
+	 * @return List<SspWithdrawRequestInfo>
+	 *//*
+	public RestResponse find(SspWithdrawRequestInfo sspWithdrawRequestInfo);
+	*//**
+	 * 添加
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-04-01 14:18:52
+	 *
+	 * @param sspWithdrawRequestInfo
+	 * @return RestResponse
+	 *//*
+	public RestResponse add(SspWithdrawRequestInfo sspWithdrawRequestInfo);
+	*//**
+	 * 更新
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-04-01 14:18:59
+	 *
+	 * @param sspWithdrawRequestInfo
+	 * @return boolean
+	 *//*
+	public RestResponse update(SspWithdrawRequestInfo sspWithdrawRequestInfo);
+	*//**
+	 * 分页
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-04-01 14:19:04
+	 *
+	 * @param pageCriteria
+	 * @return RestResponse
+	 *//*
+	public RestResponse page(PageCriteria pageCriteria);
+	*//**
+	 * 批量删除
+	 * @author changguobin@unioncast.cn
+	 * @date 2017-04-01 14:19:11
+	 *
+	 * @param ids
+	 * @return boolean
+	 *//*
+	public RestResponse batchDelete(Long[] ids);*/
+}

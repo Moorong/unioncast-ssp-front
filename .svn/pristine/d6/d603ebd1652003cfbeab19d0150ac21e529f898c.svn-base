@@ -1,0 +1,27 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.rest.response.ssp.SspBuyArrResponse;
+import com.unioncast.common.rest.response.ssp.SspSexTypeArrResponse;
+import com.unioncast.common.ssp.model.SspDictBuyTarget;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspBuyTypeService;
+
+@Component
+public class SspBuyTypeServiceImpl implements SspBuyTypeService {
+
+	@Resource
+	private RestTemplate restTemplate;
+	
+	@Override
+	public SspDictBuyTarget[] findByCode(String[] buyTarget) {
+		  HttpEntity<String[]> httpEntity = new HttpEntity<String[]>(buyTarget);
+		  SspBuyArrResponse response = restTemplate.postForObjectForDB("rest/ssp/dictBuyTarget/batchFindbyCodes", httpEntity, SspBuyArrResponse.class);
+		return response.getResult();
+	}
+
+}

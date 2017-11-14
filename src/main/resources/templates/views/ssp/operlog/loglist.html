@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<body>
+<h2 class="current_loc">
+    <i class="iconfont icon-zhuye"></i><a href="" onclick="backUp()">广告主管理</a> <i> / </i> <span>日志管理</span>
+</h2>
+    <!-- 表单内容开始 -->
+    <div class="page_main">
+        <div class="page_main_white">
+            <div class="search_block clearfix">
+                <div class="form-group  clearfix">
+                    <div class="pull-left">
+                        <div class="formgroup clearfix ">
+                            <label>模块：</label>
+                            <select id="parentId" name="parentId" class="dropdown">
+                            </select>
+                        </div>
+                        <div class="formgroup clearfix ">
+                            <label>操作人：</label>
+                            <select class="dropdown">
+                                <option value="1">全部</option>
+                                <option value="2">某某</option>
+                                <option value="2">具体到账户</option>
+                            </select>
+                        </div>
+                        <div class="formgroup clearfix ">
+                            <label>时间段：</label>
+                            <div id="reportrange2"  style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                <span></span> <b class="caret"></b>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="pull-right">
+                        <div class="has-feedback clearfix ">
+                            <label class="control-label sr-only" for="inputSuccess2">状态</label>
+                            <input type="text" class="form-control" id="inputSuccess2" placeholder="请输入名称和ID">
+                        </div>
+                        <a href="javascript:void(0)" class="btn btn-sm">提交</a>
+                    </div>
+                </div>
+            </div>
+            <!-- 间隔 -->
+            <div style="height:10px;background:#f1f2f7;"></div>
+            <!-- 间隔 -->
+            <div class="block_content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table" >
+                                <thead>
+                                <tr>
+                                    <th>时间</th>
+                                    <th>模块</th>
+                                    <th>操作人</th>
+                                    <th>操作内容</th>
+                                </tr>
+                                </thead>
+                                <tbody id="loglist">
+                                </tbody>
+                            </table>
+                            <!-- 分页开始 -->
+                            <div class="bs-component clearfix pull-right" id="page">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script>
+    $(function () {
+        //下拉菜单
+        
+
+        /*双日历组件*/
+        $('#reportrange2 span').html(moment().subtract('days', 7).format('YYYY.MMMM.D') + ' - ' + moment().format('YYYY.MMMM.D'));
+        $('#reportrange2').daterangepicker({locale: page.attr.drDefaultLocal});
+
+        $("table input[name='checkboxall']").on('click',function(event){
+            $(this).parent().parent().parent().next('tbody').find("input").prop('checked',$(this).prop('checked'));
+            event.stopPropagation();
+        });
+        $('table input[name="checkboxed"]').on('click',function(event){
+            $(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+            event.stopPropagation();
+        });
+        $('#tabbtn').click(function(){
+            $(this).parent().parent().next('.form-group').toggleClass('hidden');
+        });
+
+        //初始化加载
+        loadData(1);
+    });
+
+    //加载页面开始
+    function loadData(currentPageNo) {
+        var advertiserId = $("#advertiserId").val();
+        var pageSize = 10;
+        page.ajax({
+            url: "orerLog/log/page",
+            data: {currentPageNo: currentPageNo, advertiserId: advertiserId},
+            datatype: 'json',
+            success: function (data) {
+                $("#loglist").html("");
+                if (data.totalPage == 0) {
+                    alert("没有查询到数据")
+                    return false;
+                }
+                loadPage(data, "loadPage");
+            }
+        });
+    }
+    /*公共加载页面*/
+    function loadPage(data, type) {
+        var datas = data.dataArray;
+        $.each(datas, function (index, log) {
+            var html = "<tr>";
+            html += "<td style='display: none' class='orderId'>" + log.id + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>" + getMyDate(log.createTime) + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>" + log.module + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>" + log.user.loginName + "</td>";
+            html += "<td style='vertical-align: middle;text-align:center;'>" + log.operation + "</td>";
+            html += "</tr>";
+            $("#loglist").append(html);
+        });
+        //渲染分页插件
+        var totalPage = data.totalPage;
+        var totalCount = data.totalCount;
+        var startPage = data.currentPageNo;
+        $('#page').html("");
+        $('#page').html('<ul id="pageUserListUl" class="bs-component pull-right"></ul>');
+        page.ajaxPage({
+            pcont: 'pageUserListUl',//分页容器，ID
+            totalPages: totalPage, //总页数
+            startPage: startPage, //当前页
+            count: totalCount, //总记录数
+            onPageClick: function (env, thisPage) {
+                if (type == "loadPage")
+                    loadData(thisPage);
+                if (type == "search")
+                    searchPage(thisPage);
+            }
+        });
+    }
+
+    /*搜索按钮提交*/
+    function searchPage(currentPageNo) {
+    /*    var advertiserId = $("#advertiserId").val();
+        var adPutState = $("#adPutState").val();
+        var orderName = $("#orderName").val();
+        var pushStartTime = $("#pushStartTime").val();
+        var pushEndTime = $("#pushEndTime").val();*/
+        var pageSize = 10;
+        page.ajax({
+            url: "orerLog/log/page",
+            data: {
+                currentPageNo: currentPageNo,
+                advertiserId: advertiserId,
+                adPutState: adPutState,
+                orderName: orderName,
+                pushStartTime: pushStartTime,
+                pushEndTime: pushEndTime
+            },
+            datatype: 'json',
+            success: function (data) {
+                $("#orderList").html("");
+                if (data.totalPage == 0) {
+                    alert("没有查询到数据")
+                    return false;
+                }
+                loadPage(data, "search");
+            }
+        });
+    }
+
+
+    //加载模块列表
+    var pageInit = {
+        init: function () {
+            this.loadData();
+        },
+        loadData: function () {
+            var options = [];
+            $.ajax({
+                url: "rest/ssp/module/findModuleBySystemId",
+                type: "POST",
+                dataType: "json",
+                success: function (restResponse) {
+                    if (restResponse.result != null) {
+                        $('#parentId').empty();
+                        options.push("<option value='0'>--请选择--</option>")
+                        for (var i = 0; i < restResponse.result.length; i++) {
+                            var row = restResponse.result[i];
+                            options.push("<option value=\"" + row.id + "\">" + row.name + "</option>");
+                        }
+                        //var selectElement = "<select id=\"parentId\" name=\"parentId\" class=\"form-control\"> " + options.join('') + " </select>"
+                        $("#parentId").append(options.join(''));
+                        $('#parentId').selectpicker('refresh');
+
+                    }
+                }, error: function () {
+                    alert.msg('加载模块父节点失败！');
+                }
+            });
+        }
+    }
+
+
+    $(function () {
+        pageInit.init();
+    })
+</script>
+</html>

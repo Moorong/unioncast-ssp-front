@@ -1,0 +1,79 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.ssp.model.SspPlanTargetCondition;
+import com.unioncast.ssp.front.common.util.MyHttpEntity;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspPlanTargetConditionService;
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
+/**
+ * Simple to Introduction
+ *
+ * @Description: [广告定向服务实现类]
+ * @Author: [dxy]
+ * @CreateDate: [2017/2/15 10:27]
+ * @UpdateRemark: [说明本次修改内容]
+ * @Version: [v1.0]
+ */
+@Component
+public class SspPlanTargetConditionServiceImpl
+        implements SspPlanTargetConditionService {
+
+    @Resource
+    private RestTemplate restTemplate;
+
+    @Override
+    public RestResponse find(Long id) {
+        SspPlanTargetCondition sspPlanTargetCondition = new SspPlanTargetCondition();
+        sspPlanTargetCondition.setId(id);
+        HttpEntity<SspPlanTargetCondition> httpEntity = new MyHttpEntity<SspPlanTargetCondition>(
+                sspPlanTargetCondition);
+        return restTemplate.postForObjectForDB(
+                "/rest/ssp/planTargetCondition/find", httpEntity,
+                RestResponse.class);
+    }
+
+    @Override
+    public RestResponse save(SspPlanTargetCondition sspPlanTargetCondition) {
+        HttpEntity<SspPlanTargetCondition> httpEntity = new MyHttpEntity<SspPlanTargetCondition>(
+                sspPlanTargetCondition);
+        return restTemplate.postForObjectForDB(
+                "/rest/ssp/planTargetCondition/add",
+                httpEntity, RestResponse.class);
+
+    }
+
+    @Override
+    public void update(SspPlanTargetCondition sspPlanTargetCondition) {
+        HttpEntity<SspPlanTargetCondition> httpEntity = new MyHttpEntity<SspPlanTargetCondition>(
+                sspPlanTargetCondition);
+        restTemplate.postForObjectForDB("/rest/ssp/planTargetCondition/update",
+                httpEntity, RestResponse.class);
+    }
+
+    @Override
+    public RestResponse page(PageCriteria pageCriteria) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        Long[] ids = new Long[] { id };
+        HttpEntity<Long[]> httpEntity = new MyHttpEntity<Long[]>(ids);
+        restTemplate.postForObjectForDB("/rest/ssp/planTargetCondition/update",
+                httpEntity, RestResponse.class);
+    }
+
+    @Override
+    public void batchDelete(Long[] ids) {
+        HttpEntity<Long[]> httpEntity = new MyHttpEntity<Long[]>(ids);
+        restTemplate.postForObjectForDB(
+                "/rest/ssp/planTargetCondition/batchDelete", httpEntity,
+                RestResponse.class);
+    }
+}

@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<body>
+<link rel="stylesheet" href="css/base/theme.default.css">
+
+<!-- select2 -->
+<!--<link rel="stylesheet" type="text/css" href="css/base/select2.min.css">
+<script type="text/javascript" src="js/base/select2.min.js"></script>
+<script type="text/javascript" src="js/base/zh-CN.js"></script>-->
+<!--
+<link rel="stylesheet" type="text/css" href="css/base/bootstrap-select.css">
+<script type="text/javascript" src="js/base/bootstrap-select.js"></script>
+<script type="text/javascript" src="js/base/defaults-zh_CN.js"></script>-->
+
+<!-- 导出到ecxel -->
+<script type="text/javascript" src="js/encrypt/jquery.base64.js"></script>
+<script type="text/javascript" src="plugs/table2excel/jquery.table2excel.js"></script>
+<script type="text/javascript" src="plugs/tableExport/tableExport.js"></script>
+<!--<script type="text/javascript" src="js/base/jquery.table2excel.js"></script>-->
+
+<!-- <script type="text/javascript" src="plugs/tablesorter/jquery.tablesorter.js"></script> -->
+<!-- <script type="text/javascript" src="plugs/tablesorter/jquery.tablesorter.widgets.js"></script> -->
+<h2 class="current_loc">
+    <i class="iconfont icon-zhuye"></i><a href="javascript:void(0)">报表中心</a>
+</h2>
+<style>
+
+    .bootstrap-select.btn-group .dropdown-menu {
+        max-width: 130px;
+        overflow: auto;
+    }
+
+    .search_block .form-group input.form-control {
+        width: 128px;
+    }
+
+    .bs-actionsbox, .bs-donebutton, .bs-searchbox {
+        padding: 4px 0px;
+    }
+    
+    th.tablesorter-header.resizable-false {
+  background-color: #e6bf99;
+}
+</style>
+</body>
+<!-- 表单内容开始 -->
+<div class="page_main">
+    <div class="page_main_white">
+        <!-- 标签页开始 -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active"><a href="#ggbb" role="tab" data-toggle="tab" >广告报表</a></li>
+            <li role="presentation"><a href="#mtbb" role="tab" data-toggle="tab" >媒体报表</a></li>
+            <li role="presentation"><a href="#ptbb" role="tab" data-toggle="tab">平台报表</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- 广告报表 -->
+
+            <div role="tabpanel" class="tab-pane active" id="ggbb">
+                <form id="adReportForm" action="ssp/report/adPage">
+                    <div class="search_block clearfix">
+                        <div class="form-group  clearfix">
+                            <div class="pull-left">
+                                <div class="formgroup clearfix ">
+                                    <label>时间段：</label>
+                                    <div id="reportrange2"
+                                         style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                        <span></span> <b class="caret"></b>
+                                        <input type="hidden" name="startTimeTem" value=""/>
+                                        <input type="hidden" name="endTimeTem" value=""/>
+                                        <input type="hidden" name="startTime" value=""/>
+                                        <input type="hidden" name="endTime" value=""/>
+                                    </div>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>广告主：</label>
+                                    <select class="selectpicker advertiserId" name="advertiserId"
+                                            data-live-search="true" data-width="140px" data-size="10"
+                                            onchange="pullDownOrderId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>订单：</label>
+                                    <select class="selectpicker orderId" name="orderId" data-live-search="true"
+                                            data-width="140px" data-size="10" onchange="pullDownPlanId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>策略：</label>
+                                    <select class="selectpicker planId" name="planId" data-live-search="true"
+                                            data-width="140px" data-size="10" onchange="pullDownCreativeId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>创意：</label>
+                                    <select class="selectpicker creativeId" name="creativeId" data-live-search="true"
+                                            data-width="140px" data-size="10">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <a href="javascript:void(0)" class="btn btn-sm" id="searchAD">查询</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <!-- 间隔 -->
+                <div style="height:10px;background:#f1f2f7;"></div>
+                <!-- 间隔 -->
+                <div class="block_content">
+                    <div class="container-fluid clearfix">
+                        <div class="pull-right">
+                            <!--    <a href="javascript:void(0)" class="btn" id="element" data-toggle="popover"><i
+                                        class="iconfont icon-tag"></i>选择标签</a>-->
+                            <a href="javascript:void(0)" class="btn" id="element"><i
+                                    class="iconfont icon-tag"></i>选择标签</a>
+
+                            <div class="popover fade left in" role="tooltip" id="selectColumn"
+                                 style="top: 14px; left: 682.162px; display: none;">
+                                <div class="arrow" style="top: 50%;"></div>
+                                <h3 class="popover-title" style="display: none;"></h3>
+                                <div class="popover-content" id="checkboxNoZero"><p>至少选择一项</p>
+                                    <div class="clearfix" style="padding:12px 0; border-bottom:1px solid #e7e9ef;">
+                                        <label class="checkbox-inline"><input type="checkbox" value="日期" checked="checked"
+                                                                              id="upti">日期</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="广告主" checked="checked"
+                                                                           id="advertiser">广告主</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="订单" checked="checked"
+                                                                           id="order">订单</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="策略" checked="checked"
+                                                                           id="plan">策略</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="创意" checked="checked"
+                                                                           id="creative">创意</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox"
+                                                                                                value="曝光"
+                                                                                                checked="checked"
+                                                                                                id="showTimes">曝光</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="消耗" checked="checked"
+                                                                           id="consumption">消耗</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPM" checked="checked"
+                                                                           id="cpm">CPM</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击" checked="checked"
+                                                                           id="clickTimes">点击</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击率" checked="checked"
+                                                                           id="clickRatio">点击率</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPC" checked="checked"
+                                                                           id="cpc">CPC</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox"
+                                                                                                value="到达" checked="checked" id="arrival">到达</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="转化" checked="checked"
+                                                                           id="transform">转化</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPA" checked="checked"
+                                                                           id="cpa">CPA</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="二跳"  checked="checked" id="secondJump">二跳</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="二跳率" checked="checked"
+                                                                           id="secondJumpRatio">二跳率</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="到达率" checked="checked"
+                                                                           id="arrivalRatio">到达率</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox" checked="checked"
+                                                                                                value="点击转化"
+                                                                                                id="clickTransform">点击转化</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击转化率" checked="checked"
+                                                                           id="clickTransformRatio">点击转化率</label></div>
+                                    <div class="text-center" style="margin-top:10px;"><a href="javascript:void(0)"
+                                                                                         id="adConfirm"
+                                                                                         onclick="adConfirmMeth()"
+                                                                                         class="btn btn2 green"
+                                                                                         style="padding:5px;">确定</a><a
+                                            href="javascript:void(0)" id="adCancel" onclick="adCancelMeth()"
+                                            class="btn btn2"
+                                            style="padding:5px;">取消</a></div>
+                                </div>
+                            </div>
+
+
+                            <a href="javascript:void(0)" class="btn" id="exportExcel" ecfn="广告报表"><i class="iconfont icon-daochu"></i>导出</a>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+<!--                             	<div class="tabsortwrapper"> -->
+                                <table class="tablesorter" id="adTable">
+                                    <thead>
+                                    <tr>
+                                        <!--<th>日期<i class="iconfont icon-sort"></i></th>-->
+                                        <th width="5%">日期</th>
+                                        <th width="5%">广告主</th>
+                                        <th width="5%">订单</th>
+                                        <th width="5%">策略</th>
+                                        <th width="5%">创意</th>
+                                        <th width="5%">曝光</th>
+                                        <th width="5%">消耗</th>
+                                        <th width="5%">CPM</th>
+                                        <th width="5%">点击</th>
+                                        <th width="5%">点击率</th>
+                                        <th width="5%">CPC</th>
+                                        <th width="5%">到达</th>
+                                        <th width="5%">转化</th>
+                                        <th width="5%">CPA</th>
+                                        <th width="5%">二跳</th>
+                                        <th width="5%">二跳率</th>
+                                        <th width="5%">到达率</th>
+                                        <th width="5%">点击转化</th>
+                                        <th width="5%">点击转化率</th>
+                                        <!--                                        <th>曝光<i class="iconfont icon-sort"></i></th>
+                                                                                <th>消耗<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPM<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPC<i class="iconfont icon-sort"></i></th>
+                                                                                <th>到达<i class="iconfont icon-sort"></i></th>
+                                                                                <th>转化<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPA<i class="iconfont icon-sort"></i></th>
+                                                                                <th>二跳<i class="iconfont icon-sort"></i></th>
+                                                                                <th>二跳率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>到达率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击转化<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击转化率<i class="iconfont icon-sort"></i></th>-->
+                                    </tr>
+                                    </thead>
+                                    <tbody id="adReportList">
+                                    <!--<tr>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--</tr>-->
+                                    </tbody>
+                                </table>
+<!--                                 </div> -->
+                                <!-- 分页开始 -->
+                                <div class="bs-component clearfix pull-right" id="adReportPage">
+
+                                </div>
+                                <!-- 分页结束 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 媒体报表 -->
+            <div role="tabpanel" class="tab-pane" id="mtbb">
+                <form id="mtReportForm" action="ssp/mtReport/mtPage">
+                    <div class="search_block clearfix">
+                        <div class="form-group  clearfix">
+                            <div class="pull-left">
+                                <div class="formgroup clearfix ">
+                                    <label>时间段：</label>
+                                    <div id="mtReportrange"
+                                         style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                        <span></span> <b class="caret"></b>
+                                        <input type="hidden" name="mtStartTimeTem" value=""/>
+                                        <input type="hidden" name="mtEndTimeTem" value=""/>
+                                        <input type="hidden" name="mtStartTime" value=""/>
+                                        <input type="hidden" name="mtEndTime" value=""/>
+                                    </div>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>开发者：</label>
+                                    <select class="selectpicker userId" name="userId"
+                                            data-live-search="true" data-width="140px" data-size="10"
+                                            onchange="pullDownAppInfoId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>应用：</label>
+                                    <select class="selectpicker appInfoId" name="appInfoId" data-live-search="true"
+                                            data-width="140px" data-size="10" onchange="pullDownAdPositionInfoId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>广告位：</label>
+                                    <select class="selectpicker adPositionInfoId" name="adPositionInfoId" data-live-search="true"
+                                            data-width="140px" data-size="10" >
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <!-- <div class="formgroup clearfix ">
+                                    <label>创意：</label>
+                                    <select class="selectpicker creativeId" name="creativeId" data-live-search="true"
+                                            data-width="140px" data-size="10">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>-->
+                                <a href="javascript:void(0)" class="btn btn-sm" id="searchMTPostion">查询</a> 
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <!-- 间隔 -->
+                <div style="height:10px;background:#f1f2f7;"></div>
+                <!-- 间隔 -->
+                <div class="block_content">
+                    <div class="container-fluid clearfix">
+                        <div class="pull-right">
+                            <!--    <a href="javascript:void(0)" class="btn" id="element" data-toggle="popover"><i
+                                        class="iconfont icon-tag"></i>选择标签</a>-->
+                            <a href="javascript:void(0)" class="btn" id="mtElement"><i
+                                    class="iconfont icon-tag"></i>选择标签</a>
+
+                            <div class="popover fade left in" role="tooltip" id="mtSelectColumn"
+                                 style="top: 14px; left: 682.162px; display: none;">
+                                <div class="arrow" style="top: 50%;"></div>
+                                <h3 class="popover-title" style="display: none;"></h3>
+                                <div class="popover-content" id="mtCheckboxNoZero"><p>至少选择一项</p>
+                                    <div class="clearfix" style="padding:12px 0; border-bottom:1px solid #e7e9ef;">
+                                        <label class="checkbox-inline"><input type="checkbox" value="日期" checked="checked"
+                                                                              id="upti">日期</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="开发者" checked="checked"
+                                                                           id="user">开发者</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="应用" checked="checked"
+                                                                           id="appInfo">应用</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="广告位" checked="checked"
+                                                                           id="position">广告位</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox"
+                                                                                                value="曝光"
+                                                                                                checked="checked"
+                                                                                                id="showTimes">曝光</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="收益" checked="checked"
+                                                                           id="consumption">收益</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPM" checked="checked"
+                                                                           id="cpm">CPM</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击" checked="checked"
+                                                                           id="clickTimes">点击</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击率" checked="checked"
+                                                                           id="clickRatio">点击率</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPC" checked="checked"
+                                                                           id="cpc">CPC</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox" checked="checked"
+                                                                                                value="到达" id="arrival">到达</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="转化" checked="checked"
+                                                                           id="transform">转化</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPA" checked="checked"
+                                                                           id="cpa">CPA</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="二跳" id="secondJump" checked="checked">二跳</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="二跳率" checked="checked"
+                                                                           id="secondJumpRatio">二跳率</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="到达率" checked="checked"
+                                                                           id="arrivalRatio">到达率</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox" checked="checked"
+                                                                                                value="点击转化"
+                                                                                                id="clickTransform">点击转化</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击转化率" checked="checked"
+                                                                           id="clickTransformRatio">点击转化率</label></div>
+                                    <div class="text-center" style="margin-top:10px;"><a href="javascript:void(0)"
+                                                                                         id="mtConfirm"
+                                                                                         onclick="mtConfirmMeth()"
+                                                                                         class="btn btn2 green"
+                                                                                         style="padding:5px;">确定</a><a
+                                            href="javascript:void(0)" id="mtCancel" onclick="mtCancelMeth()"
+                                            class="btn btn2"
+                                            style="padding:5px;">取消</a></div>
+                                </div>
+                            </div>
+
+
+                            <a href="javascript:void(0)" class="btn" id="mtExportExcel"  ecfn="媒体报表"><i class="iconfont icon-daochu"></i>导出</a>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="tablesorter" id="mtTable">
+                                    <thead>
+                                    <tr>
+                                        <!--<th>日期<i class="iconfont icon-sort"></i></th>-->
+                                        <th width="5%">日期</th>
+                                        <th width="5%">开发者</th>
+                                        <th width="5%">应用</th>
+                                        <th width="5%">广告位</th>
+                                        <!-- <th width="5%">创意</th> -->
+                                        <th width="5%">曝光</th>
+                                        <th width="5%">收益</th>
+                                        <th width="5%">CPM</th>
+                                        <th width="5%">点击</th>
+                                        <th width="5%">点击率</th>
+                                        <th width="5%">CPC</th>
+                                        <th width="5%">到达</th>
+                                        <th width="5%">转化</th>
+                                        <th width="5%">CPA</th>
+                                        <th width="5%">二跳</th>
+                                        <th width="5%">二跳率</th>
+                                        <th width="5%">到达率</th>
+                                        <th width="5%">点击转化</th>
+                                        <th width="5%">点击转化率</th>
+                                        <!--                                        <th>曝光<i class="iconfont icon-sort"></i></th>
+                                                                                <th>消耗<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPM<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPC<i class="iconfont icon-sort"></i></th>
+                                                                                <th>到达<i class="iconfont icon-sort"></i></th>
+                                                                                <th>转化<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPA<i class="iconfont icon-sort"></i></th>
+                                                                                <th>二跳<i class="iconfont icon-sort"></i></th>
+                                                                                <th>二跳率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>到达率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击转化<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击转化率<i class="iconfont icon-sort"></i></th>-->
+                                    </tr>
+                                    </thead>
+                                    <tbody id="mtReportList">
+                                    <!--<tr>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--</tr>-->
+                                    </tbody>
+                                </table>
+                                <!-- 分页开始 -->
+                                <div class="bs-component clearfix pull-right" id="mtReportPage">
+
+                                </div>
+                                <!-- 分页结束 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+<!--             &lt;!&ndash; 平台报表 &ndash;&gt; -->
+           <div role="tabpanel" class="tab-pane" id="ptbb">
+                <form id="adReportForm" action="ssp/report/adPage">
+                    <div class="search_block clearfix">
+                        <div class="form-group  clearfix">
+                            <div class="pull-left">
+                                <div class="formgroup clearfix ">
+                                    <label>时间段：</label>
+                                    <div id="reportrange2"
+                                         style="display: inline-block; background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc">
+                                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>
+                                        <span></span> <b class="caret"></b>
+                                        <input type="hidden" name="startTimeTem" value=""/>
+                                        <input type="hidden" name="endTimeTem" value=""/>
+                                        <input type="hidden" name="startTime" value=""/>
+                                        <input type="hidden" name="endTime" value=""/>
+                                    </div>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>广告主：</label>
+                                    <select class="selectpicker advertiserId" name="advertiserId"
+                                            data-live-search="true" data-width="140px" data-size="10"
+                                            onchange="pullDownOrderId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>订单：</label>
+                                    <select class="selectpicker orderId" name="orderId" data-live-search="true"
+                                            data-width="140px" data-size="10" onchange="pullDownPlanId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>策略：</label>
+                                    <select class="selectpicker planId" name="planId" data-live-search="true"
+                                            data-width="140px" data-size="10" onchange="pullDownCreativeId()">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <div class="formgroup clearfix ">
+                                    <label>创意：</label>
+                                    <select class="selectpicker creativeId" name="creativeId" data-live-search="true"
+                                            data-width="140px" data-size="10">
+                                        <option value="">全部</option>
+                                    </select>
+                                </div>
+                                <a href="javascript:void(0)" class="btn btn-sm" id="searchAD">查询</a>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <!-- 间隔 -->
+                <div style="height:10px;background:#f1f2f7;"></div>
+                <!-- 间隔 -->
+                <div class="block_content">
+                    <div class="container-fluid clearfix">
+                        <div class="pull-right">
+                            <!--    <a href="javascript:void(0)" class="btn" id="element" data-toggle="popover"><i
+                                        class="iconfont icon-tag"></i>选择标签</a>-->
+                            <a href="javascript:void(0)" class="btn" id="element"><i
+                                    class="iconfont icon-tag"></i>选择标签</a>
+
+                            <div class="popover fade left in" role="tooltip" id="selectColumn"
+                                 style="top: 14px; left: 682.162px; display: none;">
+                                <div class="arrow" style="top: 50%;"></div>
+                                <h3 class="popover-title" style="display: none;"></h3>
+                                <div class="popover-content" id="checkboxNoZero"><p>至少选择一项</p>
+                                    <div class="clearfix" style="padding:12px 0; border-bottom:1px solid #e7e9ef;">
+                                        <label class="checkbox-inline"><input type="checkbox" value="日期"
+                                                                              id="upti">日期</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="广告主" checked="checked"
+                                                                           id="advertiser">广告主</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="订单" checked="checked"
+                                                                           id="order">订单</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="策略" checked="checked"
+                                                                           id="plan">策略</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="创意"
+                                                                           id="creative">创意</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox"
+                                                                                                value="曝光"
+                                                                                                checked="checked"
+                                                                                                id="showTimes">曝光</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="消耗" checked="checked"
+                                                                           id="consumption">消耗</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPM" checked="checked"
+                                                                           id="cpm">CPM</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击" checked="checked"
+                                                                           id="clickTimes">点击</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击率" checked="checked"
+                                                                           id="clickRatio">点击率</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPC" checked="checked"
+                                                                           id="cpc">CPC</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox"
+                                                                                                value="到达" id="arrival">到达</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="转化" checked="checked"
+                                                                           id="transform">转化</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="CPA" checked="checked"
+                                                                           id="cpa">CPA</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="二跳" id="secondJump">二跳</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="二跳率"
+                                                                           id="secondJumpRatio">二跳率</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="到达率"
+                                                                           id="arrivalRatio">到达率</label></div>
+                                    <div class="clearfix"><label class="checkbox-inline"><input type="checkbox"
+                                                                                                value="点击转化"
+                                                                                                id="clickTransform">点击转化</label><label
+                                            class="checkbox-inline"><input type="checkbox" value="点击转化率"
+                                                                           id="clickTransformRatio">点击转化率</label></div>
+                                    <div class="text-center" style="margin-top:10px;"><a href="javascript:void(0)"
+                                                                                         id="adConfirm"
+                                                                                         onclick="adConfirmMeth()"
+                                                                                         class="btn btn2 green"
+                                                                                         style="padding:5px;">确定</a><a
+                                            href="javascript:void(0)" id="adCancel" onclick="adCancelMeth()"
+                                            class="btn btn2"
+                                            style="padding:5px;">取消</a></div>
+                                </div>
+                            </div>
+
+
+                            <a href="javascript:void(0)" class="btn" id="exportExcel"  ecfn="平台报表"><i class="iconfont icon-daochu"></i>导出</a>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="tablesorter" id="ptTable">
+                                    <thead>
+                                    <tr>
+                                        <!--<th>日期<i class="iconfont icon-sort"></i></th>-->
+                                        <th width="5%">日期</th>
+                                        <th width="5%">广告主</th>
+                                        <th width="5%">订单</th>
+                                        <th width="5%">策略</th>
+                                        <th width="5%">创意</th>
+                                        <th width="5%">曝光</th>
+                                        <th width="5%">消耗</th>
+                                        <th width="5%">CPM</th>
+                                        <th width="5%">点击</th>
+                                        <th width="5%">点击率</th>
+                                        <th width="5%">CPC</th>
+                                        <th width="5%">到达</th>
+                                        <th width="5%">转化</th>
+                                        <th width="5%">CPA</th>
+                                        <th width="5%">二跳</th>
+                                        <th width="5%">二跳率</th>
+                                        <th width="5%">到达率</th>
+                                        <th width="5%">点击转化</th>
+                                        <th width="5%">点击转化率</th>
+                                        <!--                                        <th>曝光<i class="iconfont icon-sort"></i></th>
+                                                                                <th>消耗<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPM<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPC<i class="iconfont icon-sort"></i></th>
+                                                                                <th>到达<i class="iconfont icon-sort"></i></th>
+                                                                                <th>转化<i class="iconfont icon-sort"></i></th>
+                                                                                <th>CPA<i class="iconfont icon-sort"></i></th>
+                                                                                <th>二跳<i class="iconfont icon-sort"></i></th>
+                                                                                <th>二跳率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>到达率<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击转化<i class="iconfont icon-sort"></i></th>
+                                                                                <th>点击转化率<i class="iconfont icon-sort"></i></th>-->
+                                    </tr>
+                                    </thead>
+                                    <tbody id="ptReportList">
+                                    <!--<tr>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--<td>2</td>-->
+                                    <!--</tr>-->
+                                    </tbody>
+                                </table>
+                                <!-- 分页开始 -->
+                                <div class="bs-component clearfix pull-right" id="ptReportPage">
+
+                                </div>
+                                <!-- 分页结束 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- 标签页结束 -->
+    </div>
+</div>
+</body>
+<script type="text/javascript">
+var currReportTabIndex = 0;
+function flushColResize(index){
+	$.tablesorter.destroy( $("table:eq("+currReportTabIndex+")"), true,function(table){});
+	$("table:eq("+currReportTabIndex+")").tablesorter({
+		widgets: ['resizable'],
+	    widgetOptions: {
+	      resizable: true,
+	      resizable_widths : [ '5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%','5%' ]
+	    }//,
+// 		headers : {
+// 						1 : {
+// 							sorter : false
+// 						},
+// 						2 : {
+// 							sorter : false
+// 						},
+// 						3 : {
+// 							sorter : false
+// 						},
+// 						4 : {
+// 							sorter : false
+// 						}
+// 					}
+	});
+	$( 'table:eq('+currReportTabIndex+')' ).trigger( 'resizableReset' );
+}
+</script>
+<script type="text/javascript" src="js/ssp/report/report.js"></script>
+<script type="text/javascript" src="js/ssp/report/mtReport.js"></script>
+</html>

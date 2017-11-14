@@ -1,0 +1,26 @@
+package com.unioncast.ssp.front.service.ssp.impl;
+
+import javax.annotation.Resource;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.stereotype.Component;
+
+import com.unioncast.common.rest.response.ssp.SspMarriageArrResponse;
+import com.unioncast.common.ssp.model.SspDictMarriageTarget;
+import com.unioncast.ssp.front.rest.template.RestTemplate;
+import com.unioncast.ssp.front.service.ssp.SspMarriageService;
+
+@Component
+public class SspMarriageServiceImpl implements SspMarriageService{
+
+	@Resource
+	private RestTemplate restTemplate;
+	
+	@Override
+	public SspDictMarriageTarget[] findByCode(String[] dictMarriage) {
+		HttpEntity<String[]> httpEntity = new HttpEntity<String[]>(dictMarriage);
+		SspMarriageArrResponse sspMarriageArrResponse = restTemplate.postForObjectForDB("rest/ssp/dictMarriage/batchFindbyCodes", httpEntity, SspMarriageArrResponse.class);
+		return sspMarriageArrResponse.getResult();
+	}
+
+}

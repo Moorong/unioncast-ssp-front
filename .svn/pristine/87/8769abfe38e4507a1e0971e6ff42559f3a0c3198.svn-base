@@ -1,0 +1,379 @@
+@charset "utf-8";
+/* CSS Document */
+/*************** 系统默认样式 Start ***************/
+* {
+	padding:0;
+	margin:0;
+}
+body, div, ul, ol, li, h1, h2, h3, h4, h5, h6, form, fieldset, legend, input, textarea, p, table, thead, tbody, tfoot, th, td, dl, dt, dd {
+	margin: 0;
+	padding: 0;
+	font-size: 100%;
+	font-weight: normal;
+	border: 0;
+}
+body,button,input,select,textarea {font: 12px/21px Microsoft YaHei,tahoma,arial,\5b8b\4f53;}
+table, thead, tbody, tfoot, th, td, dl, dt, dd {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+img, table, tr, th, td, form, fieldset {border: none;}
+address, caption, cite, code, dfn, em, th, var, span, strong {
+	font-style: normal;
+	font-weight: normal;
+}
+ul, li, dl, dd {
+	list-style-image: none;
+	list-style-position: outside;
+	list-style-type: none;
+}
+table {border-collapse: collapse;}
+h1, h2, h3, h4, h5, h6 {
+	font-size: 100%;
+	font-weight: normal;
+	vertical-align: baseline;
+	zoom: 1;
+}
+button, input, textarea, select, {
+	font-family: tahoma, arial, \5b8b\4f53;
+	font-size: 12px/1.5;
+	font-weight: inherit;
+	vertical-align:middle;
+}
+input[type=radio], input[type=checkbox] {vertical-align: middle;}
+textarea {
+	resize: none;
+	overflow-x: hidden;
+	overflow-y: auto;
+	outline: medium none;
+	word-wrap: break-word;
+}
+a {
+	color: #666;
+	text-decoration: none;
+	blr: expression(this.onFocus=this.blur());
+	outline: none;
+}
+a:hover {
+	text-decoration: none;
+}
+a:link, a:visited, a:active {text-decoration: none;}
+a:focus, input {
+	outline: none;
+	-moz-outline-style: none;
+}
+label.checkbox, label.radio, label.text {
+	padding-left: 4px;
+	vertical-align: middle;
+}
+
+i {font-style:normal}
+/*************** 系统默认样式 End ***************/
+
+input[type="text"],
+input[type="password"]{
+	border:1px solid #ccc;
+	background: #f4f4f4;
+	border-radius:4px;
+	padding:0  4px;
+	color: #666;
+	height: 25px;
+	line-height: 25px;
+	font-size: 14px;
+}
+input[type="button"]{
+	height: 25px;
+	background: #d8494d;
+	text-align: center;
+	color: #fff;
+	padding: 5px 14px;
+	border-radius:4px;
+	cursor: pointer;
+}
+select{
+	color: #282828;
+	border-radius:4px;
+	border: 1px solid #ccc;
+	height: 28px;
+	line-height: 28px;
+}
+textarea{
+	height: 150px;
+	border: 1px solid #ccc;
+}
+.txt_hidden{
+	display: inline-block;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	white-space:nowrap;
+}
+/*************** 全局样式 Start ***************/
+.clear{
+	clear: both;
+	line-height: 0;
+	height: 0;
+	font-size: 0;
+}
+.clearfix:after{
+	content: ".";
+	display: block;
+	height: 0;
+	clear: both;
+	visibility: hidden;
+}
+/*定义元素*/
+.displayBlock{
+	display: block;
+}
+.inlineBlock{
+	display: inline-block;
+	*display: inline;
+    *zoom: 1
+}
+.displayNone{
+	display: none;
+}
+/*浮动*/
+.floatLeft {float: left;}
+.floatRight {float: right;}
+/*字*/
+.textLeft{text-align: left;}
+.textRight{text-align: right;}
+.textCenter{text-align: center;}
+
+.pr{
+	position: relative;
+	zoom:1;
+}
+/*************** 全局样式 End ***************/
+/*字体*/
+.f12{
+	font-size: 12px;
+}
+.cl999{
+	color: #999;
+}
+h1{
+	font-size: 30px;
+	font-weight: 500;
+	color: #333;
+	line-height: 1.5;
+}
+h4{
+	font-size: 20px;
+	font-weight: 500;
+	color: #666;
+	line-height: 1.5;
+}
+/*自定义外间距*/
+.mt10px{
+	margin-top:10px; 
+}
+.mb20px{
+	margin-bottom: 20px;
+}
+.ml20px{
+	margin-left: 20px;
+}
+.margin0auto{
+	margin: 0 auto;
+}
+.mlr10px{
+	margin: 0 10px;
+}
+/*自定义内间距间距*/
+
+/*统一宽度处理*/
+
+.w10{
+	width: 10%;
+}
+.w15{
+	width: 15%;
+}
+.w20{
+	width: 20%;
+}
+.w30{
+	width: 30%;
+}
+.w40{
+	width: 40%;
+}
+.w45{
+	width: 45%;
+}
+.w49{
+	width: 49%;
+}
+.w50{
+	width: 50%;
+}
+.w55{
+	width: 55%;
+}
+.w60{
+	width: 60%;
+}
+.w70{
+	width: 70%;
+}
+.w90{
+	width: 90%;
+}
+.w95{
+	width: 95%;
+}
+.w99{
+	width: 99%;	
+}
+.w100{
+	width: 100%;
+}	
+
+/*统一宽度处理*/
+
+.btnSwitch{
+	padding:0;
+	margin: 0; 	
+}
+.btnSwitch span{
+	display: inline-block; 
+	vertical-align: middle;
+}
+.cla9a9a9{
+	color: #a9a9a9;
+}
+.switch{
+	width: 40px;
+	height: 18px;
+	background-color: #a9a9a9;
+	border-radius: 20px;
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 5px;	
+	position: relative;
+	cursor: pointer;
+}
+.switch i{
+	position: absolute;
+	left: 2px;
+	top: 2px;
+	width: 14px;
+	height: 14px;
+	background-color: #fff;
+	border-radius: 50%;
+}
+.switch.bkcolor{
+	background-color: #5aa62e;
+}
+.switch.bkcolor i{
+	left: auto;
+	right: 2px;
+}
+
+/*下拉菜单*/
+.dropdown{
+	height: 23px;
+	line-height: 23px;
+	border-radius: 2px;
+	border: 1px solid #ddd;
+	border-bottom:1px solid #bbb;
+	display: inline-block;
+	position: relative;
+}
+.dropdown .dropdown-hd{
+	padding:0 10px;
+	width: 100px;
+	display: block;
+	background-color: #f4f4f4;
+	cursor: pointer;
+	overflow: hidden;
+	text-overflow:ellipsis;
+	padding-right: 20px;
+}
+.dropdown .icon-arrow-down{
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	width:0; 
+    height:0; 
+    border-left:6px solid transparent;
+    border-right:6px solid transparent;
+    border-top:6px solid #000;
+    margin-top: -3px;
+}
+.dropdown .dropdown-list{
+	display: none;
+	position: absolute;
+	top: 24px;
+	left: -1px;
+	background-color: #fff;
+	border: 1px solid #ddd;
+	width: 100%;
+	border-radius: 2px;
+	z-index: 999;
+}
+.dropdown .dropdown-list li{
+	overflow: hidden;
+	color: #333;
+	cursor: default;
+	position: relative;
+	padding-right:20px;
+}
+.dropdown .dropdown-list li span{
+	display: block;
+	text-overflow: ellipsis;
+	height: 25px;
+	line-height: 25px;
+	text-indent: 8px; 
+	overflow: hidden;
+}
+.dropdown .dropdown-list li .icon-ok{
+	position: absolute;
+	right: 6px;
+	top: 0px;
+	font-family: iconfont;
+	font-weight: 600;
+	clear:both;
+	visibility:hidden;
+}
+.dropdown .dropdown-list li.dropdown-mouseover,
+.dropdown .dropdown-list li.dropdown-itemselected
+{
+	background-color: #5aa62e;
+	color: #fff;
+}
+.dropdown .dropdown-list li.dropdown-itemselected .icon-ok{
+	visibility: visible;
+}
+
+/*按钮*/
+a.btn{
+	display: inline-block;
+	padding: 0 10px;
+	height: 23px;
+	line-height: 23px;
+	text-align: center;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	background-color: #f4f4f4;
+}
+a.btn_on{
+	background-color: #d1d3db;
+}
+.btnscaling{
+	font-size: 12px;
+	width: 12px;
+	height: 12px;
+	text-align: center;
+	line-height: 12px;
+	display: inline-block;
+	background-color:#ccc; 
+	color: #fff;
+	vertical-align: middle;
+	margin-right: 5px;
+}
+.vm{
+	vertical-align: middle;
+}

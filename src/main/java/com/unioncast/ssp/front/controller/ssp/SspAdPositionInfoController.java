@@ -1,0 +1,231 @@
+package com.unioncast.ssp.front.controller.ssp;
+
+import com.unioncast.common.page.Operation;
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.page.SearchExpression;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.common.restClient.RestResponseFactory;
+import com.unioncast.common.ssp.model.SspAdPositionInfo;
+import com.unioncast.common.ssp.model.SspDictAdPositionType;
+import com.unioncast.common.user.model.User;
+import com.unioncast.common.util.CommonUtil;
+import com.unioncast.ssp.front.controller.common.BaseController;
+import com.unioncast.ssp.front.service.ssp.SspAdPositionInfoService;
+import com.unioncast.ssp.front.service.ssp.SspDictAdPositionTypeService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+@Api("广告位")
+@Controller
+@RequestMapping("/rest/sspAdPositionInfo")
+public class SspAdPositionInfoController extends BaseController {
+
+	private static final Logger LOG = LogManager.getLogger(SspAdPositionInfoController.class);
+
+	@Resource
+	private SspAdPositionInfoService sspAdPositionInfoService;
+	@Resource
+	private SspDictAdPositionTypeService sspDictAdPositionTypeService;
+
+	/**
+	 * 新增广告位映射
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/4/1 16:48
+	 */
+	@RequestMapping(value = { "/add" })
+	public String addAdPosition(ModelMap model,@RequestParam(required = false) Long id) {
+		SspDictAdPositionType sspDictAdPositionType = new SspDictAdPositionType();
+		try {
+			RestResponse restResponse = sspDictAdPositionTypeService.find(sspDictAdPositionType);
+			model.addAttribute("positionType", restResponse.getResult());
+			model.addAttribute("appId",id);
+		} catch (Exception e) {
+			LOG.error("获取广告位类型出错", e.getMessage());
+		}
+		return "ssp/adPosition/addAdPosition";
+	}
+
+	/**
+	 * 更新广告位页面映射
+	 *
+	 * @param model
+	 * @return
+	 * @author wangyao
+	 * @date 2017/4/6 9:36
+	 */
+	@RequestMapping(value = { "/update/{id}" })
+	public String updateAdPosition(@PathVariable Long id, ModelMap model) {
+		SspDictAdPositionType sspDictAdPositionType = new SspDictAdPositionType();
+		try {
+			RestResponse restResponse = sspDictAdPositionTypeService.find(sspDictAdPositionType);
+			model.addAttribute("positionType", restResponse.getResult());
+			SspAdPositionInfo sspAdPositionInfo = new SspAdPositionInfo();
+			sspAdPositionInfo.setId(id);
+			SspAdPositionInfo[] sspAdPositionInfos = sspAdPositionInfoService.findT(sspAdPositionInfo);
+			if (CommonUtil.isNotNull(sspAdPositionInfos)) {
+				sspAdPositionInfo = sspAdPositionInfos[0];
+			}
+			model.addAttribute("adPosition", sspAdPositionInfo);
+		} catch (Exception e) {
+			LOG.error("获取广告位数据出错", e.getMessage());
+		}
+		return "ssp/adPosition/editAdPosition";
+	}
+
+	/**
+	 * 广告位列表页面映射
+	 *
+	 * @return
+	 * @author wangyao
+	 * @date 2017/3/30 14:44
+	 */
+	@RequestMapping(value = { "/list" })
+	public String adPositionList() {
+		return "ssp/adPosition/adPositionList";
+	}
+
+	@RequestMapping(value = { "/listManage" })
+	public String adPositionManagerList() {
+		return "ssp/media/adPositionManager/list";
+	}
+
+	@ApiOperation(value = "查询广告位信息", httpMethod = "POST", response = RestResponse.class)
+	@ResponseBody
+	@RequestMapping(value = "/find", method = RequestMethod.POST)
+	public RestResponse find(SspAdPositionInfo sspAdPositionInfo) {
+		LOG.info("find sspAdPositionInfo:{}", sspAdPositionInfo);
+		try {
+			return sspAdPositionInfoService.find(sspAdPositionInfo);
+		} catch (Exception e) {
+			LOG.error(e.getMessage(), e);
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "增加广告位", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "sspAdPositionInfo", required = true, dataType = "SspAdPositionInfo", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/addInfo", method = RequestMethod.POST)
+	public RestResponse add(SspAdPositionInfo sspAdPositionInfo) {
+		LOG.info("add sspAdPositionInfo:{}", sspAdPositionInfo);
+		try {
+			sspAdPositionInfo.setUpdateTime(new Date());
+			sspAdPositionInfo.setCreateTime(new Date());
+			sspAdPositionInfo.setDeleteState(1);
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			sspAdPositionInfo.setUser(user);
+			sspAdPositionInfo.setAdPositionId(UUID.randomUUID().toString().replace("-", ""));
+			sspAdPositionInfo.setState(1);
+			sspAdPositionInfoService.save(sspAdPositionInfo);
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("新增广告位出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "更新广告位", httpMethod = "POST")
+	@ApiImplicitParam(name = "sspAdPositionInfo", required = true, dataType = "SspAdPositionInfo", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/updateInfo", method = RequestMethod.POST)
+	public RestResponse update(SspAdPositionInfo sspAdPositionInfo) {
+		LOG.info("update sspAdPositionInfo:{}", sspAdPositionInfo);
+		try {
+			sspAdPositionInfo.setUpdateTime(new Date());
+			sspAdPositionInfoService.update(sspAdPositionInfo);
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("新增广告位出错");
+			return RestResponseFactory.exception(e);
+		}
+
+	}
+
+	@ApiOperation(value = "条件分页查询", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "pageCriteria", value = "分页查询条件", required = true, dataType = "PageCriteria", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/page", method = RequestMethod.POST)
+	public RestResponse page(@RequestBody PageCriteria pageCriteria) {
+		LOG.info("page sspAdPositionInfo pageCriteria:{}", pageCriteria);
+		try {
+			User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+			if (user.getUserType() == 2) {
+				List<SearchExpression> searchExpressionList = pageCriteria.getSearchExpressionList();
+				SearchExpression searchExpression = new SearchExpression();
+				searchExpression.setOperation(Operation.EQ);
+				searchExpression.setPropertyName("creater_id");
+				searchExpression.setValue(user.getId());
+				searchExpressionList.add(searchExpression);
+			}
+			return sspAdPositionInfoService.page(pageCriteria);
+		} catch (Exception e) {
+			LOG.error("获取广告位分页出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+
+	@ApiOperation(value = "删除一个广告位", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "id", required = true, dataType = "long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/delete", method = RequestMethod.POST)
+	public RestResponse delete(Long id) {
+		LOG.info("delete sspAdPositionInfo id:{}", id);
+		try {
+			sspAdPositionInfoService.deleteById(id);
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("删除广告位出错");
+			return RestResponseFactory.exception(e);
+		}
+
+	}
+
+	@ApiOperation(value = "批量删除广告位", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "ids", required = true, dataType = "List<Long>", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/batchDelete", method = RequestMethod.POST)
+	public RestResponse batchDelete(@RequestParam String ids) {
+		LOG.info("batchDelete sspAdPositionInfo ids:{}", ids);
+		String[] appIdArr = ids.split(",");
+		Long longArray[] = new Long[appIdArr.length];
+		for (int i = 0; i < longArray.length; i++) {
+			longArray[i] = Long.valueOf(appIdArr[i]);
+		}
+		try {
+			sspAdPositionInfoService.batchDelete(longArray);
+			return RestResponseFactory.ok();
+		} catch (Exception e) {
+			LOG.error("删除广告位出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+	
+	@ApiOperation(value = "根据appId查找", httpMethod = "POST", response = RestResponse.class)
+	@ApiImplicitParam(name = "id", required = true, dataType = "Long", paramType = "body")
+	@ResponseBody
+	@RequestMapping(value = "/findByAppInfoId", method = RequestMethod.POST)
+	public RestResponse findByAppInfoId(@RequestParam Long id) {
+		LOG.info("findByAppInfoId sspAdPositionInfo id:{}", id);
+		try {
+			RestResponse result = 	sspAdPositionInfoService.findByAppInfoId(id);
+			return result;
+		} catch (Exception e) {
+			LOG.error("根据appInfoid查询广告位出错");
+			return RestResponseFactory.exception(e);
+		}
+	}
+}

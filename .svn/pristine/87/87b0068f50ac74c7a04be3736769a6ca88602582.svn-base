@@ -1,0 +1,48 @@
+package com.unioncast.ssp.front.service.common.impl;
+
+import java.io.Serializable;
+import com.unioncast.common.page.PageCriteria;
+import com.unioncast.common.restClient.RestResponse;
+import com.unioncast.ssp.front.common.util.RestUtil;
+import com.unioncast.ssp.front.service.common.GeneralService;
+
+public abstract class AbsGeneralService<T extends Serializable> implements GeneralService<T> {
+
+	protected String prefix;
+
+	@Override
+	public RestResponse find(T entity) {
+		RestResponse restResponse = RestUtil.postForObjectForDB(String.format("%s/find", getPrefix()), entity,
+				RestResponse.class);
+		return restResponse;
+	}
+
+	@Override
+	public RestResponse add(T entity) {
+		RestResponse restResponse = RestUtil.postForObjectForDB(String.format("%s/add", getPrefix()), entity,
+				RestResponse.class);
+		return restResponse;
+	}
+
+	@Override
+	public RestResponse update(T entity) {
+		RestResponse restResponse = RestUtil.postForObjectForDB(String.format("%s/update", getPrefix()), entity,
+				RestResponse.class);
+		return restResponse;
+	}
+
+	@Override
+	public RestResponse page(PageCriteria pageCriteria) {
+		RestResponse restResponse = RestUtil.postForObjectForDB(String.format("%s/page", getPrefix()), pageCriteria,
+				RestResponse.class);
+		return restResponse;
+	}
+
+	@Override
+	public RestResponse batchDelete(Long[] ids) {
+		RestResponse restResponse = RestUtil.postForObjectForDB(String.format("%s/add", getPrefix()), ids,
+				RestResponse.class);
+		return restResponse;
+	}
+
+}

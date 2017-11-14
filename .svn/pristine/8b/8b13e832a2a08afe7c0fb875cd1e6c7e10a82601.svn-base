@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+<body>
+	<!-- 右侧开始 -->
+	<!-- 当前位置开始 -->
+	<h2 class="current_loc"><i class="iconfont icon-zhuye"></i><a href="#">媒体管理</a> <i> / </i> <a href="#">开发者管理</a> <i> / </i><span>详细信息</span><span style="color:red">${(error)!}</span></h2>
+	<!-- 当前位置结束 -->
+	<!-- 表单内容开始 -->
+	<div class="page_main">
+		<div class="page_main_white">
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						 <div class="block_title white clearfix">
+							<span class="block_title_name pull-left">
+								收入状况
+							</span>
+						</div> 
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<form class="form-horizontal" role="form">
+								<div class="formwarp">
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">收入余额:</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static" id="balance">暂无</p>
+										</div>
+									</div>
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">本月扣款(￥):</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static" id="charge">暂无</p>
+										</div>
+									</div>
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">申请提现金额:</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static" id="request">暂无申请</p>
+										</div>
+									</div>
+								</div>
+								<!-- 
+								<div class="savewarp text-center">
+									<button type="button" class="btn formbtn green" data-toggle="modal" data-target="#myModal">已打款</button>
+									<button class="btn formbtn bk999"  data-toggle="modal" data-target="#myModal2">拒绝打款</button>
+								</div>
+								 -->
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 间隔 -->
+			<div class="jiange"></div>
+			<!-- 间隔 -->
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						 <div class="block_title white clearfix">
+							<span class="block_title_name pull-left">
+								账户信息
+							</span>
+						</div> 
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<form class="form-horizontal" role="form">
+								<div class="formwarp">
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">开发者账户:</label>
+										<div class="col-sm-8 switchgroup">
+											<p class="form-control-static"><#if (financeInfo.recipientName)??>${(financeInfo.recipientName)!}<#else>暂无</#if></p>
+										</div>
+									</div>
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">手机</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static"><#if
+												(financeInfo.user.phone)??>${(financeInfo.user.phone)!}<#else>暂无</#if></p>
+										</div>
+									</div>
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">邮箱:</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static"><#if (financeInfo.user.email)??>${(financeInfo.user.email)!}<#else>暂无</#if></p>
+										</div>
+									</div>
+									<div class="form-group">
+										<label  class="col-sm-2 control-label">姓名 :</label>
+										<div class="col-sm-8 ">
+											<p class="form-control-static"><#if (financeInfo.user.username)??>${(financeInfo.user.username)!}<#else>暂无</#if></p>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- 间隔 -->
+			<div class="jiange"></div>
+			<!-- 间隔 -->
+			<div class="block_content">
+				<div class="container-fluid">
+					<div class="row">
+						<!-- 表单名称开始 -->
+						 <div class="block_title white clearfix">
+							<span class="block_title_name pull-left">
+								财务信息
+							</span>
+						</div> 
+						<!-- 表单名称结束 -->
+						<div class="col-md-12">
+							<form class="form-horizontal" role="form">
+								<div class="formwarp">
+									<div id="personal">
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">开户地:</label>
+											<div class="col-sm-8 switchgroup">
+												<p class="form-control-static"><#if
+												(financeInfo.sspCityInfo.name)??>${(financeInfo.sspCityInfo.name)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">收款银行:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.recipientBank)??>${(financeInfo.recipientBank)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">银行账号:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.bankAccount)??>${(financeInfo.bankAccount)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">收款人姓名:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.recipientName)??>${(financeInfo.recipientName)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">身份证号:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.recipientIdentityNum)??>${(financeInfo.recipientIdentityNum)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+									</div>
+									<div id="enterprise">
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">企业名称:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.recipientName)??>${(financeInfo.recipientName)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">开户地:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if
+												(financeInfo.sspCityInfo.name)??>${(financeInfo.sspCityInfo.name)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">收款银行:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.recipientBank)??>${(financeInfo.recipientBank)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">银行账号:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.bankAccount)??>${(financeInfo.bankAccount)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">发票类型:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.invoiceType)??>${(financeInfo.invoiceType)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+										<div class="form-group">
+											<label  class="col-sm-2 control-label">税号:</label>
+											<div class="col-sm-8 ">
+												<p class="form-control-static"><#if (financeInfo.taxNum)??>${(financeInfo.taxNum)!}<#else>暂无</#if></p>
+											</div>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>	
+	</div>
+	<!-- 表单内容结束 -->
+	<!-- 右侧结束 -->
+	<div class="modal  modaltitle" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog  modal-dialog2" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">提示：</h4>
+				</div>
+				<div class="modal-body">
+					<p class="modal-title-content">确认该应用通过审核</p>
+					<div class="text-center" style="margin-top:10px;"><a href="#" class="btn btn2 green tbnok" style="padding:5px;">确定</a><a href="#" class="btn btn2 tbnremove" style="padding:5px;" data-dismiss="modal">取消</a></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="modal" id="myModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog modal-dialog2" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title" id="myModalLabel">提示：</h4>
+				</div>
+				<div class="modal-body">
+					<form class="form-horizontal" role="form">
+						<div class="form-group ">
+							<label for="inputEmail3" class="col-sm-2 control-label sr-only">广告标题</label>
+							<div class="col-sm-8 ">
+								<textarea class="form-control small338" rows="3">请填写拒绝打款的原因</textarea>
+							</div>
+						</div>
+						<div class="text-center" style="margin-top:10px;"><a href="#" class="btn btn2 green tbnok" style="padding:5px;" >确定</a><a href="#" class="btn btn2 tbnremove" style="padding:5px;" data-dismiss="modal">取消</a></div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+<script>
+$(function () {
+	/*组件初始化*/
+	$("[data-toggle='tooltip']").tooltip();
+	$("input[name='switch']").bootstrapSwitch({  
+        onText:"开",  
+        offText:"关",  
+        size:"mini",  
+        onSwitchChange:function(event,state){  
+            if(state==true){  
+                $(this).val("1");  
+            }else{  
+                $(this).val("2");  
+            }  
+        }  
+    }); 
+	//下拉菜单
+    $(".dropdown").selectpicker({});
+
+	/*双日历组件*/
+	$('#reportrange2 span').html(moment().subtract('days', 7).format('YYYY.MMMM.D') + ' - ' + moment().format('YYYY.MMMM.D'));
+	$('#reportrange2').daterangepicker({});
+  	
+	$("table input[name='checkboxall']").on('click',function(event){
+		$(this).parent().parent().parent().next('tbody').find("input").prop('checked',$(this).prop('checked'));
+		event.stopPropagation();
+	});
+	$('table input[name="checkboxed"]').on('click',function(event){
+		$(this).parent().parent().parent().prev('thead').find("input[name='checkboxall']").prop('checked', $(this).parent().parent().parent().find('tr').find('input:checked').length == $(this).parent().parent().parent().find('tr').length ? true : false);
+		event.stopPropagation();
+	});
+	var financeType = "${(financeInfo.financeType)!}";
+	if(!isEmpty(financeType)) {
+		if(financeType == "1") {
+			$("#enterprise").hide();
+		} else if(financeType == "2") {
+			$("#personal").hide();
+		}
+	} else {
+		$("#personal").hide();
+		$("#enterprise").hide();
+	}
+	var error = "${(error)!}";
+	if(isEmpty(error)) {
+		page.ajax({
+			url : 'ssp/withdrawRequestInfo/find',
+			success : function(data) {
+				if(data.result.length > 0) {
+					var result = data.result;
+					console.log(result);
+					if(result[0].user.balance) {
+						$("#balance").html(result[0].user.balance);
+					}
+					var charged = 0;
+					var requested = 0;
+					$.each(result, function(index, withdrawRequestInfo) {
+						if(withdrawRequestInfo.state == 1) {
+							requested += withdrawRequestInfo.preTax;
+						} else if(withdrawRequestInfo.state == 2) {
+							charged += withdrawRequestInfo.preTax;
+						}
+					});
+					$("#request").html(requested);
+					$("#charge").html(charged);
+				} else {
+					$("#balance").html("暂无信息");
+					$("#request").html("暂无申请");
+					$("#charge").html("暂无扣款");
+				}
+			},
+			error : function(err) {
+				
+			}
+		});
+	} else {
+		alert(error);
+	}
+});
+
+
+</script>
+</html>

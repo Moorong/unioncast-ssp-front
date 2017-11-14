@@ -1,0 +1,48 @@
+<script type="text/javascript" src="js/base/jquery-1.10.1.min.js"></script>
+<script type="text/javascript" src="js/base/bootstrap.min.js"></script>
+<!-- 组件 -->
+<!-- <script type="text/javascript" src="js/base/material.js"></script> -->
+<!-- 日期 -->
+<script type="text/javascript" src="plugs/bootstrap-datetimepicker/bootstrap-datetimepicker.js"></script>
+<script type="text/javascript" src="plugs/bootstrap-datetimepicker/locales/bootstrap-datetimepicker.zh-CN.js"
+        charset="UTF-8"></script>
+<!-- 图片懒加载 -->
+<script type="text/javascript" src="plugs/echojs/echo.min.js"></script>
+<!-- 日期处理类库 -->
+<script type="text/javascript" src="plugs/moment/moment.js"></script>
+<!-- 日期区间 -->
+<script type="text/javascript" src="plugs/daterangepicker/daterangepicker.js"></script>
+<!-- 分页 -->
+<script type="text/javascript" src="plugs/twbs-pagination/jquery.twbsPagination.js"></script>
+<!-- 下拉列表 -->
+<script type="text/javascript" src="plugs/bootstrap-select/bootstrap-select.min.js"></script>
+<script type="text/javascript" src="plugs/bootstrap-select/defaults-zh_CN.min.js"></script>
+<!-- <script type="text/javascript" src="plugs/select2/select2.full.min.js"></script> -->
+<!-- <script type="text/javascript" src="plugs/select2/zh-CN.js"></script> -->
+<!-- loading -->
+<!-- <script type="text/javascript" src="plugs/nprogress/nprogress.js"></script> -->
+<!-- 滚动条 -->
+<script type="text/javascript" src="plugs/scrollbar/jquery.mCustomScrollbar.concat.min.js"></script>
+<!-- 图表 -->
+<!-- <script type="text/javascript" src="plugs/echarts/echarts.min.js"></script> -->
+<!-- 开关按钮 -->
+<script type="text/javascript" src="plugs/bootstrap-switch/bootstrap-switch.min.js"></script>
+<!-- 表单验证 -->
+<script type="text/javascript" src="plugs/bootstrap-validator/bootstrapValidator.min.js"></script>
+<script type="text/javascript" src="plugs/bootstrap-validator/zh_CN.js" charset="UTF-8"></script>
+<!-- 提示框 -->
+<!-- <script type="text/javascript" src="plugs/toastr/toastr.min.js"></script> -->
+<script type="text/javascript" src="plugs/confirm/jquery-confirm.js"></script>
+<!-- 表格列宽调整 -->
+<script type="text/javascript" src="plugs/colresizable/colResizable-1.6.js"></script>
+<script type="text/javascript" src="plugs/tablesorter/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="plugs/tablesorter/jquery.tablesorter.widgets.js"></script>
+<!-- 公共js -->
+<script type="text/javascript" src="js/common/initCommon.js"></script>
+<script type="text/javascript" src="js/common/common.js"></script>
+
+<!-- 主页面js -->
+<script type="text/javascript" src="js/base/main.js"></script>
+<script type="text/javascript" src="js/base/jquery-form.js"></script>
+<!-- 左侧导航 -->
+<!-- <script type="text/javascript" src="js/base/menu.js"></script> -->

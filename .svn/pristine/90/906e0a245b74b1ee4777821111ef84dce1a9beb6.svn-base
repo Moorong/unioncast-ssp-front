@@ -1,0 +1,9 @@
+package com.unioncast.ssp.front.service.ssp;
+
+import com.unioncast.common.ssp.model.SspDictIncomeTarget;
+
+public interface SspIncomeService {
+
+	SspDictIncomeTarget[] findByCode(String[] dictIncome);
+
+}
